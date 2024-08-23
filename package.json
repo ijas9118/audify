@@ -4,7 +4,9 @@
   "description": "E-commerce website for audio products",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
+    "server": "nodemon index.js"
   },
   "author": "Ijas Ahammed",
   "license": "ISC",
