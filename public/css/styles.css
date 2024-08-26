@@ -4,3 +4,14 @@
 a {
   text-decoration: none;
 }
+
+.btn-custom {
+  background-color: #0C4BB1 !important; 
+  border-color: #0C4BB1 !important; 
+  color: #fff !important; 
+}
+
+.btn-custom:hover {
+  background-color: #0A3F91 !important; 
+  border-color: #0A3F91 !important; 
+}
