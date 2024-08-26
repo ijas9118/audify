@@ -16,6 +16,7 @@ router.get("/", (req, res) => {
     title: "Audify",
     header: req.session.user ? "partials/login_header" : "partials/header",
     viewName: "users/home",
+    activePage: "home"
   });
 });
 
@@ -27,6 +28,7 @@ router.get("/signup", (req, res) => {
     title: "Sign Up",
     header: "partials/header",
     viewName: "users/signup",
+    activePage: "home"
   });
 });
 router.post("/signup", sendOtp);
@@ -40,10 +42,20 @@ router.get("/login", (req, res) => {
     title: "Login",
     header: "partials/header",
     viewName: "users/login",
+    activePage: "home"
   });
 });
 router.post("/login", loginUser);
 
 router.post("/logout", logoutUser);
+
+router.get("/shop", (req, res) => {
+  res.render("layout", {
+    title: "Audify",
+    header: req.session.user ? "partials/login_header" : "partials/header",
+    viewName: "users/shop",
+    activePage: "shop",
+  });
+});
 
 module.exports = router;
