@@ -37,8 +37,6 @@ var userSchema = new mongoose.Schema(
     dob: {
       type: String,
     },
-    otp: String,
-    otpExpires: Date,
   },
   { timestamps: true }
 );
