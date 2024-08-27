@@ -37,6 +37,8 @@ exports.sendOtp = asyncHandler(async (req, res) => {
         header: "partials/header",
         viewName: "users/verifyOtp",
         error: null,
+        isAdmin: false,
+        activePage: "home",
       });
     } catch (error) {
       console.error(error);
@@ -75,6 +77,8 @@ exports.verifyAndSignUp = asyncHandler(async (req, res) => {
         header: "partials/header",
         viewName: "users/verifyOtp",
         error: "Invalid OTP",
+        isAdmin: false,
+        activePage: "home",
       });
     }
   } else {
@@ -83,6 +87,8 @@ exports.verifyAndSignUp = asyncHandler(async (req, res) => {
       header: "partials/header",
       viewName: "users/verifyOtp",
       error: "OTP has expired. Please sign up again.",
+      isAdmin: false,
+      activePage: "home",
     });
   }
 });

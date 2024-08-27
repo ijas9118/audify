@@ -14,6 +14,7 @@ router.get("/", (req, res) => {
     header: req.session.user ? "partials/login_header" : "partials/header",
     viewName: "users/home",
     activePage: "home",
+    isAdmin: false,
   });
 });
 
@@ -26,6 +27,7 @@ router.get("/signup", (req, res) => {
     header: "partials/header",
     viewName: "users/signup",
     activePage: "home",
+    isAdmin: false,
   });
 });
 router.post("/signup", sendOtp);
@@ -40,6 +42,7 @@ router.get("/login", (req, res) => {
     header: "partials/header",
     viewName: "users/login",
     activePage: "home",
+    isAdmin: false,
   });
 });
 router.post("/login", loginUser);
@@ -52,6 +55,7 @@ router.get("/shop", (req, res) => {
     header: req.session.user ? "partials/login_header" : "partials/header",
     viewName: "users/shop",
     activePage: "shop",
+    isAdmin: false,
   });
 });
 
