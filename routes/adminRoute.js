@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const adminAuth = require("../middleware/adminAuth");
 const {
   loginAdmin,
   logoutAdmin,
@@ -12,21 +13,20 @@ const {
   getDeals,
   getAdminHome,
   getAdminLogin,
+  addCategory,
 } = require("../controller/adminController");
 
 // ============================
 // Admin Home Route
 // ============================
-router.get("/", getAdminHome);
+router.get("/", adminAuth, getAdminHome);
 
 // ============================
 // Admin Authentication Routes
 // ============================
 
 // Admin Login Route
-router.get("/login",getAdminLogin);
-
-router.post("/login", loginAdmin);
+router.route("/login").get(getAdminLogin).post(loginAdmin);
 
 // Admin Logout Route
 router.post("/logout", logoutAdmin);
@@ -34,36 +34,36 @@ router.post("/logout", logoutAdmin);
 // ============================
 // User Management Routes
 // ============================
-router.get("/users", getUsers);
+router.get("/users", adminAuth, getUsers);
 
 // ============================
 // Product Management Route
 // ============================
-router.get("/products", getProduct);
+router.get("/products", adminAuth, getProduct);
 
 // ============================
 // Order Management Route
 // ============================
-router.get("/orders", getOrders);
+router.get("/orders", adminAuth, getOrders);
 
 // ============================
 // Category Management Route
 // ============================
-router.get("/category", getCategory);
+router.route("/category").get(adminAuth, getCategory).post(addCategory);
 
 // ============================
 // Coupon Management Route
 // ============================
-router.get("/coupon", getCoupons);
+router.get("/coupon", adminAuth, getCoupons);
 
 // ============================
 // Offer Management Route
 // ============================
-router.get("/offer", getOffers);
+router.get("/offer", adminAuth, getOffers);
 
 // ============================
 // Deal Management Route
 // ============================
-router.get("/deal", getDeals);
+router.get("/deal", adminAuth, getDeals);
 
 module.exports = router;

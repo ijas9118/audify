@@ -1,5 +1,6 @@
 const Admin = require("../models/adminModel");
 const User = require("../models/userModel");
+const Category = require('../models/categories')
 const asyncHandler = require("express-async-handler");
 
 // ============================
@@ -31,10 +32,6 @@ exports.loginAdmin = asyncHandler(async (req, res) => {
 
 // Render Admin Home Page (Dashboard)
 exports.getAdminHome = asyncHandler(async (req, res) => {
-  if (!req.session.admin) {
-    return res.redirect("/admin/login");
-  }
-
   res.render("layout", {
     title: "Audify",
     viewName: "admin/adminHome",
@@ -59,10 +56,6 @@ exports.logoutAdmin = asyncHandler(async (req, res) => {
 
 // Render User Management Page
 exports.getUsers = asyncHandler(async (req, res) => {
-  if (!req.session.admin) {
-    return res.redirect("/admin/login");
-  }
-
   const users = await User.find();
 
   if (!users) {
@@ -84,10 +77,6 @@ exports.getUsers = asyncHandler(async (req, res) => {
 
 // Render Product Management Page
 exports.getProduct = asyncHandler(async (req, res) => {
-  if (!req.session.admin) {
-    return res.redirect("/admin/login");
-  }
-
   res.render("layout", {
     title: "Product Management",
     viewName: "admin/productManagement",
@@ -102,10 +91,6 @@ exports.getProduct = asyncHandler(async (req, res) => {
 
 // Render Order Management Page
 exports.getOrders = asyncHandler(async (req, res) => {
-  if (!req.session.admin) {
-    return res.redirect("/admin/login");
-  }
-
   res.render("layout", {
     title: "Order Management",
     viewName: "admin/orderManagement",
@@ -120,8 +105,10 @@ exports.getOrders = asyncHandler(async (req, res) => {
 
 // Render Category Management Page
 exports.getCategory = asyncHandler(async (req, res) => {
-  if (!req.session.admin) {
-    return res.redirect("/admin/login");
+  const categories = await Category.find();
+
+  if (!categories) {
+    throw new Error("Failed to fetch users");
   }
 
   res.render("layout", {
@@ -129,7 +116,32 @@ exports.getCategory = asyncHandler(async (req, res) => {
     viewName: "admin/categoryManagement",
     activePage: "category",
     isAdmin: true,
+    categories: categories,
   });
+});
+
+// Controller to add a new category
+exports.addCategory = asyncHandler(async (req, res) => {
+  const { name, description } = req.body;
+
+  // Validate input
+  if (!name) {
+    res.status(400);
+    throw new Error('Category name is required');
+  }
+
+  // Check if category already exists
+  const existingCategory = await Category.findOne({ name });
+  if (existingCategory) {
+    res.status(400);
+    throw new Error('Category already exists');
+  }
+
+  // Create new category
+  const newCategory = new Category({ name, description });
+  await newCategory.save();
+
+  res.status(201).json(newCategory);
 });
 
 // ============================
@@ -138,10 +150,6 @@ exports.getCategory = asyncHandler(async (req, res) => {
 
 // Render Coupon Management Page
 exports.getCoupons = asyncHandler(async (req, res) => {
-  if (!req.session.admin) {
-    return res.redirect("/admin/login");
-  }
-
   res.render("layout", {
     title: "Coupon Management",
     viewName: "admin/couponManagement",
@@ -156,10 +164,6 @@ exports.getCoupons = asyncHandler(async (req, res) => {
 
 // Render Offer Management Page
 exports.getOffers = asyncHandler(async (req, res) => {
-  if (!req.session.admin) {
-    return res.redirect("/admin/login");
-  }
-
   res.render("layout", {
     title: "Offer Management",
     viewName: "admin/offerManagement",
@@ -174,10 +178,6 @@ exports.getOffers = asyncHandler(async (req, res) => {
 
 // Render Deals Management Page
 exports.getDeals = asyncHandler(async (req, res) => {
-  if (!req.session.admin) {
-    return res.redirect("/admin/login");
-  }
-
   res.render("layout", {
     title: "Offer Management",
     viewName: "admin/dealManagement",
