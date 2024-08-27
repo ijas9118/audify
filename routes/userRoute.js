@@ -9,14 +9,11 @@ const {
 } = require("../controller/userController");
 
 router.get("/", (req, res) => {
-  if (!req.session.user) {
-    return res.redirect("/login");
-  }
   res.render("layout", {
     title: "Audify",
     header: req.session.user ? "partials/login_header" : "partials/header",
     viewName: "users/home",
-    activePage: "home"
+    activePage: "home",
   });
 });
 
@@ -28,7 +25,7 @@ router.get("/signup", (req, res) => {
     title: "Sign Up",
     header: "partials/header",
     viewName: "users/signup",
-    activePage: "home"
+    activePage: "home",
   });
 });
 router.post("/signup", sendOtp);
@@ -42,7 +39,7 @@ router.get("/login", (req, res) => {
     title: "Login",
     header: "partials/header",
     viewName: "users/login",
-    activePage: "home"
+    activePage: "home",
   });
 });
 router.post("/login", loginUser);

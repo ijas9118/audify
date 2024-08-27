@@ -15,3 +15,47 @@ a {
   background-color: #0A3F91 !important; 
   border-color: #0A3F91 !important; 
 }
+
+/* Filter Slider */
+#price-slider .noUi-connect {
+  background: black; /* Adjust the color of the connecting line */
+}
+
+/* Remove default box-shadow and inner shadow */
+.noUi-handle {
+  box-shadow: none; /* Removes default shadow */
+}
+
+/* Adjust the thickness of the slider track */
+.noUi-target,
+.noUi-base,
+.noUi-connect {
+  height: 8px; /* Adjust the thickness as needed */
+}
+
+/* Adjust the base track height (unfilled portion) */
+.noUi-base {
+  background: #ddd; /* Optional: change the background color */
+}
+
+/* Adjust the filled portion of the track */
+.noUi-connect {
+  background: black; /* Adjust the color of the filled portion */
+}
+
+/* Customize the handle appearance */
+.noUi-horizontal .noUi-handle {
+  background-color: black; /* Black color for the handle */
+  border-radius: 50%; /* Circular handle */
+  width: 20px; /* Adjust size as needed */
+  height: 20px; /* Adjust size as needed */
+  border: none; /* Removes any border */
+}
+
+
+/* Remove any additional shadows on the handle */
+.noUi-handle:before,
+.noUi-handle:after {
+  display: none; /* Hide the default before and after pseudo-elements */
+}
+
