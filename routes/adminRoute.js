@@ -14,6 +14,7 @@ const {
   getAdminHome,
   getAdminLogin,
   addCategory,
+  addProduct,
 } = require("../controller/adminController");
 
 // ============================
@@ -29,7 +30,7 @@ router.get("/", adminAuth, getAdminHome);
 router.route("/login").get(getAdminLogin).post(loginAdmin);
 
 // Admin Logout Route
-router.post("/logout", logoutAdmin);
+router.post("/logout", adminAuth, logoutAdmin);
 
 // ============================
 // User Management Routes
@@ -40,6 +41,9 @@ router.get("/users", adminAuth, getUsers);
 // Product Management Route
 // ============================
 router.get("/products", adminAuth, getProduct);
+
+// Add new product
+router.post("/products/add", addProduct)
 
 // ============================
 // Order Management Route
