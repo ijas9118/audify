@@ -1,8 +1,9 @@
 const Admin = require("../models/adminModel");
 const User = require("../models/userModel");
-const Product = require('../models/products')
+const Product = require("../models/products");
 const Category = require("../models/categories");
 const asyncHandler = require("express-async-handler");
+const cloudinary = require("../config/cloudinary");
 
 // ============================
 //  Admin Authentication Controllers
@@ -98,7 +99,9 @@ exports.addProduct = asyncHandler(async (req, res) => {
   // Check if a product with the same name already exists
   const existingProduct = await Product.findOne({ name });
   if (existingProduct) {
-    return res.status(400).json({ message: 'Product with this name already exists' });
+    return res
+      .status(400)
+      .json({ message: "Product with this name already exists" });
   }
 
   // Create a new product document
@@ -172,7 +175,45 @@ exports.addCategory = asyncHandler(async (req, res) => {
   const newCategory = new Category({ name, description });
   await newCategory.save();
 
-  res.status(201).json(newCategory);
+  res.redirect('/admin/category');
+});
+
+// Unlist Category
+exports.toggleCategoryStatus = asyncHandler(async (req, res) => {
+  const categoryId = req.params.id;
+
+  // Find the category by ID
+  const category = await Category.findById(categoryId);
+
+  if (!category) {
+    res.status(404);
+    throw new Error("Category not found");
+  }
+
+  // Toggle the isActive field
+  category.isActive = !category.isActive;
+
+  // Save the updated category
+  await category.save();
+
+  // Redirect back to the category management page
+  res.redirect("/admin/category");
+});
+
+// Controller to delete a category
+exports.deleteCategory = asyncHandler(async (req, res) => {
+  const categoryId = req.params.id;
+
+  // Find and delete the category by ID
+  const category = await Category.findByIdAndDelete(categoryId);
+
+  if (!category) {
+    res.status(404);
+    throw new Error("Category not found");
+  }
+
+  // Redirect back to the category management page
+  res.redirect('/admin/category');
 });
 
 // ============================

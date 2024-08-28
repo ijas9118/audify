@@ -15,6 +15,8 @@ const {
   getAdminLogin,
   addCategory,
   addProduct,
+  toggleCategoryStatus,
+  deleteCategory,
 } = require("../controller/adminController");
 
 // ============================
@@ -43,7 +45,7 @@ router.get("/users", adminAuth, getUsers);
 router.get("/products", adminAuth, getProduct);
 
 // Add new product
-router.post("/products/add", addProduct)
+router.post("/products/add", addProduct);
 
 // ============================
 // Order Management Route
@@ -53,7 +55,9 @@ router.get("/orders", adminAuth, getOrders);
 // ============================
 // Category Management Route
 // ============================
-router.route("/category").get(adminAuth, getCategory).post(addCategory);
+router.route("/category").get(adminAuth, getCategory).post(adminAuth, addCategory);
+router.post("/category/toggle-status/:id",adminAuth, toggleCategoryStatus);
+router.post("/category/delete/:id", adminAuth, deleteCategory);
 
 // ============================
 // Coupon Management Route
