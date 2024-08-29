@@ -3,13 +3,14 @@ const router = express.Router();
 const adminAuth = require("../middleware/adminAuth");
 const upload = require("../middleware/multer");
 const {
-  getProduct,
   addProduct,
   toggleProductStatus,
+  getProducts,
 } = require("../controller/productController");
 
 // Product Management Route
-router.get("/", adminAuth, getProduct);
+router.get("/", adminAuth, getProducts);
+
 // Add new product
 router.post(
   "/add",

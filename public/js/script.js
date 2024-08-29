@@ -36,3 +36,7 @@ function previewImage(event, previewId) {
   };
   reader.readAsDataURL(event.target.files[0]);
 }
+
+function updateMainImage(src) {
+  document.getElementById('mainImage').src = src;
+}

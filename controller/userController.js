@@ -1,4 +1,5 @@
 const User = require("../models/userModel");
+const Product = require("../models/products");
 const asyncHandler = require("express-async-handler");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
@@ -66,7 +67,7 @@ exports.verifyAndSignUp = asyncHandler(async (req, res) => {
       await newUser.save();
 
       req.session.otp = null;
-      req.session.otpExpiry = null; 
+      req.session.otpExpiry = null;
       req.session.tempUser = null;
 
       req.session.user = newUser._id;
@@ -111,5 +112,32 @@ exports.logoutUser = asyncHandler(async (req, res) => {
       return res.status(500).json({ message: "Failed to log out" });
     }
     res.redirect("/login");
+  });
+});
+
+exports.getShop = asyncHandler(async (req, res) => {
+  const products = await Product.find();
+  res.render("layout", {
+    title: "Audify",
+    header: req.session.user ? "partials/login_header" : "partials/header",
+    viewName: "users/shop",
+    activePage: "shop",
+    isAdmin: false,
+    products,
+  });
+});
+
+exports.getProduct = asyncHandler(async (req, res) => {
+  const product = await Product.findById(req.params.id);
+  if (!product) {
+    return res.status(404).send("Product not found");
+  }
+  res.render("layout", {
+    title: "Audify",
+    header: req.session.user ? "partials/login_header" : "partials/header",
+    viewName: "users/product-detail",
+    activePage: "shop",
+    isAdmin: false,
+    product,
   });
 });

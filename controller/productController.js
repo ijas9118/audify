@@ -4,7 +4,7 @@ const asyncHandler = require("express-async-handler");
 const cloudinary = require("../config/cloudinary");
 
 // Render Product Management Page
-exports.getProduct = asyncHandler(async (req, res) => {
+exports.getProducts = asyncHandler(async (req, res) => {
   const categories = await Category.find();
   const products = await Product.aggregate([
     {
@@ -34,7 +34,6 @@ exports.getProduct = asyncHandler(async (req, res) => {
 exports.addProduct = asyncHandler(async (req, res) => {
   const { name, description, price, categoryId } = req.body;
 
-  // Extract files from request
   const mainImageFile = req.files['mainImage'] ? req.files['mainImage'][0] : null;
   const supportImageFiles = req.files['supportImages'] ? req.files['supportImages'] : [];
 
@@ -105,7 +104,7 @@ exports.addProduct = asyncHandler(async (req, res) => {
   const createdProduct = await product.save();
 
   // Respond with the created product
-  res.status(201).json(createdProduct);
+  res.redirect("/admin/products");
 });
 
 

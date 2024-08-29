@@ -1,5 +1,6 @@
 @import './footer.css';
 @import './signup.css';
+@import './filter.css';
 
 a {
   text-decoration: none;
@@ -59,3 +60,24 @@ a {
   display: none; /* Hide the default before and after pseudo-elements */
 }
 
+
+.card-link {
+  text-decoration: none; /* Remove underline */
+  color: inherit; /* Inherit text color from parent */
+}
+
+/* Style the card image and body */
+.card-link img {
+  display: block; /* Ensure the image occupies the full width */
+}
+
+/* Optional: add some styling for the card body */
+.card-body {
+  padding: 16px;
+  border-bottom: 1px solid #e0e0e0; /* Add a border to separate content from footer */
+}
+
+/* Optional: Add styling for the card footer */
+.card-footer {
+  padding: 16px;
+}

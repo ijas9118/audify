@@ -1,5 +1,5 @@
-<nav class="navbar navbar-expand-lg bg-body-tertiary">
-  <div class="container-fluid mx-5 my-2">
+<nav class="navbar navbar-expand-lg bg-light shadow-sm sticky-top">
+  <div class="container-fluid mx-md-5 my-2">
     <div class="logo col-md-3 mb-2 mb-md-0">
       <a href="/">
         <img src="/images/svg/logo.svg" alt="Logo" />
@@ -38,22 +38,22 @@
           placeholder="Search"
           aria-label="Search"
         />
-        <button class="btn btn-outline-success" type="submit">Search</button>
+        <button class="btn btn-dark" type="submit">Search</button>
       </form>
-      <div class="col-md-4 d-flex justify-content-end">
-        <div class="d-flex gap-4 justify-content-center">
+      <div class="col-md-4 d-flex justify-content-end align-items-center">
+        <div class="d-flex gap-4">
           <a href="#">
-            <img src="/images/svg/love.svg" alt="" />
+            <img src="/images/svg/love.svg" alt="Favorites" class="icon"/>
           </a>
           <a href="#">
-            <img src="/images/svg/cart.svg" alt="" />
+            <img src="/images/svg/cart.svg" alt="Cart" class="icon"/>
           </a>
           <a href="#">
-            <img src="/images/svg/user.svg" alt="" />
+            <img src="/images/svg/user.svg" alt="User" class="icon"/>
           </a>
         </div>
         <form action="/logout" method="POST" style="display: inline">
-          <button type="submit" class="btn btn-outline-primary ms-3">
+          <button type="submit" class="btn btn-outline-dark ms-3">
             Logout
           </button>
         </form>
@@ -61,3 +61,47 @@
     </div>
   </div>
 </nav>
+
+<style>
+  .navbar {
+    background-color: #f8f9fa; /* Light background color for the navbar */
+  }
+  
+  .navbar-nav .nav-link {
+    color: #333; /* Dark color for the nav links */
+  }
+  
+  .navbar-nav .nav-link.active {
+    color: #5a2b81; /* Dark purple color for the active link */
+    font-weight: bold;
+  }
+  
+  .btn-dark {
+    background-color: #5a2b81; /* Dark purple background for button */
+    border-color: #5a2b81; /* Dark purple border for button */
+  }
+  
+  .btn-dark:hover {
+    background-color: #7a479b; /* Slightly lighter dark purple for hover */
+    border-color: #7a479b; /* Border color match hover background */
+  }
+
+  .btn-outline-dark {
+    border-color: #5a2b81; /* Dark purple border for outline button */
+    color: #5a2b81; /* Dark purple text color for outline button */
+  }
+  
+  .btn-outline-dark:hover {
+    background-color: #7a479b; /* Dark purple background on hover */
+    color: #fff; /* White text color on hover */
+  }
+
+  .icon {
+    width: 24px; /* Adjust icon size */
+    height: 24px; /* Adjust icon size */
+  }
+
+  .navbar {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Shadow at the bottom of the navbar */
+  }
+</style>

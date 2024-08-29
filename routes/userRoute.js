@@ -1,12 +1,14 @@
 const express = require("express");
-const User = require("../models/userModel");
 const router = express.Router();
 const {
   sendOtp,
   loginUser,
   logoutUser,
   verifyAndSignUp,
+  getShop,
+  getProduct
 } = require("../controller/userController");
+const {  } = require("../controller/productController");
 
 router.get("/", (req, res) => {
   res.render("layout", {
@@ -49,14 +51,8 @@ router.post("/login", loginUser);
 
 router.post("/logout", logoutUser);
 
-router.get("/shop", (req, res) => {
-  res.render("layout", {
-    title: "Audify",
-    header: req.session.user ? "partials/login_header" : "partials/header",
-    viewName: "users/shop",
-    activePage: "shop",
-    isAdmin: false,
-  });
-});
+router.get("/shop", getShop);
+
+router.get('/shop/:id', getProduct);
 
 module.exports = router;
