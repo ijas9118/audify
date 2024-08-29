@@ -92,7 +92,11 @@
           aria-label="Close"
         ></button>
       </div>
-      <form action="/admin/products/add" method="POST"  enctype="multipart/form-data">
+      <form
+        action="/admin/products/add"
+        method="POST"
+        enctype="multipart/form-data"
+      >
         <div class="modal-body">
           <div class="mb-3">
             <label for="productName" class="form-label">Product Name</label>
@@ -138,163 +142,39 @@
               <% }); %>
             </select>
           </div>
-          <!-- Image Uploads -->
-          <!-- <div class="mb-3">
-            <label class="form-label">Product Images</label>
-            <div class="d-flex justify-content-between">
-              <div class="text-center">
-                <label for="productImage1" class="form-label d-block">
-                  <div
-                    class="image-upload-container"
-                    style="
-                      width: 150px;
-                      height: 150px;
-                      border: 2px dashed #ccc;
-                      position: relative;
-                    "
-                  >
-                    <span
-                      class="plus-icon"
-                      style="
-                        font-size: 24px;
-                        position: absolute;
-                        top: 50%;
-                        left: 50%;
-                        transform: translate(-50%, -50%);
-                      "
-                    >
-                      +
-                    </span>
-                    <input
-                      type="file"
-                      class="form-control"
-                      id="productImage1"
-                      name="images"
-                      accept="image/*"
-                      style="
-                        opacity: 0;
-                        width: 100%;
-                        height: 100%;
-                        position: absolute;
-                        top: 0;
-                        left: 0;
-                        cursor: pointer;
-                      "
-                      onchange="previewImage(event, 'preview1')"
-                      required
-                    />
-                  </div>
-                </label>
-                <img
-                  id="preview1"
-                  src=""
-                  alt=""
-                  style="display: none; width: 150px;"
-                />
-              </div>
+          <!-- Main Image Upload -->
+          <div class="mb-3">
+            <label for="mainImage" class="form-label">Main Image</label>
+            <input
+              type="file"
+              class="form-control"
+              id="mainImage"
+              name="mainImage"
+              accept="image/*"
+              required
+            />
+          </div>
 
-              <div class="text-center">
-                <label for="productImage2" class="form-label d-block">
-                  <div
-                    class="image-upload-container"
-                    style="
-                      width: 150px;
-                      height: 150px;
-                      border: 2px dashed #ccc;
-                      position: relative;
-                    "
-                  >
-                    <span
-                      class="plus-icon"
-                      style="
-                        font-size: 24px;
-                        position: absolute;
-                        top: 50%;
-                        left: 50%;
-                        transform: translate(-50%, -50%);
-                      "
-                    >
-                      +
-                    </span>
-                    <input
-                      type="file"
-                      class="form-control"
-                      id="productImage2"
-                      name="images"
-                      accept="image/*"
-                      style="
-                        opacity: 0;
-                        width: 100%;
-                        height: 100%;
-                        position: absolute;
-                        top: 0;
-                        left: 0;
-                        cursor: pointer;
-                      "
-                      onchange="previewImage(event, 'preview2')"
-                    />
-                  </div>
-                </label>
-                <img
-                  id="preview2"
-                  src=""
-                  alt=""
-                  style="display: none; width: 150px;"
-                />
-              </div>
-
-              <div class="text-center">
-                <label for="productImage3" class="form-label d-block">
-                  <div
-                    class="image-upload-container"
-                    style="
-                      width: 150px;
-                      height: 150px;
-                      border: 2px dashed #ccc;
-                      position: relative;
-                    "
-                  >
-                    <span
-                      class="plus-icon"
-                      style="
-                        font-size: 24px;
-                        position: absolute;
-                        top: 50%;
-                        left: 50%;
-                        transform: translate(-50%, -50%);
-                      "
-                    >
-                      +
-                    </span>
-                    <input
-                      type="file"
-                      class="form-control"
-                      id="productImage3"
-                      name="images"
-                      accept="image/*"
-                      style="
-                        opacity: 0;
-                        width: 100%;
-                        height: 100%;
-                        position: absolute;
-                        top: 0;
-                        left: 0;
-                        cursor: pointer;
-                      "
-                      onchange="previewImage(event, 'preview3')"
-                    />
-                  </div>
-                </label>
-                <img
-                  id="preview3"
-                  src=""
-                  alt=""
-                  style="display: none; width: 150px;"
-                />
-              </div>
-            </div>
-          </div> -->
-          <input type="file" name="images" multiple>
+          <!-- Support Images Upload -->
+          <div class="mb-3">
+            <label class="form-label">Support Images</label>
+            <input
+              type="file"
+              class="form-control"
+              id="supportImage1"
+              name="supportImages"
+              accept="image/*"
+              required
+            />
+            <input
+              type="file"
+              class="form-control mt-2"
+              id="supportImage2"
+              name="supportImages"
+              accept="image/*"
+              required
+            />
+          </div>
         </div>
         <div class="modal-footer">
           <button

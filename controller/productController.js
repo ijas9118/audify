@@ -33,8 +33,18 @@ exports.getProduct = asyncHandler(async (req, res) => {
 // Add new product
 exports.addProduct = asyncHandler(async (req, res) => {
   const { name, description, price, categoryId } = req.body;
-  const uploadPromises = req.files.map((file) => {
-    return new Promise((resolve, reject) => {
+
+  // Extract files from request
+  const mainImageFile = req.files['mainImage'] ? req.files['mainImage'][0] : null;
+  const supportImageFiles = req.files['supportImages'] ? req.files['supportImages'] : [];
+
+  if (!mainImageFile || supportImageFiles.length !== 2) {
+    return res.status(400).json({ message: "Please provide exactly one main image and two support images." });
+  }
+
+  const uploadPromises = [
+    // Upload main image
+    new Promise((resolve, reject) => {
       cloudinary.uploader
         .upload_stream(
           { folder: "products", resource_type: "image" },
@@ -43,11 +53,28 @@ exports.addProduct = asyncHandler(async (req, res) => {
             resolve(result.secure_url);
           }
         )
-        .end(file.buffer);
-    });
-  });
+        .end(mainImageFile.buffer);
+    }),
+
+    // Upload support images
+    ...supportImageFiles.map((file) => {
+      return new Promise((resolve, reject) => {
+        cloudinary.uploader
+          .upload_stream(
+            { folder: "products", resource_type: "image" },
+            (error, result) => {
+              if (error) return reject(error);
+              resolve(result.secure_url);
+            }
+          )
+          .end(file.buffer);
+      });
+    })
+  ];
 
   const imageUrls = await Promise.all(uploadPromises);
+  
+  const [mainImageUrl, ...supportImageUrls] = imageUrls;
 
   // Check if all required fields are provided
   if (!name || !price || !categoryId) {
@@ -68,7 +95,10 @@ exports.addProduct = asyncHandler(async (req, res) => {
     description,
     price,
     categoryId,
-    images: imageUrls,
+    images: {
+      main: mainImageUrl,
+      supports: supportImageUrls
+    },
   });
 
   // Save the product to the database
@@ -77,6 +107,7 @@ exports.addProduct = asyncHandler(async (req, res) => {
   // Respond with the created product
   res.status(201).json(createdProduct);
 });
+
 
 // Unlist Product
 exports.toggleProductStatus = asyncHandler(async (req, res) => {

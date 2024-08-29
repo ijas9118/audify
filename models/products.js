@@ -23,8 +23,20 @@ const productSchema = new mongoose.Schema(
       required: true,
     },
     images: {
-      type: [String],
-      // required: true
+      main: {
+        type: String, // URL of the main image
+        required: true,
+      },
+      supports: {
+        type: [String], // Array of URLs for support images
+        validate: {
+          validator: function (v) {
+            return v.length === 2; // Ensure exactly two support images
+          },
+          message: "Supports images must be exactly 2",
+        },
+        required: true,
+      },
     },
     isActive: { type: Boolean, default: true },
   },
