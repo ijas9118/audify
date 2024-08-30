@@ -22,20 +22,17 @@ exports.getCategory = asyncHandler(async (req, res) => {
 exports.addCategory = asyncHandler(async (req, res) => {
   const { name, description } = req.body;
 
-  // Validate input
   if (!name) {
     res.status(400);
     throw new Error("Category name is required");
   }
 
-  // Check if category already exists
   const existingCategory = await Category.findOne({ name });
   if (existingCategory) {
     res.status(400);
     throw new Error("Category already exists");
   }
 
-  // Create new category
   const newCategory = new Category({ name, description });
   await newCategory.save();
 
@@ -46,7 +43,6 @@ exports.addCategory = asyncHandler(async (req, res) => {
 exports.toggleCategoryStatus = asyncHandler(async (req, res) => {
   const categoryId = req.params.id;
 
-  // Find the category by ID
   const category = await Category.findById(categoryId);
 
   if (!category) {
@@ -54,13 +50,10 @@ exports.toggleCategoryStatus = asyncHandler(async (req, res) => {
     throw new Error("Category not found");
   }
 
-  // Toggle the isActive field
   category.isActive = !category.isActive;
 
-  // Save the updated category
   await category.save();
 
-  // Redirect back to the category management page
   res.redirect("/admin/category");
 });
 

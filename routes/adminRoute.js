@@ -11,6 +11,7 @@ const {
   getDeals,
   getAdminHome,
   getAdminLogin,
+  toggleUserStatus,
 } = require("../controller/adminController");
 const categoryRouter = require("./categoryRouter");
 const productRouter = require('./productRouter')
@@ -26,6 +27,9 @@ router.post("/logout", adminAuth, logoutAdmin);
 
 // User Management Routes
 router.get("/users", adminAuth, getUsers);
+
+// User status toggle
+router.post("/users/toggle-status/:id", adminAuth, toggleUserStatus);
 
 // Product Management Route
 router.use("/products", productRouter);

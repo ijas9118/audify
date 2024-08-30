@@ -22,7 +22,6 @@ exports.loginAdmin = asyncHandler(async (req, res) => {
 
   if (findAdmin && (await findAdmin.isPasswordMatched(password))) {
     req.session.admin = findAdmin._id;
-    console.log("Admin logged in");
 
     res.redirect("/admin");
   } else {
@@ -69,6 +68,36 @@ exports.getUsers = asyncHandler(async (req, res) => {
     isAdmin: true,
     users: users,
   });
+});
+
+// Toggle user status
+exports.toggleUserStatus = asyncHandler(async (req, res) => {
+  const userId = req.params.id;
+
+  // Find user by ID
+  const user = await User.findById(userId);
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  // Determine the new status
+  const newStatus = user.status === "Active" ? "Inactive" : "Active";
+
+  // Update the status field only
+  const result = await User.updateOne(
+    { _id: userId },
+    { $set: { status: newStatus } }
+  );
+
+  // Check if the update was successful
+  if (result.modifiedCount === 0) {
+    res.status(404);
+    throw new Error("User not found or status not changed");
+  }
+
+  // Redirect back to user management page
+  res.redirect("/admin/users");
 });
 
 // ============================

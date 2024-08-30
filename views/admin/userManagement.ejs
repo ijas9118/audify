@@ -33,7 +33,17 @@
                 <td><%= user.mobile %></td>
                 <td><%= user.gender %></td>
                 <td>
-                  <button class="btn btn-danger">Block</button>
+                  <form
+                    action="/admin/users/toggle-status/<%= user._id %>"
+                    method="POST"
+                  >
+                    <button
+                      type="submit"
+                      class="btn <%= user.status === 'Active' ? 'btn-danger' : 'btn-success' %>"
+                    >
+                      <%= user.status === 'Active' ? 'Block' : 'Unblock' %>
+                    </button>
+                  </form>
                 </td>
               </tr>
               <% }); %>

@@ -98,7 +98,7 @@ exports.loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
   const findUser = await User.findOne({ email });
 
-  if (findUser && (await findUser.isPasswordMatched(password))) {
+  if (findUser && (await findUser.isPasswordMatched(password)) && (findUser.status === 'Active')) {
     req.session.user = findUser._id;
     res.redirect("/");
   } else {
