@@ -31,6 +31,7 @@
                 <th scope="col">Product Name</th>
                 <th scope="col">Category</th>
                 <th scope="col">Price</th>
+                <th scope="col">Stock</th>
                 <th scope="col">Action</th>
               </tr>
             </thead>
@@ -41,6 +42,7 @@
                 <td><%= product.name %></td>
                 <td><%= product.categoryDetails.name %></td>
                 <td>₹<%= product.price.toFixed(2) %></td>
+                <td><%= product.stock %></td>
                 <td>
                   <div class="d-flex gap-2">
                     <a
@@ -49,6 +51,7 @@
                     >
                       Edit
                     </a>
+
                     <form
                       action="/admin/products/toggle-status/<%= product._id %>"
                       method="POST"
@@ -142,6 +145,19 @@
               <% }); %>
             </select>
           </div>
+          <!-- Stock Input -->
+          <div class="mb-3">
+            <label for="productStock" class="form-label">Stock</label>
+            <input
+              type="number"
+              class="form-control"
+              id="productStock"
+              name="stock"
+              min="0"
+              max="100"
+              required
+            />
+          </div>
           <!-- Main Image Upload -->
           <div class="mb-3">
             <label for="mainImage" class="form-label">Main Image</label>
@@ -190,3 +206,34 @@
     </div>
   </div>
 </div>
+
+<style>
+  .modal-content {
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .modal-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+  }
+
+  .modal-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+  }
+
+  .modal-body {
+    padding: 2rem;
+  }
+
+  .form-label {
+    font-weight: 500;
+  }
+
+  .btn-close {
+    font-size: 1.25rem;
+  }
+</style>

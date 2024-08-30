@@ -6,6 +6,8 @@ const {
   addProduct,
   toggleProductStatus,
   getProducts,
+  getProductById,
+  updateProduct,
 } = require("../controller/productController");
 
 // Product Management Route
@@ -23,5 +25,15 @@ router.post(
 );
 
 router.post("/toggle-status/:id", adminAuth, toggleProductStatus);
+
+// Get product details for editing
+router.get("/edit/:id", adminAuth, getProductById);
+
+// Update product details
+router.post(
+  "/edit/:id",
+  adminAuth,
+  updateProduct
+);
 
 module.exports = router;

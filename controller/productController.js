@@ -10,13 +10,13 @@ exports.getProducts = asyncHandler(async (req, res) => {
     {
       $lookup: {
         from: "categories",
-        localField: "categoryId", 
-        foreignField: "_id", 
+        localField: "categoryId",
+        foreignField: "_id",
         as: "categoryDetails",
       },
     },
     {
-      $unwind: "$categoryDetails", 
+      $unwind: "$categoryDetails",
     },
   ]);
 
@@ -32,13 +32,19 @@ exports.getProducts = asyncHandler(async (req, res) => {
 
 // Add new product
 exports.addProduct = asyncHandler(async (req, res) => {
-  const { name, description, price, categoryId } = req.body;
+  const { name, description, price, categoryId, stock } = req.body;
 
-  const mainImageFile = req.files['mainImage'] ? req.files['mainImage'][0] : null;
-  const supportImageFiles = req.files['supportImages'] ? req.files['supportImages'] : [];
+  const mainImageFile = req.files["mainImage"]
+    ? req.files["mainImage"][0]
+    : null;
+  const supportImageFiles = req.files["supportImages"]
+    ? req.files["supportImages"]
+    : [];
 
   if (!mainImageFile || supportImageFiles.length !== 2) {
-    return res.status(400).json({ message: "Please provide exactly one main image and two support images." });
+    return res.status(400).json({
+      message: "Please provide exactly one main image and two support images.",
+    });
   }
 
   const uploadPromises = [
@@ -68,15 +74,15 @@ exports.addProduct = asyncHandler(async (req, res) => {
           )
           .end(file.buffer);
       });
-    })
+    }),
   ];
 
   const imageUrls = await Promise.all(uploadPromises);
-  
+
   const [mainImageUrl, ...supportImageUrls] = imageUrls;
 
   // Check if all required fields are provided
-  if (!name || !price || !categoryId) {
+  if (!name || !price || !categoryId || !stock) {
     return res.status(400).json({ message: "Please fill all required fields" });
   }
 
@@ -94,9 +100,10 @@ exports.addProduct = asyncHandler(async (req, res) => {
     description,
     price,
     categoryId,
+    stock,
     images: {
       main: mainImageUrl,
-      supports: supportImageUrls
+      supports: supportImageUrls,
     },
   });
 
@@ -106,7 +113,6 @@ exports.addProduct = asyncHandler(async (req, res) => {
   // Respond with the created product
   res.redirect("/admin/products");
 });
-
 
 // Unlist Product
 exports.toggleProductStatus = asyncHandler(async (req, res) => {
@@ -128,4 +134,54 @@ exports.toggleProductStatus = asyncHandler(async (req, res) => {
 
   // Redirect back to the product management page
   res.redirect("/admin/products");
+});
+
+// Get product for editing
+exports.getProductById = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  // Fetch product details
+  const product = await Product.findById(id).populate("categoryId");
+  if (!product) {
+    res.status(404);
+    throw new Error("Product not found");
+  }
+
+  // Fetch categories for the dropdown
+  const categories = await Category.find();
+
+  // Render the edit page with product details and categories
+  res.render("layout", {
+    title: "Edit Product",
+    viewName: "admin/editProduct",
+    activePage: "products",
+    isAdmin: true,
+    product,
+    categories,
+  });
+});
+
+// Update product
+exports.updateProduct = asyncHandler(async (req, res) => {
+  const { name, price, categoryId, stock, description } = req.body;
+  const productId = req.params.id;
+  console.log(req.body);
+  
+
+  let product = await Product.findById(productId);
+
+  if (!product) {
+    return res.status(404).json({ message: "Product not found" });
+  }
+
+  // Update product details
+  product.name = name;
+  product.price = price;
+  product.categoryId = categoryId;
+  product.stock = stock;
+  product.description = description;
+
+  await product.save();
+
+  res.redirect('/admin/products/')
 });
