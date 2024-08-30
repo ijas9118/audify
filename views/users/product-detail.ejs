@@ -36,16 +36,26 @@
         </div>
 
         <!-- Center: Main Image -->
-        <div class="col-md-6 d-flex align-items-center justify-content-center">
-          <div class="position-relative">
-            <img
-              id="mainImage"
-              src="<%= product.images.main %>"
-              class="img-fluid border border-light rounded"
-              alt="<%= product.name %>"
-              style="width: 100%; max-height: 500px; object-fit: cover"
-            />
-          </div>
+        <div
+          class="col-md-6 d-flex align-items-center justify-content-center position-relative"
+        >
+          <img
+            id="mainImage"
+            src="<%= product.images.main %>"
+            class="img-fluid border border-light rounded"
+            alt="<%= product.name %>"
+            style="width: 100%; max-height: 500px; object-fit: contain"
+          />
+        </div>
+
+        <!-- Magnifier container, positioned fixed to the right -->
+        <div id="magnifier" class="magnifier">
+          <img
+            id="magnifierImage"
+            src="<%= product.images.main %>"
+            class="img-fluid"
+            alt="<%= product.name %>"
+          />
         </div>
 
         <!-- Right Side: Product Details -->
@@ -123,7 +133,6 @@
   </div>
 </div>
 
-<!-- Custom Styles -->
 <style>
   .img-thumbnail {
     width: 100%;
@@ -154,10 +163,66 @@
     background-color: #7a479b;
     border-color: #7a479b;
   }
+
+  /* Magnifier styles */
+  .magnifier {
+    position: fixed;
+    top: 10%;
+    right: 0;
+    width: 350px; /* Size of the magnifier container */
+    height: 350px; /* Size of the magnifier container */
+    overflow: hidden;
+    border: 1px solid #ccc;
+    background-color: rgba(255, 255, 255, 0.8);
+    display: none;
+    z-index: 1000;
+  }
+
+  .magnifier img {
+    position: absolute;
+    width: 600%; /* Increase based on zoom level */
+    height: auto;
+    transform: scale(6); /* Increase zoom level */
+    transform-origin: top left; /* Ensure zoom starts from the top-left corner */
+  }
 </style>
 
 <script>
-  function updateMainImage(imgSrc) {
-    document.getElementById("mainImage").src = imgSrc;
-  }
+  document.addEventListener("DOMContentLoaded", () => {
+    const mainImage = document.getElementById("mainImage");
+    const magnifier = document.getElementById("magnifier");
+    const magnifierImage = document.getElementById("magnifierImage");
+    const magnifierSize = 300; // Same as magnifier width/height in CSS
+
+    function updateImages(imgSrc) {
+      mainImage.src = imgSrc;
+      magnifierImage.src = imgSrc;
+    }
+
+    function showMagnifier(e) {
+      magnifier.style.display = "block";
+
+      const { offsetX: x, offsetY: y, target } = e;
+      const { offsetWidth: w, offsetHeight: h } = target;
+
+      // Calculate zoom position
+      const zoomX = (x / w) * 100;
+      const zoomY = (y / h) * 100;
+
+      magnifierImage.style.transform = `translate(-${zoomX}%, -${zoomY}%) scale(2)`;
+      magnifier.style.top = `${e.clientY - magnifierSize / 2}px`;
+      magnifier.style.left = `${e.clientX + 20}px`; // Adjust based on your layout
+    }
+
+    function hideMagnifier() {
+      magnifier.style.display = "none";
+    }
+
+    mainImage.addEventListener("mousemove", showMagnifier);
+    mainImage.addEventListener("mouseleave", hideMagnifier);
+
+    window.updateMainImage = function (imgSrc) {
+      updateImages(imgSrc);
+    };
+  });
 </script>
