@@ -18,7 +18,7 @@
           <a
             class="nav-link btn btn-outline-secondary my-2 <%= activePage === 'dashboard' ? 'active' : '' %>"
             href="/admin"
-            ><i class="fas fa-tachometer-alt me-2"></i> Dashboard</a
+            ><i class="fas fa-tachometer me-2"></i> Dashboard</a
           >
         </li>
         <li class="nav-item">
@@ -67,10 +67,21 @@
           <a
             class="nav-link btn btn-outline-secondary my-2 <%= activePage === 'deal' ? 'active' : '' %>"
             href="/admin/deal"
-            ><i class="fas fa-handshake me-2"></i> Deal</a
+            ><i class="fas fa-handshake me-2"></i> De al</a
           >
         </li>
       </ul>
     </div>
   </div>
 </nav>
+
+<style>
+  .nav-link i {
+  color: #1e44a3; /* Default icon color */
+}
+
+.nav-link.active i {
+  color: #ffffff; /* Ensure active links have the same icon color */
+}
+
+</style>

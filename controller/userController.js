@@ -116,7 +116,25 @@ exports.logoutUser = asyncHandler(async (req, res) => {
 });
 
 exports.getShop = asyncHandler(async (req, res) => {
-  const products = await Product.find();
+  const products = await Product.aggregate([
+    {
+      $lookup: {
+        from: "categories",
+        localField: "categoryId",
+        foreignField: "_id",
+        as: "categoryDetails",
+      },
+    },
+    {
+      $unwind: "$categoryDetails",
+    },
+    {
+      $match: {
+        "categoryDetails.isActive": true, // Only include products where the associated category is active
+        isActive: true,
+      },
+    },
+  ]);
   res.render("layout", {
     title: "Audify",
     header: req.session.user ? "partials/login_header" : "partials/header",

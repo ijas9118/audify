@@ -166,7 +166,6 @@ exports.updateProduct = asyncHandler(async (req, res) => {
   const { name, price, categoryId, stock, description } = req.body;
   const productId = req.params.id;
   console.log(req.body);
-  
 
   let product = await Product.findById(productId);
 
@@ -183,5 +182,5 @@ exports.updateProduct = asyncHandler(async (req, res) => {
 
   await product.save();
 
-  res.redirect('/admin/products/')
+  res.redirect("/admin/products/");
 });
