@@ -1,4 +1,5 @@
 const Category = require("../models/categories");
+const Product = require('../models/products')
 const asyncHandler = require("express-async-handler");
 
 // Render Category Management Page
@@ -62,15 +63,24 @@ exports.deleteCategory = asyncHandler(async (req, res) => {
   const categoryId = req.params.id;
 
   // Find and delete the category by ID
-  const category = await Category.findByIdAndDelete(categoryId);
+  const category = await Category.findById(categoryId);
 
   if (!category) {
     res.status(404);
     throw new Error("Category not found");
   }
 
-  // Redirect back to the category management page
-  res.redirect("/admin/category");
+  const products = await Product.countDocuments({ categoryId: categoryId });
+  console.log(products);
+  
+
+  if (products > 0) {
+    res.status(400);
+    throw new Error(`Cannot delete category. There are ${products} product(s) associated with this category.`);
+  } else {
+    await Category.findByIdAndDelete(categoryId);
+    res.redirect("/admin/category");
+  }
 });
 
 // Get edit category page
