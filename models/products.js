@@ -24,14 +24,14 @@ const productSchema = new mongoose.Schema(
     },
     images: {
       main: {
-        type: String, // URL of the main image
+        type: String,
         required: true,
       },
       supports: {
-        type: [String], // Array of URLs for support images
+        type: [String],
         validate: {
           validator: function (v) {
-            return v.length === 2; // Ensure exactly two support images
+            return v.length === 2;
           },
           message: "Supports images must be exactly 2",
         },
@@ -41,10 +41,14 @@ const productSchema = new mongoose.Schema(
     stock: {
       type: Number,
       required: true,
-      min: 0,
+      min: 1,
       max: 100,
     },
     isActive: { type: Boolean, default: true },
+    isOutOfStock: {
+      type: Boolean,
+      default: false, 
+    },
   },
   {
     timestamps: true,

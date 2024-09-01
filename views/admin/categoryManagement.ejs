@@ -55,12 +55,28 @@
                       </button>
                     </form>
                     <form
+                      action="/admin/category/edit/<%= category._id %>"
+                      method="GET"
+                      style="display: inline"
+                      class="w-100"
+                    >
+                      <button
+                        type="submit"
+                        class="btn btn-outline-primary w-100"
+                      >
+                        Edit
+                      </button>
+                    </form>
+                    <form
                       action="/admin/category/delete/<%= category._id %>"
                       method="POST"
                       style="display: inline"
                       class="w-100"
                     >
-                      <button type="submit" class="btn btn-outline-danger w-100">
+                      <button
+                        type="submit"
+                        class="btn btn-outline-danger w-100"
+                      >
                         Delete
                       </button>
                     </form>
@@ -75,64 +91,6 @@
     </div>
   </div>
 </div>
-
-<!-- Add Category Modal -->
-<div
-  class="modal fade"
-  id="addCategoryModal"
-  tabindex="-1"
-  aria-labelledby="addCategoryModalLabel"
-  aria-hidden="true"
->
-  <div class="modal-dialog">
-    <div class="modal-content text-dark">
-      <div class="modal-header">
-        <h5 class="modal-title" id="addCategoryModalLabel">Add New Category</h5>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-          aria-label="Close"
-        ></button>
-      </div>
-      <form action="/admin/category" method="POST">
-        <div class="modal-body">
-          <div class="mb-3">
-            <label for="categoryName" class="form-label">Category Name</label>
-            <input
-              type="text"
-              class="form-control"
-              id="categoryName"
-              name="name"
-              required
-            />
-          </div>
-          <div class="mb-3">
-            <label for="categoryDescription" class="form-label"
-              >Description</label
-            >
-            <textarea
-              class="form-control"
-              id="categoryDescription"
-              name="description"
-            ></textarea>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button
-            type="button"
-            class="btn btn-secondary"
-            data-bs-dismiss="modal"
-          >
-            Close
-          </button>
-          <button type="submit" class="btn btn-primary">Add Category</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
 
 <!-- Add Category Modal -->
 <div

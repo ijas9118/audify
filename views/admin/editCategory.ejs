@@ -1,0 +1,39 @@
+<div class="container mt-5 d-flex flex-column align-items-center">
+  <h1 class="mb-4">Edit Category</h1>
+
+  <div class="card shadow-sm col-lg-8">
+    <div class="card-body">
+      <form action="/admin/category/edit/<%= category._id %>" method="POST">
+        <div class="mb-3">
+          <label for="categoryName" class="form-label">Category Name</label>
+          <input
+            type="text"
+            class="form-control"
+            id="categoryName"
+            name="name"
+            value="<%= category.name %>"
+            required
+          />
+        </div>
+        <div class="mb-3">
+          <label for="categoryDescription" class="form-label"
+            >Description</label
+          >
+          <textarea
+            class="form-control"
+            id="categoryDescription"
+            name="description"
+            rows="4"
+            required
+          >
+<%= category.description %></textarea
+          >
+        </div>
+        <div class="d-flex justify-content-between">
+          <button type="submit" class="btn btn-primary">Update Category</button>
+          <a href="/admin/category" class="btn btn-secondary">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

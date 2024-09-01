@@ -42,7 +42,12 @@
                 <td><%= product.name %></td>
                 <td><%= product.categoryDetails.name %></td>
                 <td>₹<%= product.price.toFixed(2) %></td>
-                <td><%= product.stock %></td>
+                <td><% if (product.isOutOfStock) { %> 
+                        Out of Stock
+                    <% } else { %>
+                      <%= product.stock %>
+                    <% } %>
+                </td>
                 <td>
                   <div class="d-flex gap-2">
                     <a

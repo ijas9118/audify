@@ -21,7 +21,7 @@ var userSchema = new mongoose.Schema(
       match: [/\S+@\S+.\S+/, "Please enter a valid email address"],
     },
     mobile: {
-      type: String,
+      type: Number,
       match: [/^\d{10}$/, "Please provide a valid 10-digit mobile number"],
     },
     password: {
