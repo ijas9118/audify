@@ -1,15 +1,11 @@
 <div class="container my-5 py-5">
   <div class="row justify-content-center">
     <div class="col-md-6">
-      <div class="card shadow">
+      <div class="card shadow-sm">
         <div class="card-body">
-          <h2 class="text-center mb-4"><%= title %></h2>
-          <% if (error) { %>
-          <div class="alert alert-danger"><%= error %></div>
-          <% } %>
+          <h2 class="text-center my-4"><%= title %></h2>
           <form action="/verify-otp" method="POST">
             <div class="form-group mb-3">
-              <label for="otp">OTP</label>
               <input
                 type="text"
                 class="form-control"
@@ -18,11 +14,17 @@
                 placeholder="Enter your OTP"
                 required
               />
+              <% if (error) { %>
+              <div class="alert alert-danger mt-2"><%= error %></div>
+              <% } %>
             </div>
-            <div class="d-grid">
+            <div class="d-grid mt-4 mb-3">
               <button type="submit" class="btn btn-primary btn-block">
                 Verify
               </button>
+            </div>
+            <div class="text-center mb-3">
+              <a href="/signup/resend-otp" class="btn-resend">Resend OTP</a>
             </div>
           </form>
         </div>

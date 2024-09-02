@@ -32,7 +32,11 @@ router.get("/signup", (req, res) => {
     isAdmin: false,
   });
 });
+
 router.post("/signup", sendOtp);
+
+router.post('/signup/resend-otp', sendOtp)
+
 router.post("/verify-otp", verifyAndSignUp);
 
 router.get("/login", (req, res) => {
