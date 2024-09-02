@@ -11,7 +11,7 @@
       <div class="bg-light p-4 rounded shadow-sm">
         <h2 class="mb-4">Create an account</h2>
         <p class="text-muted mb-4">Enter your details below</p>
-        <form action="/signup" method="POST">
+        <form id="signupForm" action="/signup" method="POST">
           <div class="mb-3">
             <input
               type="text"
@@ -19,8 +19,8 @@
               id="firstname"
               name="firstName"
               placeholder="First Name"
-              required
             />
+             <div id="firstnameError" class="text-danger mt-2 alert alert-danger" style="display: none;"></div>
           </div>
           <div class="mb-3">
             <input
@@ -29,18 +29,18 @@
               id="lastname"
               name="lastName"
               placeholder="Last Name"
-              required
             />
+            <div id="lastnameError" class="text-danger mt-2 alert alert-danger" style="display: none;"></div>
           </div>
           <div class="mb-3">
             <input
-              type="email"
+              type="text"
               class="form-control"
               id="email"
               name="email"
               placeholder="Email"
-              required
             />
+            <div id="emailError" class="text-danger mt-2 alert alert-danger" style="display: none;"></div>
           </div>
           <div class="mb-3">
             <input
@@ -49,8 +49,8 @@
               id="password"
               name="password"
               placeholder="Password"
-              required
             />
+            <div id="passwordError" class="text-danger mt-2 alert alert-danger" style="display: none;"></div>
           </div>
           <button type="submit" class="btn btn-primary w-100 py-2 mb-3">
             Create Account
@@ -68,3 +68,5 @@
     </div>
   </div>
 </div>
+
+<script src="/js/signUp-validation.js"></script>
