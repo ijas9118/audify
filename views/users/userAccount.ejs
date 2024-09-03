@@ -15,15 +15,21 @@
 
   <!-- User Details Section -->
   <div class="user-details">
-    <form>
+    <form action="/account/<%= user._id %>" method="POST">
       <div class="form-row">
         <div class="form-group my-3">
           <label for="firstName">First Name</label>
-          <input type="text" class="form-control" id="firstName" value="John" />
+          <input
+            type="text"
+            class="form-control"
+            id="firstName"
+            name="firstName"
+            value="<%= user.firstName %>"
+          />
         </div>
         <div class="form-group my-3">
           <label for="lastName">Last Name</label>
-          <input type="text" class="form-control" id="lastName" value="Doe" />
+          <input type="text" class="form-control" id="lastName" name="lastName" value="<%= user.lastName %>" />
         </div>
       </div>
       <div class="form-group my-3">
@@ -32,7 +38,8 @@
           type="email"
           class="form-control"
           id="email"
-          value="john.doe@example.com"
+          name="email"
+          value="<%= user.email %>"
         />
       </div>
       <div class="form-group my-3">
@@ -41,20 +48,24 @@
           type="tel"
           class="form-control"
           id="phone"
-          value="123-456-7890"
+          name="mobile"
+          value="<%= user.mobile %>"
         />
       </div>
       <div class="form-group my-3">
         <label for="gender">Gender</label>
-        <select id="gender" class="form-control">
-          <option>Male</option>
-          <option>Female</option>
-          <option>Other</option>
+        <select id="gender" name="gender" class="form-control">
+          <option  value="Male" <%= user.gender === 'Male' ? 'selected' : '' %> >Male</option>
+          <option  value="Female" <%= user.gender === 'Female' ? 'selected' : '' %> >Female</option>
+          <option  value="Other" <%= user.gender === 'Other' ? 'selected' : '' %> >Other</option>
         </select>
       </div>
       <div class="form-group my-3">
         <label for="dob">Date of Birth</label>
-        <input type="date" class="form-control" id="dob" value="1990-01-01" />
+        <input type="date" class="form-control" id="dob" name="dob"  value="<%= user.dob ? new Date(user.dob).toISOString().split('T')[0] : '' %>"/>
+      </div>
+      <div class="d-flex justify-content-end">
+        <button type="submit" class="btn btn-outline-dark w-25" id="updateButton">Update</button>
       </div>
     </form>
   </div>
@@ -68,15 +79,15 @@
     >
       <a
         href="manage-address.html"
-        class="btn btn-primary py-4 d-flex justify-content-center align-items-center gap-3"
+        class="btn btn-primary py-4 px-0 d-flex justify-content-center align-items-center gap-3 w-50"
       >
         <i class="fas fa-map-marker-alt"></i> Manage Address
       </a>
       <a
         href="my-orders.html"
-        class="btn btn-secondary py-4 d-flex justify-content-center align-items-center gap-3"
+        class="btn btn-secondary py-4 px-0 d-flex justify-content-center align-items-center gap-3 w-50"
       >
-        <i class="fas fa-box"></i> My Orders
+        <i class="fas fa-box"></i>My Orders
       </a>
     </div>
   </div>
@@ -149,7 +160,10 @@
   <!-- Logout Button -->
   <div class="logout my-5">
     <form action="/logout" method="POST" style="display: inline">
-      <button type="submit" class="btn btn-outline-danger w-100 d-flex justify-content-center align-items-center gap-3 py-3">
+      <button
+        type="submit"
+        class="btn btn-outline-danger w-100 d-flex justify-content-center align-items-center gap-3 py-3"
+      >
         <i class="fas fa-sign-out-alt fa-lg"></i>
         Logout
       </button>

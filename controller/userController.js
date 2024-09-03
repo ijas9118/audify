@@ -98,7 +98,11 @@ exports.loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
   const findUser = await User.findOne({ email });
 
-  if (findUser && (await findUser.isPasswordMatched(password)) && (findUser.status === 'Active')) {
+  if (
+    findUser &&
+    (await findUser.isPasswordMatched(password)) &&
+    findUser.status === "Active"
+  ) {
     req.session.user = findUser._id;
     res.redirect("/");
   } else {
@@ -161,11 +165,27 @@ exports.getProduct = asyncHandler(async (req, res) => {
 });
 
 exports.getUserAccount = asyncHandler(async (req, res) => {
+  const id = req.session.user;
+  const user = await User.findById(id);
+
   res.render("layout", {
     title: "My Audify Account",
     header: req.session.user ? "partials/login_header" : "partials/header",
     viewName: "users/userAccount",
     activePage: "Home",
     isAdmin: false,
+    user,
   });
-})
+});
+
+exports.updateUserAccount = asyncHandler(async (req, res) => {
+  const updatedUser = await User.findByIdAndUpdate(req.params.id, {
+    $set: req.body,
+  });
+
+  if (!updatedUser) {
+    return res.status(404).json({ message: "User not found" });
+  }
+
+  res.redirect("/account");
+});

@@ -35,7 +35,7 @@ var userSchema = new mongoose.Schema(
       default: "Other",
     },
     dob: {
-      type: String,
+      type: Date,
     },
     status: {
       type: String,

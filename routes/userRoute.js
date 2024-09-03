@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const userAuth = require('../middleware/userAuth')
 const {
   sendOtp,
   loginUser,
@@ -7,9 +8,9 @@ const {
   verifyAndSignUp,
   getShop,
   getProduct,
-  getUserAccount
+  getUserAccount,
+  updateUserAccount
 } = require("../controller/userController");
-const {  } = require("../controller/productController");
 
 router.get("/", (req, res) => {
   res.render("layout", {
@@ -54,12 +55,13 @@ router.get("/login", (req, res) => {
 });
 router.post("/login", loginUser);
 
-router.post("/logout", logoutUser);
+router.post("/logout", userAuth, logoutUser);
 
 router.get("/shop", getShop);
 
 router.get('/shop/:id', getProduct);
 
-router.get('/account', getUserAccount);
+router.get('/account', userAuth, getUserAccount);
+router.post('/account/:id', userAuth, updateUserAccount);
 
 module.exports = router;
