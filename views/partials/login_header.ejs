@@ -19,16 +19,33 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav gap-4 mx-auto mb-2 mb-lg-0 justify-content-center">
         <li class="nav-item">
-          <a class="nav-link <% if (activePage === 'home') { %> active <% } %>" aria-current="page" href="/">Home</a>
+          <a
+            class="nav-link <% if (activePage === 'home') { %> active <% } %>"
+            aria-current="page"
+            href="/"
+            >Home</a
+          >
         </li>
         <li class="nav-item">
-          <a class="nav-link <% if (activePage === 'shop') { %> active <% } %>" href="/shop">Shop</a>
+          <a
+            class="nav-link <% if (activePage === 'shop') { %> active <% } %>"
+            href="/shop"
+            >Shop</a
+          >
         </li>
         <li class="nav-item">
-          <a class="nav-link <% if (activePage === 'about') { %> active <% } %>" href="#">About</a>
+          <a
+            class="nav-link <% if (activePage === 'about') { %> active <% } %>"
+            href="#"
+            >About</a
+          >
         </li>
         <li class="nav-item">
-          <a class="nav-link <% if (activePage === 'contact') { %> active <% } %>" href="#">Contact</a>
+          <a
+            class="nav-link <% if (activePage === 'contact') { %> active <% } %>"
+            href="#"
+            >Contact</a
+          >
         </li>
       </ul>
       <form class="d-flex col-md-4" role="search">
@@ -43,20 +60,15 @@
       <div class="col-md-4 d-flex justify-content-end align-items-center">
         <div class="d-flex gap-4">
           <a href="#">
-            <img src="/images/svg/love.svg" alt="Favorites" class="icon"/>
+            <img src="/images/svg/love.svg" alt="Favorites" class="icon" />
           </a>
           <a href="#">
-            <img src="/images/svg/cart.svg" alt="Cart" class="icon"/>
+            <img src="/images/svg/cart.svg" alt="Cart" class="icon" />
           </a>
-          <a href="#">
-            <img src="/images/svg/user.svg" alt="User" class="icon"/>
+          <a href="/account">
+            <img src="/images/svg/user.svg" alt="User" class="icon" />
           </a>
         </div>
-        <form action="/logout" method="POST" style="display: inline">
-          <button type="submit" class="btn btn-outline-dark ms-3">
-            Logout
-          </button>
-        </form>
       </div>
     </div>
   </div>
@@ -66,21 +78,21 @@
   .navbar {
     background-color: #f8f9fa; /* Light background color for the navbar */
   }
-  
+
   .navbar-nav .nav-link {
     color: #333; /* Dark color for the nav links */
   }
-  
+
   .navbar-nav .nav-link.active {
     color: #5a2b81; /* Dark purple color for the active link */
     font-weight: bold;
   }
-  
+
   .btn-dark {
     background-color: #5a2b81; /* Dark purple background for button */
     border-color: #5a2b81; /* Dark purple border for button */
   }
-  
+
   .btn-dark:hover {
     background-color: #7a479b; /* Slightly lighter dark purple for hover */
     border-color: #7a479b; /* Border color match hover background */
@@ -90,7 +102,7 @@
     border-color: #5a2b81; /* Dark purple border for outline button */
     color: #5a2b81; /* Dark purple text color for outline button */
   }
-  
+
   .btn-outline-dark:hover {
     background-color: #7a479b; /* Dark purple background on hover */
     color: #fff; /* White text color on hover */

@@ -159,3 +159,13 @@ exports.getProduct = asyncHandler(async (req, res) => {
     product,
   });
 });
+
+exports.getUserAccount = asyncHandler(async (req, res) => {
+  res.render("layout", {
+    title: "My Audify Account",
+    header: req.session.user ? "partials/login_header" : "partials/header",
+    viewName: "users/userAccount",
+    activePage: "Home",
+    isAdmin: false,
+  });
+})

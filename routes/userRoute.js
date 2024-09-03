@@ -6,7 +6,8 @@ const {
   logoutUser,
   verifyAndSignUp,
   getShop,
-  getProduct
+  getProduct,
+  getUserAccount
 } = require("../controller/userController");
 const {  } = require("../controller/productController");
 
@@ -58,5 +59,7 @@ router.post("/logout", logoutUser);
 router.get("/shop", getShop);
 
 router.get('/shop/:id', getProduct);
+
+router.get('/account', getUserAccount);
 
 module.exports = router;
