@@ -1,5 +1,6 @@
 const User = require("../models/userModel");
 const Product = require("../models/products");
+const Address = require("../models/address");
 const asyncHandler = require("express-async-handler");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
@@ -188,4 +189,63 @@ exports.updateUserAccount = asyncHandler(async (req, res) => {
   }
 
   res.redirect("/account");
+});
+
+exports.getAddresses = asyncHandler(async (req, res) => {
+  const userId = req.session.user;
+  const addresses = await Address.find({ user: userId });
+
+  res.render("layout", {
+    title: "Manage Address",
+    header: req.session.user ? "partials/login_header" : "partials/header",
+    viewName: "users/manageAddress",
+    activePage: "Home",
+    isAdmin: false,
+    addresses,
+  });
+});
+
+exports.addAddress = asyncHandler(async (req, res) => {
+  const userId = req.session.user;
+  const userAddresses = await Address.find({ user: userId })
+  
+  if (req.body.isDefault == 'true')
+    await Address.updateMany({}, { $set: { isDefault: false } });
+
+  const newAddress = new Address({
+    user: userId,
+    location: req.body.location,
+    city: req.body.city,
+    state: req.body.state,
+    country: req.body.country,
+    zip: req.body.zip,
+    addressType: req.body.addressType,
+    customName: req.body.customName,
+    isDefault: (userAddresses.length === 0) || req.body.isDefault,
+  });
+  
+  await newAddress.save();
+
+  await User.findByIdAndUpdate(userId, {
+    $push: { addresses: newAddress._id },
+  });
+
+  res.redirect("/account/addresses");
+});
+
+exports.updateDefaultAddress = asyncHandler(async (req, res) => {
+  const { newDefaultId } = req.body;
+
+  try {
+    await Address.updateMany({}, { $set: { isDefault: false } });
+
+    await Address.findByIdAndUpdate(newDefaultId, {
+      $set: { isDefault: true },
+    });
+
+    res.status(200).send("Default address updated successfully");
+  } catch (error) {
+    console.error("Error updating default address:", error);
+    res.status(500).send("Internal Server Error");
+  }
 });

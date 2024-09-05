@@ -9,7 +9,10 @@ const {
   getShop,
   getProduct,
   getUserAccount,
-  updateUserAccount
+  updateUserAccount,
+  getAddresses,
+  addAddress,
+  updateDefaultAddress
 } = require("../controller/userController");
 
 router.get("/", (req, res) => {
@@ -53,6 +56,7 @@ router.get("/login", (req, res) => {
     isAdmin: false,
   });
 });
+
 router.post("/login", loginUser);
 
 router.post("/logout", userAuth, logoutUser);
@@ -62,6 +66,13 @@ router.get("/shop", getShop);
 router.get('/shop/:id', getProduct);
 
 router.get('/account', userAuth, getUserAccount);
+
+router.get('/account/addresses', userAuth, getAddresses);
+
+router.post('/account/addresses', userAuth, addAddress);
+
+router.post('/account/addresses/default', userAuth, updateDefaultAddress)
+
 router.post('/account/:id', userAuth, updateUserAccount);
 
 module.exports = router;
