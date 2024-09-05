@@ -12,7 +12,10 @@ const {
   updateUserAccount,
   getAddresses,
   addAddress,
-  updateDefaultAddress
+  updateDefaultAddress,
+  getCart,
+  addToCart,
+  updateCart
 } = require("../controller/userController");
 
 router.get("/", (req, res) => {
@@ -62,6 +65,12 @@ router.post("/login", loginUser);
 router.post("/logout", userAuth, logoutUser);
 
 router.get("/shop", getShop);
+
+router.get('/shop/cart', userAuth, getCart);
+
+router.post('/shop/cart/updateQuantity', userAuth, updateCart);
+
+router.get('/shop/cart/:id', userAuth, addToCart);
 
 router.get('/shop/:id', getProduct);
 

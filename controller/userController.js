@@ -1,6 +1,7 @@
 const User = require("../models/userModel");
 const Product = require("../models/products");
 const Address = require("../models/address");
+const Cart = require("../models/cart");
 const asyncHandler = require("express-async-handler");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
@@ -12,6 +13,41 @@ const transporter = nodemailer.createTransport({
     pass: process.env.EMAIL_PASS,
   },
 });
+
+const addToCart = async (userId, productId, quantity) => {
+  const product = await Product.findById(productId);
+
+  if (!product) {
+    throw new Error("Product not found");
+  }
+
+  let cart = await Cart.findOne({ user: userId });
+  if (!cart) {
+    cart = new Cart({ user: userId, items: [], shippingCharge: 50, total: 0 });
+  }
+
+  const itemIndex = cart.items.findIndex((item) =>
+    item.productId.equals(productId)
+  );
+
+  if (itemIndex > -1) {
+    cart.items[itemIndex].quantity = quantity;
+    cart.items[itemIndex].subtotal =
+      cart.items[itemIndex].quantity * cart.items[itemIndex].price;
+  } else {
+    cart.items.push({
+      productId: product._id,
+      name: product.name,
+      image: product.images.main,
+      price: product.price,
+      quantity: quantity,
+      subtotal: product.price * quantity,
+    });
+  }
+
+  cart.calculateTotals();
+  await cart.save();
+};
 
 exports.sendOtp = asyncHandler(async (req, res) => {
   const { firstName, lastName, email, password } = req.body;
@@ -207,9 +243,9 @@ exports.getAddresses = asyncHandler(async (req, res) => {
 
 exports.addAddress = asyncHandler(async (req, res) => {
   const userId = req.session.user;
-  const userAddresses = await Address.find({ user: userId })
-  
-  if (req.body.isDefault == 'true')
+  const userAddresses = await Address.find({ user: userId });
+
+  if (req.body.isDefault == "true")
     await Address.updateMany({}, { $set: { isDefault: false } });
 
   const newAddress = new Address({
@@ -221,9 +257,9 @@ exports.addAddress = asyncHandler(async (req, res) => {
     zip: req.body.zip,
     addressType: req.body.addressType,
     customName: req.body.customName,
-    isDefault: (userAddresses.length === 0) || req.body.isDefault,
+    isDefault: userAddresses.length === 0 || req.body.isDefault,
   });
-  
+
   await newAddress.save();
 
   await User.findByIdAndUpdate(userId, {
@@ -248,4 +284,33 @@ exports.updateDefaultAddress = asyncHandler(async (req, res) => {
     console.error("Error updating default address:", error);
     res.status(500).send("Internal Server Error");
   }
+});
+
+exports.getCart = asyncHandler(async (req, res) => {
+  const userId = req.session.user;
+  const cart = await Cart.findOne({ user: userId });
+  
+  res.render("layout", {
+    title: "Cart",
+    header: req.session.user ? "partials/login_header" : "partials/header",
+    viewName: "users/cart",
+    activePage: "Shop",
+    isAdmin: false,
+    cart,
+  });
+});
+
+exports.addToCart = asyncHandler(async (req, res) => {
+  const userId = req.session.user;
+  const productId = req.params.id;
+  await addToCart(userId, productId, 1); // Default quantity to 1 for adding to cart
+  res.redirect("/shop/cart");
+});
+
+exports.updateCart = asyncHandler(async (req, res) => {
+  const { productId, quantity } = req.body;
+  const userId = req.session.user;
+
+  await addToCart(userId, productId, quantity);
+  res.redirect("/shop/cart");
 });
