@@ -14,24 +14,36 @@
       <div class="col-md-8 pe-5">
         <% if (cart && cart.items.length > 0) { %>
           <% cart.items.forEach(item => { %>
-            <div class="cart-item d-flex justify-content-between align-items-center mb-3" data-product-id="<%= item.productId %>">
+            <div class="cart-item d-flex justify-content-between align-items-center mb-3 p-3 border rounded bg-light" data-product-id="<%= item.productId %>">
               <div class="d-flex align-items-center">
-                <img src="<%= item.image %>" alt="Product Image" class="me-3" style="width: 100px; height: 100px; object-fit: contain" />
+                <img src="<%= item.image %>" alt="Product Image" class="me-3" style="width: 100px; height: 100px; object-fit: contain;" />
                 <div>
                   <h5 class="mb-1"><%= item.name %></h5>
                   <p class="mb-1">₹<%= item.price.toFixed(2) %></p>
                 </div>
               </div>
-              <div class="d-flex align-items-center">
-                  <button class="btn btn-outline-dark btn-sm me-2" type="button" onclick="changeQuantity('<%= item.productId %>', -1)"><i class="fa-solid fa-caret-down"></i></button>
-                  <input type="number" class="form-control form-control-sm text-center" id="quantity-<%= item.productId %>" value="<%= item.quantity %>" min="1" style="width: 50px;" readonly />
-                  <button class="btn btn-outline-dark btn-sm ms-2" type="button" onclick="changeQuantity('<%= item.productId %>', 1)"><i class="fa-solid fa-caret-up"></i></button>
+
+              <div class="d-flex align-items-center me-3">
+                <button class="btn btn-outline-dark btn-sm me-2" type="button" onclick="changeQuantity('<%= item.productId %>', -1)">
+                  <i class="fa-solid fa-caret-down"></i>
+                </button>
+                <input type="number" class="form-control form-control-sm text-center" id="quantity-<%= item.productId %>" value="<%= item.quantity %>" min="1" style="width: 50px;" readonly />
+                <button class="btn btn-outline-dark btn-sm ms-2" type="button" onclick="changeQuantity('<%= item.productId %>', 1)">
+                  <i class="fa-solid fa-caret-up"></i>
+                </button>
               </div>
-            
-              <div class="subtotal">
-                <p class="mb-1">Subtotal: ₹<span id="subtotal-<%= item.productId %>"><%= item.subtotal.toFixed(2) %></span></p>
+
+              <div class="d-flex align-items-center me-3 subtotal">
+                <p class="mb-1 me-2">Subtotal: ₹<span id="subtotal-<%= item.productId %>"><%= item.subtotal.toFixed(2) %></span></p>
+              </div>
+
+              <div class="d-flex align-items-center">
+                <button class="btn btn-outline-dark btn-sm" type="button" onclick="deleteItem('<%= item.productId %>')">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
               </div>
             </div>
+
           <% }); %>
         <% } else { %>
           <p>Your cart is empty.</p>
@@ -40,23 +52,24 @@
 
       <!-- Cart Summary -->
       <div class="col-md-4">
-        <div class="cart-summary">
-          <h4>Cart Summary</h4>
-          <div class="d-flex justify-content-between mb-2">
-            <span>Subtotal</span>
+        <div class="cart-summary p-4 border rounded bg-light shadow-sm">
+          <h4 class="mb-4 text-center text-dark">Cart Summary</h4>
+          <div class="d-flex justify-content-between mb-3 border-bottom pb-2">
+            <span class="fw-semibold text-muted">Subtotal</span>
             <span>₹<%= cart ? cart.items.reduce((acc, item) => acc + item.subtotal, 0).toFixed(2) : '0.00' %></span>
           </div>
-          <div class="d-flex justify-content-between mb-2">
-            <span>Shipping Charge</span>
+          <div class="d-flex justify-content-between mb-3 border-bottom pb-2">
+            <span class="fw-semibold text-muted">Shipping Charge</span>
             <span>₹<%= cart ? cart.shippingCharge.toFixed(2) : '0.00' %></span>
           </div>
-          <div class="d-flex justify-content-between mb-3 total">
-            <span>Grand Total</span>
-            <span>₹<%= cart ? cart.total.toFixed(2) : '0.00' %></span>
+          <div class="d-flex justify-content-between mb-4 border-bottom pb-2 total">
+            <span class="fw-bold text-dark">Grand Total</span>
+            <span class="fs-5 fw-bold text-dark">₹<%= cart ? cart.total.toFixed(2) : '0.00' %></span>
           </div>
-          <a href="#" class="btn btn-primary continue-button">Continue to Payment</a>
+          <a href="#" class="btn btn-dark w-100 py-2 rounded-pill text-white">Checkout</a>
         </div>
       </div>
+    
     </div>
   </div>
 </div>

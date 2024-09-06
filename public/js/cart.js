@@ -36,6 +36,28 @@ function updateQuantityInDatabase(productId, newQuantity) {
     });
 }
 
+function addToCart(productId) {
+  fetch(`/shop/cart/${productId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      // Add any necessary authentication headers here
+    },
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.message === "Item added to cart successfully") {
+        alert("Item successfully added to your cart!");
+      } else {
+        alert(data.message || "Failed to add item to cart");
+      }
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+      alert("An error occurred while adding the item to your cart");
+    });
+}
+
 function updateCartUI(cart) {
   // Update quantities and subtotals for each item
   cart.items.forEach((item) => {
@@ -48,7 +70,7 @@ function updateCartUI(cart) {
       `.cart-item[data-product-id="${item.productId}"] .subtotal #subtotal-${item.productId}`
     );
     if (subtotalElement) {
-      subtotalElement.textContent = `₹${item.subtotal.toFixed(2)}`;
+      subtotalElement.textContent = `${item.subtotal.toFixed(2)}`;
     }
   });
 
@@ -57,7 +79,7 @@ function updateCartUI(cart) {
     ".cart-summary .d-flex.justify-content-between span:nth-of-type(2)"
   );
   if (subtotalSummaryElement) {
-    subtotalSummaryElement.textContent = `₹${cart.items
+    subtotalSummaryElement.textContent = `${cart.items
       .reduce((acc, item) => acc + item.subtotal, 0)
       .toFixed(2)}`;
   }
@@ -66,7 +88,7 @@ function updateCartUI(cart) {
     ".cart-summary .d-flex.justify-content-between:nth-of-type(2) span:nth-of-type(2)"
   );
   if (shippingChargeElement) {
-    shippingChargeElement.textContent = `₹${cart.shippingCharge.toFixed(2)}`;
+    shippingChargeElement.textContent = `${cart.shippingCharge.toFixed(2)}`;
   }
 
   const totalElement = document.querySelector(
@@ -75,4 +97,31 @@ function updateCartUI(cart) {
   if (totalElement) {
     totalElement.textContent = `₹${cart.total.toFixed(2)}`;
   }
+}
+
+function deleteItem(productId) {
+  fetch(`/shop/cart/${productId}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      // Include any required authentication tokens or cookies here
+    },
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log(data.message);
+
+      if (data.message === "Item removed successfully") {
+        // Optionally update the UI or redirect the user
+        document.querySelector(`[data-product-id="${productId}"]`).remove();
+        alert("Item removed from cart");
+        updateCartUI(data.cart);
+      } else {
+        alert("Failed to remove item");
+      }
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+      alert("An error occurred while removing the item");
+    });
 }

@@ -63,7 +63,7 @@ const cartSchema = new mongoose.Schema(
 cartSchema.methods.calculateTotals = function () {
   this.total =
     this.items.reduce((acc, item) => acc + item.subtotal, 0) +
-    this.shippingCharge;
+    (this.items.length === 0 ? 0 : this.shippingCharge);
   return this.total;
 };
 

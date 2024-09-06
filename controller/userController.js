@@ -48,7 +48,6 @@ const addToCart = async (userId, productId, quantity) => {
   cart.calculateTotals();
   await cart.save();
   return cart;
-  
 };
 
 exports.sendOtp = asyncHandler(async (req, res) => {
@@ -291,7 +290,7 @@ exports.updateDefaultAddress = asyncHandler(async (req, res) => {
 exports.getCart = asyncHandler(async (req, res) => {
   const userId = req.session.user;
   const cart = await Cart.findOne({ user: userId });
-  
+
   res.render("layout", {
     title: "Cart",
     header: req.session.user ? "partials/login_header" : "partials/header",
@@ -305,8 +304,13 @@ exports.getCart = asyncHandler(async (req, res) => {
 exports.addToCart = asyncHandler(async (req, res) => {
   const userId = req.session.user;
   const productId = req.params.id;
-  await addToCart(userId, productId, 1);
-  res.redirect("/shop/cart");
+  try {
+    await addToCart(userId, productId, 1);
+    res.status(200).json({ message: "Item added to cart successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to add item to cart" });
+  }
 });
 
 exports.updateCart = asyncHandler(async (req, res) => {
@@ -314,6 +318,33 @@ exports.updateCart = asyncHandler(async (req, res) => {
   const userId = req.session.user;
 
   const cart = await addToCart(userId, productId, quantity);
-  
+
   res.json(cart);
 });
+
+exports.deleteItemFromCart = async (req, res) => {
+  const productId = req.params.id; // Get the productId from request parameters
+  const userId = req.session.user;
+
+  try {
+    // Assuming you have a Cart model with a method to remove an item
+    const cart = await Cart.findOne({ user: userId }); // Find the cart for the user
+
+    if (!cart) {
+      return res.status(404).json({ message: "Cart not found" });
+    }
+
+    // Remove the item with the specified productId
+    cart.items = cart.items.filter(
+      (item) => item.productId.toString() !== productId
+    );
+    // Save the updated cart
+    cart.calculateTotals();
+    await cart.save();
+
+    res.status(200).json({ message: "Item removed successfully", cart });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};

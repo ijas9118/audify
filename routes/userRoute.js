@@ -15,7 +15,8 @@ const {
   updateDefaultAddress,
   getCart,
   addToCart,
-  updateCart
+  updateCart,
+  deleteItemFromCart
 } = require("../controller/userController");
 
 router.get("/", (req, res) => {
@@ -71,6 +72,8 @@ router.get('/shop/cart', userAuth, getCart);
 router.post('/shop/cart/updateQuantity', userAuth, updateCart);
 
 router.get('/shop/cart/:id', userAuth, addToCart);
+
+router.delete('/shop/cart/:id', userAuth, deleteItemFromCart);
 
 router.get('/shop/:id', getProduct);
 
