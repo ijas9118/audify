@@ -47,6 +47,8 @@ const addToCart = async (userId, productId, quantity) => {
 
   cart.calculateTotals();
   await cart.save();
+  return cart;
+  
 };
 
 exports.sendOtp = asyncHandler(async (req, res) => {
@@ -303,7 +305,7 @@ exports.getCart = asyncHandler(async (req, res) => {
 exports.addToCart = asyncHandler(async (req, res) => {
   const userId = req.session.user;
   const productId = req.params.id;
-  await addToCart(userId, productId, 1); // Default quantity to 1 for adding to cart
+  await addToCart(userId, productId, 1);
   res.redirect("/shop/cart");
 });
 
@@ -311,6 +313,7 @@ exports.updateCart = asyncHandler(async (req, res) => {
   const { productId, quantity } = req.body;
   const userId = req.session.user;
 
-  await addToCart(userId, productId, quantity);
-  res.redirect("/shop/cart");
+  const cart = await addToCart(userId, productId, quantity);
+  
+  res.json(cart);
 });

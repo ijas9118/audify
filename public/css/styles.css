@@ -1,7 +1,6 @@
 @import './footer.css';
 @import './signup.css';
 @import './filter.css';
-@import './cropper.css';
 
 a {
   text-decoration: none;

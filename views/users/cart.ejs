@@ -14,7 +14,7 @@
       <div class="col-md-8 pe-5">
         <% if (cart && cart.items.length > 0) { %>
           <% cart.items.forEach(item => { %>
-            <div class="cart-item d-flex justify-content-between align-items-center mb-3">
+            <div class="cart-item d-flex justify-content-between align-items-center mb-3" data-product-id="<%= item.productId %>">
               <div class="d-flex align-items-center">
                 <img src="<%= item.image %>" alt="Product Image" class="me-3" style="width: 100px; height: 100px; object-fit: contain" />
                 <div>
@@ -28,8 +28,8 @@
                   <button class="btn btn-outline-dark btn-sm ms-2" type="button" onclick="changeQuantity('<%= item.productId %>', 1)"><i class="fa-solid fa-caret-up"></i></button>
               </div>
             
-              <div>
-                <p class="mb-1">Subtotal: ₹<%= item.subtotal.toFixed(2) %></p>
+              <div class="subtotal">
+                <p class="mb-1">Subtotal: ₹<span id="subtotal-<%= item.productId %>"><%= item.subtotal.toFixed(2) %></span></p>
               </div>
             </div>
           <% }); %>
