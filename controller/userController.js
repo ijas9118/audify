@@ -189,9 +189,14 @@ exports.getShop = asyncHandler(async (req, res) => {
 
 exports.getProduct = asyncHandler(async (req, res) => {
   const product = await Product.findById(req.params.id);
+  const categoryId = product.categoryId;
   if (!product) {
     return res.status(404).send("Product not found");
   }
+  const relatedProducts = await Product.find({
+    categoryId: categoryId,
+    _id: { $ne: product._id },
+  });
   res.render("layout", {
     title: "Audify",
     header: req.session.user ? "partials/login_header" : "partials/header",
@@ -199,6 +204,7 @@ exports.getProduct = asyncHandler(async (req, res) => {
     activePage: "shop",
     isAdmin: false,
     product,
+    relatedProducts,
   });
 });
 

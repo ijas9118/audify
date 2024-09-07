@@ -14,7 +14,7 @@
       <div class="col-md-8 pe-5">
         <% if (cart && cart.items.length > 0) { %>
           <% cart.items.forEach(item => { %>
-            <div class="cart-item d-flex justify-content-between align-items-center mb-3 p-3 border rounded bg-light" data-product-id="<%= item.productId %>">
+            <div class="cart-item d-flex justify-content-between align-items-center mb-3 p-3 border rounded bg-light shadow-sm" data-product-id="<%= item.productId %>">
               <div class="d-flex align-items-center">
                 <img src="<%= item.image %>" alt="Product Image" class="me-3" style="width: 100px; height: 100px; object-fit: contain;" />
                 <div>
@@ -66,10 +66,23 @@
             <span class="fw-bold text-dark">Grand Total</span>
             <span class="fs-5 fw-bold text-dark">₹<%= cart ? cart.total.toFixed(2) : '0.00' %></span>
           </div>
-          <a href="#" class="btn btn-dark w-100 py-2 rounded-pill text-white">Checkout</a>
+          <a href="#" class="btn btn-dark w-100 py-2 rounded-pill text-white fs-5">Checkout</a>
         </div>
       </div>
     
+    </div>
+  </div>
+</div>
+
+<!-- Continue Shopping Section -->
+<div class="container-fluid mt-5 py-5">
+  <div class="row justify-content-center text-center text-light">
+    <div class="col-md-8 col-lg-9 bg-dark p-4 rounded shadow-sm">
+      <h2 class="mb-3 display-6">Continue Shopping</h2>
+      <p class="lead mb-4">
+        Discover more products that are perfect for gifts, for your entertainment, or a unique addition to your collection.
+      </p>
+      <a href="/shop" class="btn btn-dark btn-lg rounded-pill px-5 py-2 fs-5">Go to Shop</a>
     </div>
   </div>
 </div>

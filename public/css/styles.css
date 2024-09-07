@@ -2,6 +2,10 @@
 @import './signup.css';
 @import './filter.css';
 
+body {
+  background: linear-gradient(to right, #f3f9fe, #faf3fe);
+}
+
 a {
   text-decoration: none;
 }

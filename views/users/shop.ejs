@@ -97,14 +97,14 @@
               <!-- Product Price -->
               <div class="d-flex align-items-center mb-2">
                 <h6 class="card-price mb-0">
-                  ₹<%= product.price.toFixed(2) %>
+                  ₹<%= product.price %>
                 </h6>
                 <span class="text-muted ms-2"
-                  ><del>₹<%= (product.price * 1.25).toFixed(2) %></del></span
+                  ><del>₹<%= (product.price * 1.25).toFixed(0) %></del></span
                 >
               </div>
               <!-- Ratings -->
-              <div class="mb-2">
+              <div>
                 <span class="text-warning">
                   <i class="fas fa-star"></i>
                   <i class="fas fa-star"></i>
@@ -114,10 +114,6 @@
                 </span>
                 <span class="text-muted">(4.0)</span>
               </div>
-              <!-- Short Description -->
-              <p class="card-text text-muted text-truncate">
-                <%= product.shortDescription %>
-              </p>
             </div>
             <div class="card-footer bg-white border-0">
               <div class="btn-group w-100" role="group">
