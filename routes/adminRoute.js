@@ -12,6 +12,8 @@ const {
   getAdminHome,
   getAdminLogin,
   toggleUserStatus,
+  updateOrderStatus,
+  viewOrder,
 } = require("../controller/adminController");
 const categoryRouter = require("./categoryRouter");
 const productRouter = require('./productRouter')
@@ -36,6 +38,10 @@ router.use("/products", productRouter);
 
 // Order Management Route
 router.get("/orders", adminAuth, getOrders);
+
+router.post('/orders/update-status/:id', adminAuth, updateOrderStatus);
+
+router.get('/orders/view/:id', adminAuth, viewOrder)
 
 // Category Management Route
 router.use("/category", categoryRouter);

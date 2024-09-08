@@ -1,7 +1,7 @@
 const Admin = require("../models/adminModel");
 const User = require("../models/userModel");
+const Order = require("../models/order");
 const asyncHandler = require("express-async-handler");
-const cloudinary = require("../config/cloudinary");
 
 // ============================
 //  Admin Authentication Controllers
@@ -106,13 +106,52 @@ exports.toggleUserStatus = asyncHandler(async (req, res) => {
 
 // Render Order Management Page
 exports.getOrders = asyncHandler(async (req, res) => {
+  const orders = await Order.find();
+
   res.render("layout", {
     title: "Order Management",
     viewName: "admin/orderManagement",
     activePage: "orders",
     isAdmin: true,
+    orders,
   });
 });
+
+exports.updateOrderStatus = asyncHandler(async (req, res) => {
+  const orderId = req.params.id;
+  const status = req.body.status;
+  try {
+    const updatedOrder = await Order.updateOne({_id: orderId}, { $set: { status } });
+
+    if (!updatedOrder) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Order not found" });
+    }
+
+    res.status(200).json({ success: true, order: updatedOrder });
+  } catch (error) {
+    console.error("Error updating order status:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+exports.viewOrder = asyncHandler(async (req, res) => {
+  const orderId = req.params.id;
+  const order = await Order.findById({ _id: orderId })
+    .populate('address', 'location city state country zip')
+    .populate('user', 'firstName lastName email mobile')
+    .populate({ path: 'orderItems', populate: 'product' });
+  
+    res.render("layout", {
+      title: "Order Management",
+      viewName: "admin/viewOrder",
+      activePage: "orders",
+      isAdmin: true,
+      order,
+    });
+  
+})
 
 // ============================
 //  Coupon Management Controllers

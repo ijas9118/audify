@@ -1,0 +1,108 @@
+<div class="container-fluid mt-3">
+  <div class="row">
+    <h5 class="card-title">Order Details</h5>
+
+    <div class="card-body">
+      <h6 class="card-subtitle mb-4 text-muted">
+        Order ID: <span class="badge bg-secondary"><%= order._id %></span>
+      </h6>
+
+      <div class="row mb-4">
+        <div class="col-md-6">
+          <div class="card mb-4">
+            <div class="card-header bg-dark text-white">
+              <h6 class="mb-0">User Information</h6>
+            </div>
+            <div class="card-body">
+              <div class="mb-3">
+                <h6 class="mb-2">User ID</h6>
+                <p class="card-text">
+                  <span class="badge bg-secondary"><%= order.user._id %></span>
+                </p>
+              </div>
+              <div class="mb-3">
+                <h6 class="mb-2">User Name</h6>
+                <p class="card-text">
+                  <span
+                    ><%= order.user.firstName %> <%= order.user.lastName
+                    %></span
+                  >
+                </p>
+              </div>
+              <div class="mb-3">
+                <h6 class="mb-2">User Email</h6>
+                <p class="card-text">
+                  <span><%= order.user.email %></span>
+                </p>
+              </div>
+              <div class="mb-3">
+                <h6 class="mb-2">User Mobile</h6>
+                <p class="card-text">
+                  <span><%= order.user.mobile %></span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <h6 class="mb-2">Order Date</h6>
+          <p class="card-text">
+            <%= new Date(order.dateOrdered).toLocaleDateString() %>
+          </p>
+        </div>
+      </div>
+
+      <h6 class="mb-2">Shipping Address</h6>
+      <p class="card-text">
+        Location: <%= order.address.location %>,<br />
+        City: <%= order.address.city %>,<br />
+        State: <%= order.address.state %>,<br />
+        Country: <%= order.address.country %>,<br />
+        Zip: <%= order.address.zip %>
+      </p>
+
+      <h6 class="mb-2">Payment Method</h6>
+      <p class="card-text"><%= order.paymentMethod %></p>
+
+      <h6 class="mb-2">Order Items</h6>
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Price (Each)</th>
+            <th>Total Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% order.orderItems.forEach(item => { %>
+          <tr>
+            <td><%= item.product.name %></td>
+            <td><%= item.quantity %></td>
+            <td>₹<%= item.product.price.toFixed(2) %></td>
+            <td>₹<%= (item.product.price * item.quantity).toFixed(2) %></td>
+          </tr>
+          <% }); %>
+        </tbody>
+      </table>
+
+      <h6 class="mb-2">Order Summary</h6>
+      <ul class="list-unstyled">
+        <li>
+          <strong>Total Amount:</strong> ₹<%= order.totalAmount.toFixed(2) %>
+        </li>
+        <li>
+          <strong>Shipping Charge:</strong> ₹<%= order.shippingCharge.toFixed(2)
+          %>
+        </li>
+        <li>
+          <strong>Status:</strong>
+          <span class="badge bg-warning text-dark"><%= order.status %></span>
+        </li>
+      </ul>
+
+      <a href="/admin/orders" class="btn btn-primary">Back to Orders</a>
+    </div>
+  </div>
+</div>
