@@ -190,7 +190,7 @@ exports.getShop = asyncHandler(async (req, res) => {
 });
 
 exports.filterShop = asyncHandler(async (req, res) => {
-  const sortBy  = req.body.sort;
+  const sortBy = req.body.sort;
 
   let sortCriteria = {};
 
@@ -238,7 +238,7 @@ exports.filterShop = asyncHandler(async (req, res) => {
     },
     {
       $match: {
-        "categoryDetails.isActive": true, 
+        "categoryDetails.isActive": true,
         isActive: true,
       },
     },
@@ -247,7 +247,7 @@ exports.filterShop = asyncHandler(async (req, res) => {
   if (sortCriteria !== null) {
     pipeline.push({ $sort: sortCriteria });
   }
-  
+
   const products = await Product.aggregate(pipeline);
 
   res.render("layout", {
@@ -449,13 +449,52 @@ exports.orderSuccessPage = asyncHandler(async (req, res) => {
   const address = await Address.findById(selectedAddressId);
   const cart = await Cart.findOne({ user: userId });
 
+  const insufficientStockItems = [];
+  await Promise.all(
+    cart.items.map(async (item) => {
+      const product = await Product.findById(item.productId);
+      if (item.quantity > product.stock) {
+        insufficientStockItems.push({
+          product: product.name,
+          availableStock: product.stock,
+          requestedQuantity: item.quantity,
+        });
+      }
+    })
+  );
+
+  if (insufficientStockItems.length > 0) {
+    // Handle insufficient stock
+    return res.render("layout", {
+      title: "Order Failed",
+      header: req.session.user ? "partials/login_header" : "partials/header",
+      viewName: "users/orderFailed",
+      activePage: "Shop",
+      isAdmin: false,
+      insufficientStockItems, // Pass the details to the view
+    });
+  }
+
   const orderItems = await Promise.all(
     cart.items.map(async (item) => {
       const orderItem = new OrderItem({
         quantity: item.quantity,
         product: item.productId,
       });
-      return await orderItem.save();
+      await orderItem.save();
+
+      const product = await Product.findById(item.productId);
+      const updatedStock = product.stock - item.quantity;
+
+      // Check if product is out of stock
+      const isOutOfStock = updatedStock <= 0;
+
+      await Product.findByIdAndUpdate(
+        item.productId,
+        { $inc: { stock: -item.quantity }, $set: { isOutOfStock } } // Decrement stock by the ordered quantity
+      );
+
+      return orderItem;
     })
   );
 
@@ -470,6 +509,8 @@ exports.orderSuccessPage = asyncHandler(async (req, res) => {
   });
 
   await order.save();
+
+  await Cart.findOneAndUpdate({ user: userId }, { $set: { items: [] } });
 
   res.render("layout", {
     title: "Thank You",
