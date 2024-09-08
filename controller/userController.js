@@ -2,6 +2,8 @@ const User = require("../models/userModel");
 const Product = require("../models/products");
 const Address = require("../models/address");
 const Cart = require("../models/cart");
+const OrderItem = require("../models/orderItem");
+const Order = require("../models/order");
 const asyncHandler = require("express-async-handler");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
@@ -376,6 +378,26 @@ exports.orderSuccessPage = asyncHandler(async (req, res) => {
   const address = await Address.findById(selectedAddressId);
   const cart = await Cart.findOne({ user: userId });
 
+  const orderItems = await Promise.all(cart.items.map(async item => {
+    const orderItem = new OrderItem({
+      quantity: item.quantity,
+      product: item.productId
+    });
+    return await orderItem.save();
+  }));
+  
+  const order = new Order({
+    user: userId,
+    address: selectedAddressId,
+    orderItems: orderItems.map(item => item._id),
+    paymentMethod,
+    shippingCharge: cart.shippingCharge,
+    totalAmount: cart.total,
+    status: 'Pending'
+  });
+
+  await order.save();
+
   res.render("layout", {
     title: "Thank You",
     header: req.session.user ? "partials/login_header" : "partials/header",
@@ -387,3 +409,21 @@ exports.orderSuccessPage = asyncHandler(async (req, res) => {
     paymentMethod
   });
 });
+
+exports.getOrderHistory = asyncHandler(async (req, res) => {
+  const userId = req.session.user;
+
+  const orders = await Order.find({ user: userId })
+    .populate('address', 'location city state country zip')
+    .populate({ path: 'orderItems', populate: 'product' })
+    .sort({ dateOrdered: -1 });
+
+  res.render('layout', {
+    title: 'Order History',
+    header: req.session.user ? 'partials/login_header' : 'partials/header',
+    viewName: 'users/orderHistory',
+    activePage: 'Order History',
+    isAdmin: false,
+    orders
+  });
+})

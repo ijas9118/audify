@@ -18,7 +18,8 @@ const {
   updateCart,
   deleteItemFromCart,
   getCheckoutPage,
-  orderSuccessPage
+  orderSuccessPage,
+  getOrderHistory
 } = require("../controller/userController");
 
 router.get("/", (req, res) => {
@@ -93,6 +94,8 @@ router.post('/account/:id', userAuth, updateUserAccount);
 router.get('/checkout', userAuth, getCheckoutPage);
 
 router.post('/checkout', userAuth, orderSuccessPage);
+
+router.get('/account/order-history', userAuth, getOrderHistory);
 
 
 module.exports = router;
