@@ -165,7 +165,6 @@ exports.getProductById = asyncHandler(async (req, res) => {
 exports.updateProduct = asyncHandler(async (req, res) => {
   const { name, price, categoryId, stock, description } = req.body;
   const productId = req.params.id;
-  console.log(req.body);
 
   let product = await Product.findById(productId);
 
@@ -177,7 +176,11 @@ exports.updateProduct = asyncHandler(async (req, res) => {
   product.name = name;
   product.price = price;
   product.categoryId = categoryId;
-  product.stock = stock;
+  if(stock){
+    product.stock = stock;
+  } else {
+    product.isOutOfStock = true
+  }
   product.description = description;
 
   await product.save();

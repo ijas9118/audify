@@ -56,14 +56,22 @@
             <label for="editProductStock" class="form-label">Stock</label>
             <input
               type="number"
-              class="form-control"
+              class="form-control stock-input"
               id="editProductStock"
               name="stock"
               value="<%= product.stock %>"
               min="0"
               max="100"
-              required
             />
+          </div>
+          <div class="form-check mb-4">
+            <input
+              type="checkbox"
+              class="form-check-input"
+              id="outOfStockCheckbox"
+              <% if (product.isOutOfStock) { %> checked <% } %>
+            />
+            <label class="form-check-label" for="outOfStockCheckbox">Out of Stock</label>
           </div>
           <div class="mb-3">
             <label for="editProductDescription" class="form-label">Description</label>
@@ -198,4 +206,30 @@
   document.getElementById('editSupportImage2').addEventListener('change', function () {
     updateImagePreview(this, document.getElementById('currentSupportImage2'));
   });
+
+  // Event listener for out of stock checkbox
+  document.getElementById('outOfStockCheckbox').addEventListener('change', function () {
+    const stockInput = document.getElementById('editProductStock');
+    const isOutOfStockInput = document.getElementById('isOutOfStock');
+    if (this.checked) {
+      stockInput.disabled = true;
+      stockInput.value = ''; // Clear the stock value
+      isOutOfStockInput.value = 'true'; // Set isOutOfStock to true
+    } else {
+      stockInput.disabled = false;
+      isOutOfStockInput.value = 'false'; // Set isOutOfStock to false
+    }
+  });
+  
+  // Initialize stock field disabled state based on checkbox
+  const stockInput = document.getElementById('editProductStock');
+  const isOutOfStockCheckbox = document.getElementById('outOfStockCheckbox');
+  const isOutOfStockInput = document.getElementById('isOutOfStock');
+
+  if (isOutOfStockCheckbox.checked) {
+    stockInput.disabled = true;
+    isOutOfStockInput.value = 'true';
+  } else {
+    isOutOfStockInput.value = 'false';
+  }
 </script>

@@ -55,7 +55,9 @@
         <!-- Product Card Example -->
         <% products.forEach(product => { %>
         <div class="col-md-4 col-sm-6 mb-4">
-          <div class="card h-100 shadow-sm border-0">
+          <div
+            class="card h-100 shadow-sm border-0 <% if (product.isOutOfStock) { %> out-of-stock <% } %>"
+          >
             <div class="position-relative">
               <a href="/shop/<%= product._id %>" class="card-link">
                 <!-- Discount Badge -->
@@ -97,13 +99,16 @@
               <div class="btn-group w-100" role="group">
                 <!-- Add to Cart Button -->
                 <button
-                  class="btn btn-dark-purple w-100"
+                  class="btn btn-dark-purple w-100 <% if (product.isOutOfStock) { %> disabled <% } %>"
                   onclick="addToCart('<%= product._id %>')"
                 >
                   Add to Cart
                 </button>
                 <!-- Wishlist Button -->
-                <a href="#" class="btn btn-outline-dark-purple w-100">
+                <a
+                  href="#"
+                  class="btn btn-outline-dark-purple w-100 <% if (product.isOutOfStock) { %> disabled <% } %>"
+                >
                   <i class="fas fa-heart"></i> Wishlist
                 </a>
               </div>
@@ -116,4 +121,11 @@
   </div>
 </div>
 
-<script src="/js/filter.js"></script>
+<style>
+  .card.out-of-stock {
+    opacity: 0.5;
+  }
+  .card.out-of-stock .btn {
+    pointer-events: none; /* Prevent button clicks */
+  }
+</style>
