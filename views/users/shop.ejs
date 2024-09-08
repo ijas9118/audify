@@ -5,11 +5,11 @@
       <div class="card shadow-sm border-0">
         <div class="card-body py-5">
           <h5 class="card-title text-center">Filter Products</h5>
-          <form>
+          <form action="/shop" method="post">
             <!-- Category Filter -->
             <div class="mb-4">
               <label for="category" class="form-label">Category</label>
-              <select class="form-select" id="category">
+              <select class="form-select" id="category" name="category">
                 <option value="">All Categories</option>
                 <option value="headphones">Headphones</option>
                 <option value="earbuds">Earbuds</option>
@@ -22,43 +22,23 @@
               <label for="price" class="form-label">Price</label>
               <div id="price-slider"></div>
               <div class="d-flex justify-content-between mt-2">
-                <span id="minPriceValue">$50</span>
-                <span id="maxPriceValue">$200</span>
+                <span id="minPriceValue">₹50</span>
+                <span id="maxPriceValue">₹200</span>
               </div>
             </div>
-            <!-- Size Filter -->
+            <!-- Sorting Options -->
             <div class="mb-4">
-              <label class="form-label">Size</label>
-              <div
-                class="btn-group w-100"
-                role="group"
-                aria-label="Size filter"
-              >
-                <input
-                  type="radio"
-                  class="btn-check"
-                  name="size"
-                  id="sizeKids"
-                  value="kids"
-                  autocomplete="off"
-                />
-                <label class="btn btn-outline-dark-purple" for="sizeKids"
-                  >Kids</label
-                >
-
-                <input
-                  type="radio"
-                  class="btn-check"
-                  name="size"
-                  id="sizeAdults"
-                  value="adults"
-                  autocomplete="off"
-                  checked
-                />
-                <label class="btn btn-outline-dark-purple" for="sizeAdults"
-                  >Adults</label
-                >
-              </div>
+              <label for="sortOptions" class="form-label">Sort By</label>
+              <select class="form-select" id="sortOptions" name="sort">
+                <option value="popularity">Popularity</option>
+                <option value="price-asc">Price: Low to High</option>
+                <option value="price-desc">Price: High to Low</option>
+                <option value="rating">Average Ratings</option>
+                <option value="featured">Featured</option>
+                <option value="new">New Arrivals</option>
+                <option value="a-z">A - Z</option>
+                <option value="z-a">Z - A</option>
+              </select>
             </div>
             <!-- Apply Filters Button -->
             <button type="submit" class="btn w-100 mt-3 btn-dark-purple">
@@ -96,9 +76,7 @@
               <h5 class="card-title text-truncate"><%= product.name %></h5>
               <!-- Product Price -->
               <div class="d-flex align-items-center mb-2">
-                <h6 class="card-price mb-0">
-                  ₹<%= product.price %>
-                </h6>
+                <h6 class="card-price mb-0">₹<%= product.price %></h6>
                 <span class="text-muted ms-2"
                   ><del>₹<%= (product.price * 1.25).toFixed(0) %></del></span
                 >
@@ -118,7 +96,12 @@
             <div class="card-footer bg-white border-0">
               <div class="btn-group w-100" role="group">
                 <!-- Add to Cart Button -->
-                <button class="btn btn-dark-purple w-100" onclick="addToCart('<%= product._id %>')">Add to Cart</button>
+                <button
+                  class="btn btn-dark-purple w-100"
+                  onclick="addToCart('<%= product._id %>')"
+                >
+                  Add to Cart
+                </button>
                 <!-- Wishlist Button -->
                 <a href="#" class="btn btn-outline-dark-purple w-100">
                   <i class="fas fa-heart"></i> Wishlist
@@ -133,4 +116,4 @@
   </div>
 </div>
 
-<script src="/js/cart.js"></script>
+<script src="/js/filter.js"></script>

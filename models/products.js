@@ -44,6 +44,10 @@ const productSchema = new mongoose.Schema(
       min: 1,
       max: 100,
     },
+    popularity: {
+      type: Number,
+      default: 0,
+    },
     isActive: { type: Boolean, default: true },
     isOutOfStock: {
       type: Boolean,

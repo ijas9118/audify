@@ -189,6 +189,77 @@ exports.getShop = asyncHandler(async (req, res) => {
   });
 });
 
+exports.filterShop = asyncHandler(async (req, res) => {
+  const sortBy  = req.body.sort;
+
+  let sortCriteria = {};
+
+  switch (sortBy) {
+    case "popularity":
+      sortCriteria = { popularity: -1 };
+      break;
+    case "price-asc":
+      sortCriteria = { price: 1 };
+      break;
+    case "price-desc":
+      sortCriteria = { price: -1 };
+      break;
+    case "rating":
+      sortCriteria = { averageRatings: -1 };
+      break;
+    case "featured":
+      sortCriteria = { featured: -1 };
+      break;
+    case "new":
+      sortCriteria = { createdAt: -1 };
+      break;
+    case "a-z":
+      sortCriteria = { name: 1 };
+      break;
+    case "z-a":
+      sortCriteria = { name: -1 };
+      break;
+    default:
+      sortCriteria = null;
+      break;
+  }
+
+  const pipeline = [
+    {
+      $lookup: {
+        from: "categories",
+        localField: "categoryId",
+        foreignField: "_id",
+        as: "categoryDetails",
+      },
+    },
+    {
+      $unwind: "$categoryDetails",
+    },
+    {
+      $match: {
+        "categoryDetails.isActive": true, 
+        isActive: true,
+      },
+    },
+  ];
+
+  if (sortCriteria !== null) {
+    pipeline.push({ $sort: sortCriteria });
+  }
+  
+  const products = await Product.aggregate(pipeline);
+
+  res.render("layout", {
+    title: "Audify",
+    header: req.session.user ? "partials/login_header" : "partials/header",
+    viewName: "users/shop",
+    activePage: "shop",
+    isAdmin: false,
+    products,
+  });
+});
+
 exports.getProduct = asyncHandler(async (req, res) => {
   const product = await Product.findById(req.params.id);
   const categoryId = product.categoryId;
@@ -378,22 +449,24 @@ exports.orderSuccessPage = asyncHandler(async (req, res) => {
   const address = await Address.findById(selectedAddressId);
   const cart = await Cart.findOne({ user: userId });
 
-  const orderItems = await Promise.all(cart.items.map(async item => {
-    const orderItem = new OrderItem({
-      quantity: item.quantity,
-      product: item.productId
-    });
-    return await orderItem.save();
-  }));
-  
+  const orderItems = await Promise.all(
+    cart.items.map(async (item) => {
+      const orderItem = new OrderItem({
+        quantity: item.quantity,
+        product: item.productId,
+      });
+      return await orderItem.save();
+    })
+  );
+
   const order = new Order({
     user: userId,
     address: selectedAddressId,
-    orderItems: orderItems.map(item => item._id),
+    orderItems: orderItems.map((item) => item._id),
     paymentMethod,
     shippingCharge: cart.shippingCharge,
     totalAmount: cart.total,
-    status: 'Pending'
+    status: "Pending",
   });
 
   await order.save();
@@ -406,7 +479,7 @@ exports.orderSuccessPage = asyncHandler(async (req, res) => {
     isAdmin: false,
     cart,
     address,
-    paymentMethod
+    paymentMethod,
   });
 });
 
@@ -414,16 +487,16 @@ exports.getOrderHistory = asyncHandler(async (req, res) => {
   const userId = req.session.user;
 
   const orders = await Order.find({ user: userId })
-    .populate('address', 'location city state country zip')
-    .populate({ path: 'orderItems', populate: 'product' })
+    .populate("address", "location city state country zip")
+    .populate({ path: "orderItems", populate: "product" })
     .sort({ dateOrdered: -1 });
 
-  res.render('layout', {
-    title: 'Order History',
-    header: req.session.user ? 'partials/login_header' : 'partials/header',
-    viewName: 'users/orderHistory',
-    activePage: 'Order History',
+  res.render("layout", {
+    title: "Order History",
+    header: req.session.user ? "partials/login_header" : "partials/header",
+    viewName: "users/orderHistory",
+    activePage: "Order History",
     isAdmin: false,
-    orders
+    orders,
   });
-})
+});

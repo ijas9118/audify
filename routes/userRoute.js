@@ -19,7 +19,8 @@ const {
   deleteItemFromCart,
   getCheckoutPage,
   orderSuccessPage,
-  getOrderHistory
+  getOrderHistory,
+  filterShop
 } = require("../controller/userController");
 
 router.get("/", (req, res) => {
@@ -69,6 +70,8 @@ router.post("/login", loginUser);
 router.post("/logout", userAuth, logoutUser);
 
 router.get("/shop", getShop);
+
+router.post("/shop", filterShop);
 
 router.get('/shop/cart', userAuth, getCart);
 
