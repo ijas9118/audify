@@ -65,6 +65,14 @@
             <strong>Total Amount:</strong> ₹<%= order.totalAmount %>
             <strong>Shipping Charge:</strong> ₹<%= order.shippingCharge %>
           </div>
+          <% if (order.status === 'Pending' || order.status === 'Processed') { %>
+          <div class="d-flex justify-content-end mt-3">
+            <form action="/account/order-history/cancel" method="POST" onsubmit="return confirm('Are you sure you want to cancel this order?');">
+              <input type="hidden" name="orderId" value="<%= order._id %>" />
+              <button type="submit" class="btn btn-danger">Cancel Order</button>
+            </form>
+          </div>
+          <% } %>
         </div>
       </div>
     </div>

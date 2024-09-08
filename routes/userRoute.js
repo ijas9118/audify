@@ -20,7 +20,8 @@ const {
   getCheckoutPage,
   orderSuccessPage,
   getOrderHistory,
-  filterShop
+  filterShop,
+  cancelOrder
 } = require("../controller/userController");
 
 router.get("/", (req, res) => {
@@ -99,6 +100,8 @@ router.get('/checkout', userAuth, getCheckoutPage);
 router.post('/checkout', userAuth, orderSuccessPage);
 
 router.get('/account/order-history', userAuth, getOrderHistory);
+
+router.post('/account/order-history/cancel', userAuth, cancelOrder);
 
 
 module.exports = router;

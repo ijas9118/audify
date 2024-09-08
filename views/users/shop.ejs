@@ -2,12 +2,12 @@
   <div class="row">
     <!-- Filter Section -->
     <div class="col-md-3">
-      <div class="card shadow-sm border-0">
+      <div class="card shadow-sm border-0 position-sticky" style="top: 100px;">
         <div class="card-body py-5">
           <h5 class="card-title text-center">Filter Products</h5>
           <form action="/shop" method="post">
             <!-- Category Filter -->
-            <div class="mb-4">
+            <div class="mb-5">
               <label for="category" class="form-label">Category</label>
               <select class="form-select" id="category" name="category">
                 <option value="">All Categories</option>
@@ -18,7 +18,7 @@
               </select>
             </div>
             <!-- Price Filter -->
-            <div class="mb-4">
+            <div class="mb-5">
               <label for="price" class="form-label">Price</label>
               <div id="price-slider"></div>
               <div class="d-flex justify-content-between mt-2">
@@ -51,10 +51,10 @@
 
     <!-- Products Section -->
     <div class="col-md-9">
-      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-3">
         <!-- Product Card Example -->
         <% products.forEach(product => { %>
-        <div class="col-md-4 col-sm-6 mb-4">
+        <div class="col-md-4 col-sm-6">
           <div
             class="card h-100 shadow-sm border-0 <% if (product.isOutOfStock) { %> out-of-stock <% } %>"
           >
@@ -93,6 +93,11 @@
                   <i class="far fa-star"></i>
                 </span>
                 <span class="text-muted">(4.0)</span>
+              </div>
+              <div class="d-flex justify-content-between align-items-center ">
+                <span class="<%= product.stock === 0 || product.isOutOfStock ? 'text-danger' : 'text-success' %>">
+                  <%= product.stock === 0 || product.isOutOfStock ? 'Out of Stock' : product.stock + ' Available' %>
+                </span>
               </div>
             </div>
             <div class="card-footer bg-white border-0">

@@ -488,7 +488,6 @@ exports.orderSuccessPage = asyncHandler(async (req, res) => {
 
       // Check if product is out of stock
       const isOutOfStock = updatedStock <= 0;
-
       await Product.findByIdAndUpdate(
         item.productId,
         { $inc: { stock: -item.quantity }, $set: { isOutOfStock } } // Decrement stock by the ordered quantity
@@ -540,4 +539,10 @@ exports.getOrderHistory = asyncHandler(async (req, res) => {
     isAdmin: false,
     orders,
   });
+});
+
+exports.cancelOrder = asyncHandler(async (req, res) => {
+  const orderId = req.body.orderId;
+  await Order.updateOne({ _id: orderId }, { $set: { isCancelled: true } });
+  return res.json({message: 'Order Cancel Requested'});
 });

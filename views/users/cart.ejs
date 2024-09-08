@@ -27,7 +27,7 @@
                 <button class="btn btn-outline-dark btn-sm me-2" type="button" onclick="changeQuantity('<%= item.productId %>', -1)">
                   <i class="fa-solid fa-caret-down"></i>
                 </button>
-                <input type="number" class="form-control form-control-sm text-center" id="quantity-<%= item.productId %>" value="<%= item.quantity %>" min="1" style="width: 50px;" readonly />
+                <input type="number" class="form-control form-control-sm text-center" id="quantity-<%= item.productId %>" value="<%= item.quantity %>" min="1" max="5" style="width: 50px;" readonly />
                 <button class="btn btn-outline-dark btn-sm ms-2" type="button" onclick="changeQuantity('<%= item.productId %>', 1)">
                   <i class="fa-solid fa-caret-up"></i>
                 </button>

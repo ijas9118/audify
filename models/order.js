@@ -41,6 +41,10 @@ const orderSchema = mongoose.Schema(
       type: Date,
       default: Date.now(),
     },
+    isCancelled: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

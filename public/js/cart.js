@@ -5,6 +5,8 @@ function changeQuantity(productId, change) {
   // Ensure the quantity is valid
   if (newQuantity < 1) {
     newQuantity = 1;
+  } else if (newQuantity > 5) {
+    newQuantity = 5;
   }
 
   updateQuantityInDatabase(productId, newQuantity);
