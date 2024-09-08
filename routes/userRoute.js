@@ -16,7 +16,9 @@ const {
   getCart,
   addToCart,
   updateCart,
-  deleteItemFromCart
+  deleteItemFromCart,
+  getCheckoutPage,
+  orderSuccessPage
 } = require("../controller/userController");
 
 router.get("/", (req, res) => {
@@ -71,6 +73,7 @@ router.get('/shop/cart', userAuth, getCart);
 
 router.post('/shop/cart/updateQuantity', userAuth, updateCart);
 
+
 router.get('/shop/cart/:id', userAuth, addToCart);
 
 router.delete('/shop/cart/:id', userAuth, deleteItemFromCart);
@@ -86,5 +89,10 @@ router.post('/account/addresses', userAuth, addAddress);
 router.post('/account/addresses/default', userAuth, updateDefaultAddress)
 
 router.post('/account/:id', userAuth, updateUserAccount);
+
+router.get('/checkout', userAuth, getCheckoutPage);
+
+router.post('/checkout', userAuth, orderSuccessPage);
+
 
 module.exports = router;

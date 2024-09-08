@@ -328,7 +328,7 @@ exports.updateCart = asyncHandler(async (req, res) => {
   res.json(cart);
 });
 
-exports.deleteItemFromCart = async (req, res) => {
+exports.deleteItemFromCart = asyncHandler(async (req, res) => {
   const productId = req.params.id; // Get the productId from request parameters
   const userId = req.session.user;
 
@@ -353,4 +353,37 @@ exports.deleteItemFromCart = async (req, res) => {
     console.error(error);
     res.status(500).json({ message: "Server error" });
   }
-};
+});
+
+exports.getCheckoutPage = asyncHandler(async (req, res) => {
+  const userId = req.session.user;
+  const cart = await Cart.findOne({ user: userId });
+  const addresses = await Address.find({ user: userId });
+  res.render("layout", {
+    title: "Checkout",
+    header: req.session.user ? "partials/login_header" : "partials/header",
+    viewName: "users/checkout",
+    activePage: "Shop",
+    isAdmin: false,
+    cart,
+    addresses,
+  });
+});
+
+exports.orderSuccessPage = asyncHandler(async (req, res) => {
+  const { selectedAddressId, paymentMethod } = req.body;
+  const userId = req.session.user;
+  const address = await Address.findById(selectedAddressId);
+  const cart = await Cart.findOne({ user: userId });
+
+  res.render("layout", {
+    title: "Thank You",
+    header: req.session.user ? "partials/login_header" : "partials/header",
+    viewName: "users/orderSuccess",
+    activePage: "Shop",
+    isAdmin: false,
+    cart,
+    address,
+    paymentMethod
+  });
+});

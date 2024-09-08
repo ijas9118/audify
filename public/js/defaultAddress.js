@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
   const addressCards = document.querySelectorAll('.address-card');
-  console.log(12345);
   
   addressCards.forEach(card => {
     card.addEventListener('click', async () => {
