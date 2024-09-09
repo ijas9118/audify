@@ -366,6 +366,49 @@ exports.updateDefaultAddress = asyncHandler(async (req, res) => {
   }
 });
 
+exports.editAddressPage = asyncHandler(async (req, res) => {
+  const addressId = req.params.id;
+  const address = await Address.findById(addressId);
+
+  res.render("layout", {
+    title: "Edit Address",
+    header: req.session.user ? "partials/login_header" : "partials/header",
+    viewName: "users/editAddress",
+    activePage: "Home",
+    isAdmin: false,
+    address,
+  });
+});
+
+exports.updateAddress = asyncHandler(async (req, res) => {
+  const addressId = req.params.id;
+  const updatedAddress = {
+    customName: req.body.customName,
+    addressType: req.body.addressType,
+    location: req.body.location,
+    city: req.body.city,
+    state: req.body.state,
+    zip: req.body.zip,
+    country: req.body.country,
+  };
+
+  await Address.findByIdAndUpdate(addressId, updatedAddress);
+
+  res.redirect("/account/addresses");
+});
+
+exports.deleteAddress = asyncHandler(async (req, res) => {
+  const addressId = req.params.id;
+
+  const result = await Address.findByIdAndDelete(addressId);
+
+  if (!result) {
+    return res.status(404).send("Address not found");
+  }
+
+  res.status(200).send("Address deleted successfully");
+});
+
 exports.getCart = asyncHandler(async (req, res) => {
   const userId = req.session.user;
   const cart = await Cart.findOne({ user: userId });
@@ -544,5 +587,5 @@ exports.getOrderHistory = asyncHandler(async (req, res) => {
 exports.cancelOrder = asyncHandler(async (req, res) => {
   const orderId = req.body.orderId;
   await Order.updateOne({ _id: orderId }, { $set: { isCancelled: true } });
-  return res.json({message: 'Order Cancel Requested'});
+  return res.json({ message: "Order Cancel Requested" });
 });

@@ -21,7 +21,10 @@ const {
   orderSuccessPage,
   getOrderHistory,
   filterShop,
-  cancelOrder
+  cancelOrder,
+  editAddressPage,
+  updateAddress,
+  deleteAddress
 } = require("../controller/userController");
 
 router.get("/", (req, res) => {
@@ -92,6 +95,12 @@ router.get('/account/addresses', userAuth, getAddresses);
 router.post('/account/addresses', userAuth, addAddress);
 
 router.post('/account/addresses/default', userAuth, updateDefaultAddress)
+
+router.get('/account/edit/:id', userAuth, editAddressPage);
+
+router.post('/account/edit/:id', userAuth, updateAddress);
+
+router.delete('/account/delete/:id', userAuth, deleteAddress);
 
 router.post('/account/:id', userAuth, updateUserAccount);
 
