@@ -6,6 +6,9 @@ require("dotenv").config();
 const { notFound, errorHandler } = require("./middleware/errorHandler");
 const userRouter = require("./routes/userRoute");
 const adminRouter = require("./routes/adminRoute");
+const shopRouter = require('./routes/shopRouter');
+const accountRouter = require('./routes/accountRouter')
+const checkoutRouter = require('./routes/checkoutRouter')
 
 const PORT = process.env.PORT || 3000;
 const app = express();
@@ -43,6 +46,9 @@ app.use(
 
 app.use("/", userRouter);
 app.use("/admin", adminRouter);
+app.use("/shop", shopRouter);
+app.use("/account", accountRouter);
+app.use("/checkout", checkoutRouter);
 
 app.use(notFound);
 app.use(errorHandler);

@@ -15,7 +15,7 @@
 
   <!-- User Details Section -->
   <div class="user-details">
-    <form action="/account/<%= user._id %>" method="POST">
+    <form id="userForm" data-id="<%= user._id %>">
       <div class="form-row">
         <div class="form-group my-3">
           <label for="firstName">First Name</label>
@@ -170,3 +170,6 @@
     </form>
   </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="/js/userAccount.js"></script>

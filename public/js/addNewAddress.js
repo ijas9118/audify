@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
       icon.addEventListener('click', (event) => {
           event.stopPropagation(); 
           const addressId = event.target.closest('.address-card').dataset.id;
-          window.location.href = `/account/edit/${addressId}`;
+          window.location.href = `/account/addresses/edit/${addressId}`;
       });
   });
 });
@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (confirm('Are you sure you want to delete this address?')) {
         try {
-          const response = await fetch(`/account/delete/${addressId}`, {
+          const response = await fetch(`/account/addresses/delete/${addressId}`, {
             method: 'DELETE',
             headers: {
               'Content-Type': 'application/json',

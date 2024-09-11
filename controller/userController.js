@@ -7,6 +7,7 @@ const Order = require("../models/order");
 const asyncHandler = require("express-async-handler");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
+const Swal = require('sweetalert2')
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -296,15 +297,20 @@ exports.getUserAccount = asyncHandler(async (req, res) => {
 });
 
 exports.updateUserAccount = asyncHandler(async (req, res) => {
-  const updatedUser = await User.findByIdAndUpdate(req.params.id, {
-    $set: req.body,
-  });
-
-  if (!updatedUser) {
-    return res.status(404).json({ message: "User not found" });
+  const { email } = req.body;
+  
+  const existingUser = await User.findOne({ email, _id: { $ne: req.params.id } });
+  if (existingUser) {
+    return res.status(400).json({ success: false, message: "Email is already in use" });
   }
 
-  res.redirect("/account");
+  const updatedUser = await User.findByIdAndUpdate(req.params.id, { $set: req.body });
+
+  if (!updatedUser) {
+    return res.status(404).json({ success: false, message: "User not found" });
+  }
+
+  res.status(200).json({ success: true, message: "Account updated successfully" });
 });
 
 exports.getAddresses = asyncHandler(async (req, res) => {
