@@ -7,7 +7,7 @@ const Order = require("../models/order");
 const asyncHandler = require("express-async-handler");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
-const Swal = require('sweetalert2')
+const Swal = require("sweetalert2");
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -145,9 +145,16 @@ exports.loginUser = asyncHandler(async (req, res) => {
     findUser.status === "Active"
   ) {
     req.session.user = findUser._id;
-    res.redirect("/");
+    res.status(200).json({
+      success: true,
+      message: "Login successful",
+      redirectUrl: "/",
+    });
   } else {
-    throw new Error("Invalid Credentials");
+    res.status(401).json({
+      success: false,
+      message: "Invalid Credentials",
+    });
   }
 });
 
@@ -298,19 +305,28 @@ exports.getUserAccount = asyncHandler(async (req, res) => {
 
 exports.updateUserAccount = asyncHandler(async (req, res) => {
   const { email } = req.body;
-  
-  const existingUser = await User.findOne({ email, _id: { $ne: req.params.id } });
+
+  const existingUser = await User.findOne({
+    email,
+    _id: { $ne: req.params.id },
+  });
   if (existingUser) {
-    return res.status(400).json({ success: false, message: "Email is already in use" });
+    return res
+      .status(400)
+      .json({ success: false, message: "Email is already in use" });
   }
 
-  const updatedUser = await User.findByIdAndUpdate(req.params.id, { $set: req.body });
+  const updatedUser = await User.findByIdAndUpdate(req.params.id, {
+    $set: req.body,
+  });
 
   if (!updatedUser) {
     return res.status(404).json({ success: false, message: "User not found" });
   }
 
-  res.status(200).json({ success: true, message: "Account updated successfully" });
+  res
+    .status(200)
+    .json({ success: true, message: "Account updated successfully" });
 });
 
 exports.getAddresses = asyncHandler(async (req, res) => {
@@ -451,12 +467,11 @@ exports.updateCart = asyncHandler(async (req, res) => {
 });
 
 exports.deleteItemFromCart = asyncHandler(async (req, res) => {
-  const productId = req.params.id; // Get the productId from request parameters
+  const productId = req.params.id;
   const userId = req.session.user;
 
   try {
-    // Assuming you have a Cart model with a method to remove an item
-    const cart = await Cart.findOne({ user: userId }); // Find the cart for the user
+    const cart = await Cart.findOne({ user: userId }); 
 
     if (!cart) {
       return res.status(404).json({ message: "Cart not found" });

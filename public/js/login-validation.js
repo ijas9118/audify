@@ -1,10 +1,9 @@
 document.addEventListener("DOMContentLoaded", function () {
   const form = document.getElementById("loginForm");
 
-  form.addEventListener("submit", function (event) {
+  form.addEventListener("submit", async function (event) {
     event.preventDefault();
 
-    // Clear previous error messages
     clearErrors();
 
     const email = document.getElementById("email").value.trim();
@@ -20,15 +19,40 @@ document.addEventListener("DOMContentLoaded", function () {
       isValid = false;
     }
 
-    // If validation is successful, submit the form
     if (isValid) {
-      form.submit();
+      try {
+        const response = await fetch('/login', { 
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email, password }),
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          window.location.href = result.redirectUrl || '/';
+        } else {
+          showAlert("error", "Login Failed", result.message || "An error occurred. Please try again.");
+        }
+      } catch (error) {
+        showAlert("error", "Error", "An error occurred. Please try again.");
+      }
     }
   });
 
   function validateEmail(email) {
     const re = /\S+@\S+\.\S+/;
     return re.test(email);
+  }
+
+  function showAlert(icon, title, text) {
+    Swal.fire({
+      icon: icon,
+      title: title,
+      text: text,
+    });
   }
 
   function setError(id, message) {

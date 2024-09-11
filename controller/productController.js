@@ -176,10 +176,11 @@ exports.updateProduct = asyncHandler(async (req, res) => {
   product.name = name;
   product.price = price;
   product.categoryId = categoryId;
-  if(stock){
+  if (stock) {
     product.stock = stock;
+    product.isOutOfStock = false;
   } else {
-    product.isOutOfStock = true
+    product.isOutOfStock = true;
   }
   product.description = description;
 

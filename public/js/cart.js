@@ -43,20 +43,33 @@ function addToCart(productId) {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      // Add any necessary authentication headers here
     },
   })
     .then((response) => response.json())
     .then((data) => {
       if (data.message === "Item added to cart successfully") {
-        alert("Item successfully added to your cart!");
+        Swal.fire({
+          icon: "success",
+          title: "Success!",
+          text: "Item successfully added to your cart!",
+          confirmButtonColor: "#4a2c77",
+        });
       } else {
-        alert(data.message || "Failed to add item to cart");
+        Swal.fire({
+          icon: "error",
+          title: "Oops!",
+          text: data.message || "Failed to add item to cart",
+          confirmButtonColor: "#4a2c77",
+        });
       }
     })
     .catch((error) => {
-      console.error("Error:", error);
-      alert("An error occurred while adding the item to your cart");
+      Swal.fire({
+        icon: "error",
+        title: "Error!",
+        text: "An error occurred while adding the item to your cart",
+        confirmButtonColor: "#4a2c77",
+      });
     });
 }
 
