@@ -1,5 +1,5 @@
 <div class="container my-5 col-md-10 col-sm-12">
-  <nav aria-label="breadcrumb"></nav>
+  <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
       <li class="breadcrumb-item"><a href="/">Home</a></li>
       <li class="breadcrumb-item"><a href="/shop">Shop</a></li>
@@ -8,24 +8,33 @@
     </ol>
   </nav>
   <h1 class="mb-4">Checkout</h1>
-  
+
   <div class="row">
     <!-- Cart Summary -->
     <div class="col-md-8">
       <div class="checkout-summary mb-4">
         <% cart.items.forEach(item => { %>
-          <div class="card mb-3">
-            <div class="card-body d-flex justify-content-between align-items-center">
-              <div class="d-flex align-items-center">
-                <img src="<%= item.image %>" alt="<%= item.name %>" class="me-3" style="width: 100px; height: 100px; object-fit: contain;">
-                <div>
-                  <h5 class="mb-1"><%= item.name %></h5>
-                  <p class="mb-1">₹<%= item.price.toFixed(2) %> x <%= item.quantity %></p>
-                </div>
+        <div class="card mb-3">
+          <div
+            class="card-body d-flex justify-content-between align-items-center"
+          >
+            <div class="d-flex align-items-center">
+              <img
+                src="<%= item.image %>"
+                alt="<%= item.name %>"
+                class="me-3"
+                style="width: 100px; height: 100px; object-fit: contain"
+              />
+              <div>
+                <h5 class="mb-1"><%= item.name %></h5>
+                <p class="mb-1">
+                  ₹<%= item.price.toFixed(2) %> x <%= item.quantity %>
+                </p>
               </div>
-              <p class="mb-0">Subtotal: ₹<%= item.subtotal.toFixed(2) %></p>
             </div>
+            <p class="mb-0">Subtotal: ₹<%= item.subtotal.toFixed(2) %></p>
           </div>
+        </div>
         <% }); %>
       </div>
     </div>
@@ -35,7 +44,10 @@
         <h4 class="mb-4 text-center">Order Summary</h4>
         <div class="d-flex justify-content-between mb-3 border-bottom pb-2">
           <span class="fw-semibold text-muted">Subtotal</span>
-          <span>₹<%= cart.items.reduce((acc, item) => acc + item.subtotal, 0).toFixed(2) %></span>
+          <span
+            >₹<%= cart.items.reduce((acc, item) => acc + item.subtotal,
+            0).toFixed(2) %></span
+          >
         </div>
         <div class="d-flex justify-content-between mb-3 border-bottom pb-2">
           <span class="fw-semibold text-muted">Savings</span>
@@ -47,73 +59,233 @@
         </div>
         <div class="d-flex justify-content-between mb-4 pb-2 total">
           <span class="fw-bold text-dark">Grand Total</span>
-          <span class="fs-5 fw-bold text-dark">₹<%= cart.total.toFixed(2) %></span>
+          <span class="fs-5 fw-bold text-dark"
+            >₹<%= cart.total.toFixed(2) %></span
+          >
         </div>
       </div>
     </div>
   </div>
 
-  <form id="checkoutForm" action="/checkout" method="POST">
+  <form id="checkoutForm">
     <!-- Address Selection -->
     <div class="mb-4">
       <h4 class="mb-3">Select Address</h4>
       <div class="row">
         <% addresses.forEach(address => { %>
-          <div class="col-md-3 mb-3 d-flex">
-            <div class="card flex-fill address-card <% if (address.isDefault) { %> active-address <% } %>" data-id="<%= address._id %>">
-              <div class="card-body d-flex flex-column">
-                <h5 class="card-title">
-                  <% if (address.isDefault) { %>
-                    <%= address.customName || address.addressType.charAt(0).toUpperCase() + address.addressType.slice(1) %> (Default)
-                  <% } else { %>
-                    <%= address.customName || address.addressType.charAt(0).toUpperCase() + address.addressType.slice(1) %>
-                  <% } %>
-                </h5>
-                <p class="card-text flex-grow-1">
-                  <%= address.location %>, <%= address.city %>, <%= address.state %>, <%= address.country %> - <%= address.zip %>
-                </p>
-              </div>
+        <div class="col-md-3 mb-3 d-flex">
+          <div class="card flex-fill address-card" data-id="<%= address._id %>">
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title">
+                <% if (address.isDefault) { %> <%= address.customName ||
+                address.addressType.charAt(0).toUpperCase() +
+                address.addressType.slice(1) %> (Default) <% } else { %> <%=
+                address.customName ||
+                address.addressType.charAt(0).toUpperCase() +
+                address.addressType.slice(1) %> <% } %>
+              </h5>
+              <p class="card-text flex-grow-1">
+                <%= address.location %>, <%= address.city %>, <%= address.state
+                %>, <%= address.country %> - <%= address.zip %>
+              </p>
             </div>
           </div>
-        <% }); %>        
+        </div>
+        <% }); %>
       </div>
     </div>
 
-    <input type="hidden" name="selectedAddressId" id="selectedAddressId">
-   
+    <div class="mb-4"></div>
+    <h4 class="mb-3">Enter New Address</h4>
     <div class="container my-5">
-      <div class="mb-4">
-        <h4 class="mb-3">Payment Method</h4>
-        <div class="row payment-methods col-8">
-          <!-- Payment Method 1 -->
-          <div class="col-md-6 mb-3">
-            <div class="payment-card d-flex align-items-center p-3 rounded" data-method="Card">
-              <i class="fas fa-credit-card fa-2x"></i>
-              <span class="ms-3 fs-5">Card</span>
+      <div class="row">
+        <!-- Form Fields Container -->
+        <div class="col-md-8">
+          <div class="row">
+            <!-- Name Field -->
+            <div class="mb-3 col-12 col-md-6">
+              <label for="name" class="form-label">Name</label>
+              <input
+                type="text"
+                class="form-control rounded-3 px-3 py-2"
+                id="name"
+                name="name"
+                placeholder="Enter your name"
+              />
+            </div>
+
+            <!-- Mobile Field -->
+            <div class="mb-3 col-12 col-md-6">
+              <label for="mobile" class="form-label">Mobile</label>
+              <input
+                type="text"
+                class="form-control rounded-3 px-3 py-2"
+                id="mobile"
+                name="mobile"
+                pattern="\d{10}"
+                title="Please provide a valid 10-digit mobile number"
+                placeholder="Enter your mobile number"
+              />
             </div>
           </div>
 
+          <div class="row">
+            <!-- Alternate Mobile Field -->
+            <div class="mb-3 col-12 col-md-6">
+              <label for="alternateMobile" class="form-label"
+                >Alternate Mobile</label
+              >
+              <input
+                type="text"
+                class="form-control rounded-3 px-3 py-2"
+                id="alternateMobile"
+                name="alternateMobile"
+                pattern="\d{10}"
+                title="Please provide a valid 10-digit mobile number"
+                placeholder="Enter alternate mobile number"
+              />
+            </div>
+
+            <!-- Location Field -->
+            <div class="mb-3 col-12 col-md-6">
+              <label for="location" class="form-label">Location</label>
+              <textarea
+                class="form-control rounded-3 px-3 py-2"
+                id="location"
+                name="location"
+                rows="2"
+                placeholder="Enter your location"
+              ></textarea>
+            </div>
+          </div>
+
+          <div class="row">
+            <!-- City Field -->
+            <div class="mb-3 col-12 col-md-6">
+              <label for="city" class="form-label">City</label>
+              <input
+                type="text"
+                class="form-control rounded-3 px-3 py-2"
+                id="city"
+                name="city"
+                placeholder="Enter your city"
+              />
+            </div>
+
+            <!-- State Field -->
+            <div class="mb-3 col-12 col-md-6">
+              <label for="state" class="form-label">State</label>
+              <input
+                type="text"
+                class="form-control rounded-3 px-3 py-2"
+                id="state"
+                name="state"
+                placeholder="Enter your state"
+              />
+            </div>
+          </div>
+
+          <div class="row">
+            <!-- Landmark Field -->
+            <div class="mb-3 col-12 col-md-6">
+              <label for="landmark" class="form-label">Landmark</label>
+              <input
+                type="text"
+                class="form-control rounded-3 px-3 py-2"
+                id="landmark"
+                name="landmark"
+                placeholder="Enter a landmark (optional)"
+              />
+            </div>
+
+            <!-- ZIP Code Field -->
+            <div class="mb-3 col-12 col-md-6">
+              <label for="zip" class="form-label">ZIP Code</label>
+              <input
+                type="text"
+                class="form-control rounded-3 px-3 py-2"
+                id="zip"
+                name="zip"
+                placeholder="Enter your ZIP code"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <input type="hidden" name="selectedAddressId" id="selectedAddressId" />
+
+    <div class="container my-5">
+      <h4 class="mb-4">Payment Method</h4>
+      <div class="row">
+        <div class="col-12">
           <!-- Payment Method 2 -->
-          <div class="col-md-6 mb-3">
-            <div class="payment-card d-flex align-items-center p-3 rounded" data-method="UPI">
-              <i class="fas fa-mobile-alt fa-2x"></i>
-              <span class="ms-3 fs-5">UPI</span>
+          <div class="mb-4">
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="radio"
+                name="paymentMethod"
+                id="razorpay"
+                value="RazorPay"
+              />
+              <label
+                class="form-check-label d-flex align-items-center"
+                for="razorpay"
+              >
+                <i
+                  class="fas fa-mobile-alt fa-2x ms-3 me-3"
+                  style="color: #7a479b"
+                ></i>
+                Online Payment (RazorPay)
+              </label>
             </div>
           </div>
 
           <!-- Payment Method 3 -->
-          <div class="col-md-6 mb-3">
-            <div class="payment-card d-flex align-items-center p-3 rounded" data-method="Wallet">
-              <i class="fas fa-wallet fa-2x"></i>
-              <span class="ms-3 fs-5">Wallet</span>
+          <div class="mb-4">
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="radio"
+                name="paymentMethod"
+                id="wallet"
+                value="Wallet"
+              />
+              <label
+                class="form-check-label d-flex align-items-center"
+                for="wallet"
+              >
+                <i
+                  class="fas fa-wallet fa-2x ms-3 me-3"
+                  style="color: #7a479b"
+                ></i>
+                Wallet
+              </label>
             </div>
           </div>
 
           <!-- Payment Method 4 -->
-          <div class="col-md-6 mb-3">
-            <div class="payment-card d-flex align-items-center p-3 rounded highlighted" data-method="Cash On Delivery">
-              <i class="fa-solid fa-money-bill-1 fa-2x"></i>
-              <span class="ms-3 fs-5">Cash On Delivery</span>
+          <div class="mb-3">
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="radio"
+                name="paymentMethod"
+                id="cashOnDelivery"
+                value="Cash On Delivery"
+              />
+              <label
+                class="form-check-label d-flex align-items-center"
+                for="cashOnDelivery"
+              >
+                <i
+                  class="fa-solid fa-money-bill-1 fa-2x ms-3 me-3"
+                  style="color: #7a479b"
+                ></i>
+                Cash On Delivery
+              </label>
             </div>
           </div>
         </div>
@@ -123,58 +295,30 @@
     <!-- Hidden Input for Payment Method -->
     <input type="hidden" name="paymentMethod" id="paymentMethod" />
 
-    <!-- Apply Coupon -->
-    <div class="mb-4 col-5">
-      <h4 class="mb-3">Apply Coupon</h4>
-      <div class="input-group">
-        <input type="text" id="couponCode" class="form-control" placeholder="Enter coupon code" aria-label="Coupon code">
-        <button id="applyCoupon" class="btn btn-dark" type="button">Apply</button>
-      </div>
-    </div>
-
     <!-- Place Order Button -->
-    <div class="d-flex justify-content-start col-5">
-      <button id="placeOrder" class="btn btn-dark btn-lg w-100" type="submit">Place Order</button>
+    <div class="d-flex justify-content-start col-4">
+      <button id="placeOrder" class="btn btn-dark btn-lg w-100" type="submit">
+        Place Order
+      </button>
     </div>
   </form>
 </div>
 
 <style>
-  .payment-card {
-  transition: all 0.3s ease;
-  cursor: pointer;
-  background-color: #f8f9fa; /* Light background color for the cards */
-}
-
-.payment-card:hover {
-  background-color: #e9ecef;
-  border-color: #0056b3;
-}
-
-.payment-card.highlighted {
-  box-shadow: 0 0 10px rgba(200, 150, 255, 0.6); /* Light purple glow */
-  border: 1px solid rgba(200, 150, 255, 0.3); /* Optional: Add a light purple border */
-  transition: all 0.3s;
-}
-
-.payment-card i {
-  color: #9166e0;
-  transition: color 0.3s ease;
-}
-.address-card {
+  .address-card {
     cursor: pointer;
     border: 2px solid transparent;
     transition: background-color 0.3s ease, border-color 0.3s ease;
-    border-radius: 0.375rem; 
+    border-radius: 0.375rem;
   }
-  
+
   .address-card.active-address {
-    box-shadow: 0 0 10px rgba(0, 123, 255, 0.5); 
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
     border-color: #007bff;
   }
-  
+
   .address-card:hover {
-    background-color: #f8f9fa; 
+    background-color: #f8f9fa;
   }
 </style>
 

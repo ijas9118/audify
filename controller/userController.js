@@ -364,6 +364,25 @@ exports.getAddresses = asyncHandler(async (req, res) => {
   });
 });
 
+exports.getAddressDetails = asyncHandler(async (req, res) => {
+  const addressid = req.params.id;
+  const userId = req.session.user;
+
+  const user = await User.findById(userId);
+  const address = await Address.findById(addressid);
+
+  const result = {
+    name: user.firstName + user.lastName,
+    mobile: user.mobile,
+    location: address.location,
+    city: address.city,
+    state: address.state,
+    landmark: address.landmark || "",
+    zip: address.zip,
+  }
+  res.status(200).json(result);
+})
+
 exports.addAddress = asyncHandler(async (req, res) => {
   const userId = req.session.user;
   const userAddresses = await Address.find({ user: userId });
@@ -561,8 +580,15 @@ exports.getCheckoutPage = asyncHandler(async (req, res) => {
 });
 
 exports.orderSuccessPage = asyncHandler(async (req, res) => {
+  console.log(req.body)
+})
+
+exports.orderSuccessPage2 = asyncHandler(async (req, res) => {
+  console.log(req.body);
+  
   const { selectedAddressId, paymentMethod } = req.body;
   const userId = req.session.user;
+  const user = await User.findById(userId);
   const address = await Address.findById(selectedAddressId);
   const cart = await Cart.findOne({ user: userId });
 
@@ -579,18 +605,6 @@ exports.orderSuccessPage = asyncHandler(async (req, res) => {
       }
     })
   );
-
-  if (insufficientStockItems.length > 0) {
-    // Handle insufficient stock
-    return res.render("layout", {
-      title: "Order Failed",
-      header: req.session.user ? "partials/login_header" : "partials/header",
-      viewName: "users/orderFailed",
-      activePage: "Shop",
-      isAdmin: false,
-      insufficientStockItems, // Pass the details to the view
-    });
-  }
 
   const orderItems = await Promise.all(
     cart.items.map(async (item) => {
@@ -615,8 +629,15 @@ exports.orderSuccessPage = asyncHandler(async (req, res) => {
   );
 
   const order = new Order({
-    user: userId,
-    address: selectedAddressId,
+    user: userId,      
+    name: user.firstName + " " + user.lastName,
+    mobile: user.mobile,
+    alternateMobile: address.alternateMobile,  
+    location: address.location,
+    city: address.city,
+    state: address.state,
+    landmark: address.landmark,
+    zip: address.zip,
     orderItems: orderItems.map((item) => item._id),
     paymentMethod,
     shippingCharge: cart.shippingCharge,
@@ -655,6 +676,22 @@ exports.getOrderHistory = asyncHandler(async (req, res) => {
     activePage: "Order History",
     isAdmin: false,
     orders,
+  });
+});
+
+exports.getOrderDetail = asyncHandler(async (req, res) => {
+  const order = await Order.find({ _id: req.params.id })
+    .populate("address", "location city state country zip")
+    .populate({ path: "orderItems", populate: "product" })
+    .sort({ dateOrdered: -1 });
+
+  res.render("layout", {
+    title: "Order Detail",
+    header: req.session.user ? "partials/login_header" : "partials/header",
+    viewName: "users/orderDetail",
+    activePage: "Order",
+    isAdmin: false,
+    order,
   });
 });
 

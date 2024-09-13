@@ -143,6 +143,18 @@ function updateCartUI(cart) {
 }
 
 function deleteItem(productId) {
+  let Toast = Swal.mixin({
+    toast: true,
+    position: "top",
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+    didOpen: (toast) => {
+      toast.onmouseenter = Swal.stopTimer;
+      toast.onmouseleave = Swal.resumeTimer;
+    },
+  });
+
   fetch(`/shop/cart/${productId}`, {
     method: "DELETE",
     headers: {
@@ -157,10 +169,16 @@ function deleteItem(productId) {
       if (data.message === "Item removed successfully") {
         // Optionally update the UI or redirect the user
         document.querySelector(`[data-product-id="${productId}"]`).remove();
-        alert("Item removed from cart");
+        Toast.fire({
+          icon: "info",
+          title: "Item removed from cart",
+        });
         updateCartUI(data.cart);
       } else {
-        alert("Failed to remove item");
+        Toast.fire({
+          icon: "error",
+          title: "Failed to remove item",
+        });
       }
     })
     .catch((error) => {

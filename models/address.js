@@ -19,9 +19,8 @@ const addressSchema = new mongoose.Schema(
       type: String,
       required: [true, "State is required"],
     },
-    country: {
+    landmark: {
       type: String,
-      required: [true, "Country is required"],
     },
     zip: {
       type: String,

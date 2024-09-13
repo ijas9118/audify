@@ -7,10 +7,37 @@ const orderSchema = mongoose.Schema(
       ref: "User",
       required: true,
     },
-    address: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Address",
-      required: true,
+    name: {
+      type: String,
+      require: true,
+    },
+    mobile: {
+      type: Number,
+      require: true,
+      match: [/^\d{10}$/, "Please provide a valid 10-digit mobile number"],
+    },
+    alternateMobile: {
+      type: Number,
+      match: [/^\d{10}$/, "Please provide a valid 10-digit mobile number"],
+    },
+    location: {
+      type: String,
+      required: [true, "Location is required"],
+    },
+    city: {
+      type: String,
+      required: [true, "City is required"],
+    },
+    state: {
+      type: String,
+      required: [true, "State is required"],
+    },
+    landmark: {
+      type: String,
+    },
+    zip: {
+      type: String,
+      required: [true, "ZIP Code is required"],
     },
     orderItems: [
       {
@@ -21,7 +48,7 @@ const orderSchema = mongoose.Schema(
     ],
     paymentMethod: {
       type: String,
-      enum: ["Card", "UPI", "Wallet", "Cash On Delivery"],
+      enum: ["RazorPay", "Wallet", "Cash On Delivery"],
       required: true,
     },
     shippingCharge: {

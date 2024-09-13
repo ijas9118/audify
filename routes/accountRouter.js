@@ -12,6 +12,8 @@ const {
   updateUserAccount,
   getOrderHistory,
   cancelOrder,
+  getOrderDetail,
+  getAddressDetails,
 } = require("../controller/userController");
 
 router.get("/", userAuth, getUserAccount);
@@ -21,6 +23,8 @@ router.get("/addresses", userAuth, getAddresses);
 router.post("/addresses", userAuth, addAddress);
 
 router.post("/addresses/default", userAuth, updateDefaultAddress);
+
+router.get('/addresses/:id', userAuth, getAddressDetails)
 
 router.get("/addresses/edit/:id", userAuth, editAddressPage);
 
@@ -33,5 +37,7 @@ router.post("/:id", userAuth, updateUserAccount);
 router.get("/order-history", userAuth, getOrderHistory);
 
 router.post("/order-history/cancel", userAuth, cancelOrder);
+
+router.get('/order-details/:id', userAuth, getOrderDetail);
 
 module.exports = router;
