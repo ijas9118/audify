@@ -119,8 +119,8 @@
             >
               <!-- Add to Cart Button -->
               <a
-                href="/shop/cart/<%= product._id %>"
                 class="btn btn-dark-purple rounded-start w-50 <% if (product.isOutOfStock) { %> disabled <% } %>"
+                onclick="addToCart('<%= product._id %>')"
               >
                 <i class="fas fa-cart-plus me-2"></i> Add to Cart
               </a>
@@ -331,3 +331,5 @@
     };
   });
 </script>
+
+<script src="/js/cart.js"></script>

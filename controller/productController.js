@@ -181,6 +181,7 @@ exports.updateProduct = asyncHandler(async (req, res) => {
     product.isOutOfStock = false;
   } else {
     product.isOutOfStock = true;
+    product.stock = 0;
   }
   product.description = description;
 

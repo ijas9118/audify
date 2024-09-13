@@ -22,10 +22,10 @@
 
   <!-- Address Grid -->
   <div
-    class="container d-flex flex-wrap justify-content-center p-0 column-gap-5"
+    class="container d-flex flex-wrap justify-content-start p-0 column-gap-5"
   >
     <% if (addresses.length > 0) { %> <% addresses.forEach((address) => { %>
-    <div class="col-5 mb-4">
+    <div class="col-md-5 col-12 mb-4">
       <div class="address-card <%= address.isDefault ? 'default' : '' %>" data-id="<%= address._id %>">
         <div class="icons d-flex align-items-center gap-3">
           <i class="fa-solid fa-square-pen edit-icon"></i>
@@ -52,7 +52,7 @@
     <% } %>
 
     <!-- Add New Address Button -->
-    <div class="col-5 mb-4">
+    <div class="col-md-5 col-12 mb-4">
       <div
         class="add-address-card"
         data-bs-toggle="modal"

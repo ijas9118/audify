@@ -7,7 +7,6 @@ const Order = require("../models/order");
 const asyncHandler = require("express-async-handler");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
-const Swal = require("sweetalert2");
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -289,6 +288,28 @@ exports.getProduct = asyncHandler(async (req, res) => {
   });
 });
 
+exports.getStock = asyncHandler(async (req, res) => {
+  try {
+    const { productId } = req.query;
+
+    if (!productId) {
+      return res.status(400).json({ error: "Product ID is required" });
+    }
+
+    const product = await Product.findById(productId);
+
+    if (!product) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    // Return the stock quantity
+    res.json({ stock: product.stock });
+  } catch (error) {
+    console.error("Error fetching stock information:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 exports.getUserAccount = asyncHandler(async (req, res) => {
   const id = req.session.user;
   const user = await User.findById(id);
@@ -445,6 +466,38 @@ exports.getCart = asyncHandler(async (req, res) => {
   });
 });
 
+exports.getCartItemID = asyncHandler(async (req, res) => {
+  const userId = req.session.user;
+
+  if (!userId) {
+    return res.status(400).json({ error: "User ID is required" });
+  }
+
+  try {
+    // Find the cart for the user
+    const cart = await Cart.findOne({ user: userId }).populate(
+      "items.productId"
+    );
+
+    if (!cart) {
+      return res.status(404).json({ error: "Cart not found" });
+    }
+
+    // Extract product IDs and quantities
+    const products = cart.items.map((item) => ({
+      productId: item.productId._id.toString(),
+      quantity: item.quantity,
+      name: item.name,
+    }));
+
+    // Return product IDs and quantities as response
+    res.json({ products });
+  } catch (error) {
+    console.error("Error fetching cart items:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 exports.addToCart = asyncHandler(async (req, res) => {
   const userId = req.session.user;
   const productId = req.params.id;
@@ -471,7 +524,7 @@ exports.deleteItemFromCart = asyncHandler(async (req, res) => {
   const userId = req.session.user;
 
   try {
-    const cart = await Cart.findOne({ user: userId }); 
+    const cart = await Cart.findOne({ user: userId });
 
     if (!cart) {
       return res.status(404).json({ message: "Cart not found" });

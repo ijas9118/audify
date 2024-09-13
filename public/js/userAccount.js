@@ -3,10 +3,22 @@ document.getElementById('userForm').addEventListener('submit', async function (e
 
   const userId = this.dataset.id;
   const formData = new FormData(this);
-  
+
   const data = {};
   formData.forEach((value, key) => {
     data[key] = value;
+  });
+
+  const Toast = Swal.mixin({
+    toast: true,
+    position: "bottom-end",
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+    didOpen: (toast) => {
+      toast.onmouseenter = Swal.stopTimer;
+      toast.onmouseleave = Swal.resumeTimer;
+    },
   });
 
   try {
@@ -21,27 +33,21 @@ document.getElementById('userForm').addEventListener('submit', async function (e
     const result = await response.json();
 
     if (response.ok) {
-      Swal.fire({
+      Toast.fire({
         icon: 'success',
-        title: 'Success',
-        text: result.message || 'Your account has been updated!',
-        showConfirmButton: false,
-        timer: 1500
-      }).then(() => {
-        window.location.href = '/account';
+        title: result.message || 'Your account has been updated!'
       });
     } else {
-      Swal.fire({
+      Toast.fire({
         icon: 'error',
-        title: 'Oops...',
-        text: result.message || 'Something went wrong!',
+        title: result.message || 'Something went wrong!'
       });
     }
   } catch (error) {
-    Swal.fire({
+    Toast.fire({
       icon: 'error',
-      title: 'Oops...',
-      text: 'There was an error updating your account. Please try again later.',
+      title: 'There was an error updating your account. Please try again later.'
     });
   }
 });
+

@@ -1,10 +1,20 @@
 document.addEventListener("DOMContentLoaded", function () {
   const form = document.getElementById("loginForm");
 
+  const Toast = Swal.mixin({
+    toast: true,
+    position: "top-end", // Adjust position as needed
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+    didOpen: (toast) => {
+      toast.onmouseenter = Swal.stopTimer;
+      toast.onmouseleave = Swal.resumeTimer;
+    },
+  });
+
   form.addEventListener("submit", async function (event) {
     event.preventDefault();
-
-    clearErrors();
 
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value.trim();
@@ -12,19 +22,25 @@ document.addEventListener("DOMContentLoaded", function () {
     let isValid = true;
 
     if (!validateEmail(email)) {
-      setError("emailError", "Please enter a valid email address.");
+      Toast.fire({
+        icon: "error",
+        title: "Please enter a valid email address.",
+      });
       isValid = false;
     } else if (password.length < 6) {
-      setError("passwordError", "Password must be at least 6 characters long.");
+      Toast.fire({
+        icon: "error",
+        title: "Password must be at least 6 characters long.",
+      });
       isValid = false;
     }
 
     if (isValid) {
       try {
-        const response = await fetch('/login', { 
-          method: 'POST',
+        const response = await fetch("/login", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({ email, password }),
         });
@@ -32,12 +48,18 @@ document.addEventListener("DOMContentLoaded", function () {
         const result = await response.json();
 
         if (response.ok) {
-          window.location.href = result.redirectUrl || '/';
+          window.location.href = result.redirectUrl || "/";
         } else {
-          showAlert("error", "Login Failed", result.message || "An error occurred. Please try again.");
+          Toast.fire({
+            icon: "error",
+            title: result.message || "Login Failed. Please try again.",
+          });
         }
       } catch (error) {
-        showAlert("error", "Error", "An error occurred. Please try again.");
+        Toast.fire({
+          icon: "error",
+          title: "An error occurred. Please try again.",
+        });
       }
     }
   });
@@ -45,25 +67,5 @@ document.addEventListener("DOMContentLoaded", function () {
   function validateEmail(email) {
     const re = /\S+@\S+\.\S+/;
     return re.test(email);
-  }
-
-  function showAlert(icon, title, text) {
-    Swal.fire({
-      icon: icon,
-      title: title,
-      text: text,
-    });
-  }
-
-  function setError(id, message) {
-    document.getElementById(id).textContent = message;
-    document.getElementById(id).style.display = "block";
-  }
-
-  function clearErrors() {
-    document.getElementById("emailError").textContent = "";
-    document.getElementById("emailError").style.display = "none";
-    document.getElementById("passwordError").textContent = "";
-    document.getElementById("passwordError").style.display = "none";
   }
 });

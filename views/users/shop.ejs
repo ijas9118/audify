@@ -9,7 +9,7 @@
   <div class="row">
     <!-- Filter Section -->
     <div class="col-md-3">
-      <div class="card shadow-sm border-0 position-sticky" style="top: 100px;">
+      <div class="card shadow-sm border-1 position-sticky" style="top: 100px;">
         <div class="card-body py-5">
           <h5 class="card-title text-center">Filter Products</h5>
           <form action="/shop" method="post">
@@ -84,7 +84,7 @@
               <!-- Product Name -->
               <h5 class="card-title text-truncate"><%= product.name %></h5>
               <!-- Product Price -->
-              <div class="d-flex align-items-center mb-2">
+              <div class="d-flex align-items-center">
                 <h6 class="card-price mb-0">₹<%= product.price %></h6>
                 <span class="text-muted ms-2"
                   ><del>₹<%= (product.price * 1.25).toFixed(0) %></del></span

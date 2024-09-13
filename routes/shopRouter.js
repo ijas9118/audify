@@ -1,20 +1,36 @@
 const express = require("express");
 const router = express.Router();
-const userAuth = require('../middleware/userAuth');
-const { getShop, filterShop, getCart, updateCart, addToCart, deleteItemFromCart, getProduct } = require("../controller/userController");
+const userAuth = require("../middleware/userAuth");
+const {
+  getShop,
+  filterShop,
+  getCart,
+  updateCart,
+  addToCart,
+  deleteItemFromCart,
+  getProduct,
+  getStock,
+  getCartItemID,
+} = require("../controller/userController");
 
 router.get("/", getShop);
 
 router.post("/", filterShop);
 
-router.get('/cart', userAuth, getCart);
+router.get("/cart", userAuth, getCart);
 
-router.post('/cart/updateQuantity', userAuth, updateCart);
+router.get("/cart-item-id", userAuth, getCartItemID);
 
-router.get('/cart/:id', userAuth, addToCart);
+router.post("/cart/updateQuantity", userAuth, updateCart);
 
-router.delete('/cart/:id', userAuth, deleteItemFromCart);
+router.get("/cart/:id", userAuth, addToCart);
 
-router.get('/:id', getProduct);
+router.delete("/cart/:id", userAuth, deleteItemFromCart);
+
+// Get the stock of a product
+router.get("/stock", userAuth, getStock);
+
+router.get("/:id", getProduct);
+
 
 module.exports = router;
