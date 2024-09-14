@@ -104,6 +104,18 @@ function setupPaymentMethodSelection() {
 function setupFormSubmission() {
   const form = document.getElementById("checkoutForm");
 
+  let Toast = Swal.mixin({
+    toast: true,
+    position: "top", // Adjust position as needed
+    showConfirmButton: false,
+    timer: 2000,
+    timerProgressBar: true,
+    didOpen: (toast) => {
+      toast.onmouseenter = Swal.stopTimer;
+      toast.onmouseleave = Swal.resumeTimer;
+    },
+  });
+
   form.addEventListener("submit", async (event) => {
     event.preventDefault(); // Prevent the default form submission
 
@@ -122,15 +134,23 @@ function setupFormSubmission() {
       const result = await response.json(); // Parse the JSON response
 
       if (response.ok) {
-        // Redirect to another endpoint on success
+        await Toast.fire({
+          icon: "success",
+          title: "Order placed!",
+        });
         window.location.href = `/checkout/order-success/${result.orderId}`; // Change this URL as needed
       } else {
-        // Show error message if response is not ok
-        alert(result.message || "An error occurred");
+        Toast.fire({
+          icon: "error",
+          title: result.message || "An error occurred",
+        });
       }
     } catch (error) {
       console.error("Error:", error);
-      alert("An unexpected error occurred");
+      Toast.fire({
+        icon: "error",
+        title: "An unexpected error occurred",
+      });
     }
   });
 }

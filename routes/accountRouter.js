@@ -2,18 +2,20 @@ const express = require("express");
 const router = express.Router();
 const userAuth = require("../middleware/userAuth");
 const {
+  cancelOrder,
+  getOrderHistory,
+  getOrderDetail,
+} = require("../controller/checkoutController");
+const {
   getUserAccount,
   getAddresses,
   addAddress,
   updateDefaultAddress,
+  getAddressDetails,
   editAddressPage,
   updateAddress,
   deleteAddress,
   updateUserAccount,
-  getOrderHistory,
-  cancelOrder,
-  getOrderDetail,
-  getAddressDetails,
 } = require("../controller/userController");
 
 router.get("/", userAuth, getUserAccount);
@@ -24,7 +26,7 @@ router.post("/addresses", userAuth, addAddress);
 
 router.post("/addresses/default", userAuth, updateDefaultAddress);
 
-router.get('/addresses/:id', userAuth, getAddressDetails)
+router.get("/addresses/:id", userAuth, getAddressDetails);
 
 router.get("/addresses/edit/:id", userAuth, editAddressPage);
 
@@ -38,6 +40,6 @@ router.get("/order-history", userAuth, getOrderHistory);
 
 router.post("/order-history/cancel", userAuth, cancelOrder);
 
-router.get('/order-details/:id', userAuth, getOrderDetail);
+router.get("/order-history/:id", userAuth, getOrderDetail);
 
 module.exports = router;

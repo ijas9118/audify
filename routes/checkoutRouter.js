@@ -5,12 +5,12 @@ const {
   getCheckoutPage,
   handleOrderSubmission,
   orderSuccessPage,
-} = require("../controller/userController");
+} = require("../controller/checkoutController");
 
 router.get("/", userAuth, getCheckoutPage);
 
 router.post("/", userAuth, handleOrderSubmission);
 
-router.get('/order-success/:orderId', userAuth, orderSuccessPage)
+router.get("/order-success/:orderId", userAuth, orderSuccessPage);
 
 module.exports = router;

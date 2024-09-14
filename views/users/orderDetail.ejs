@@ -2,36 +2,75 @@
   <!-- Breadcrumb -->
   <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
-      <li class="breadcrumb-item"><a href="/">Home</a></li>
-      <li class="breadcrumb-item"><a href="/account">My Account</a></li>
-      <li class="breadcrumb-item active" aria-current="page">Order Details</li>
+      <li class="breadcrumb-item">
+        <a href="/" class="text-decoration-none">Home</a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="/account" class="text-decoration-none">My Account</a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="/account/order-history" class="text-decoration-none">Order History</a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page"><%= order._id %></li>
     </ol>
   </nav>
 
-  <!-- Order Details -->
-  <div class="order-card card mb-4">
+  <!-- Order Details Card -->
+  <div class="card shadow-sm mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5 class="card-title mb-0">Order Details</h5>
+      <span class="badge bg-primary"><%= order.status %></span>
+    </div>
     <div class="card-body">
-      <h5 class="card-title">Order ID: <%= order._id %></h5>
-      <p class="card-text">
-        <strong>Status:</strong> <span class="badge bg-primary"><%= order.status %></span><br>
-        <strong>Address:</strong> <%= order.address.location %>, <%= order.address.city %>, <%= order.address.state %>, <%= order.address.country %> - <%= order.address.zip %><br>
-        <strong>Payment Method:</strong> <%= order.paymentMethod %><br>
-        <strong>Order Date:</strong> <%= new Date(order.dateOrdered).toDateString() %><br>
-        <strong>Shipping Charge:</strong> ₹<%= order.shippingCharge %><br>
-        <strong>Total Amount:</strong> ₹<%= order.totalAmount %>
+      <div class="row mb-4">
+        <div class="col-md-6">
+          <p class="mb-2">
+            <strong>Order ID:</strong> <%= order._id %>
+          </p>
+          <p class="mb-2">
+            <strong>Order Date:</strong> <%= new Date(order.dateOrdered).toDateString() %>
+          </p>
+          <p class="mb-2">
+            <strong>Payment Method:</strong> <%= order.paymentMethod %>
+          </p>
+        </div>
+        <div class="col-md-6">
+          <p class="mb-2">
+            <strong>Total Amount:</strong> ₹<%= order.totalAmount %>
+          </p>
+          <p class="mb-2">
+            <strong>Shipping Charge:</strong> ₹<%= order.shippingCharge %>
+          </p>
+        </div>
+      </div>
+      <h6 class="border-bottom pb-2 mb-3">Shipping Address</h6>
+      <p class="mb-2">
+        <strong>Name:</strong> <%= order.name %>
       </p>
+      <p class="mb-2">
+        <strong>Address:</strong> <%= order.location %>, <%= order.city %>, <%= order.state %> - <%= order.zip %>
+      </p>
+      <p class="mb-2">
+        <strong>Mobile:</strong> <%= order.mobile %> <% if(order.alternateMobile){ %> (Alternate: <%= order.alternateMobile %>) <% } %>
+      </p>
+    </div>
+  </div>
 
-      <!-- Ordered Items -->
-      <h6 class="mt-3 mb-2">Items:</h6>
-      <div class="d-flex flex-wrap">
+  <!-- Ordered Items Card -->
+  <div class="card shadow-sm mb-4">
+    <div class="card-header">
+      <h5 class="card-title mb-0">Ordered Items</h5>
+    </div>
+    <div class="card-body">
+      <div class="row g-3">
         <% order.orderItems.forEach(item => { %>
-          <div class="d-flex me-3 mb-3" style="width: 200px;">
-            <img src="<%= item.product.images.main %>" class="me-2" alt="<%= item.product.name %>">
-            <div class="d-flex flex-column">
-              <h6 class="mb-1"><%= item.product.name %></h6>
-              <p class="mb-0">x<%= item.quantity %> - ₹<%= item.product.price %></p>
-            </div>
+        <div class="col-12 col-md-6 d-flex">
+          <img src="<%= item.product.images.main %>" class="img-fluid me-3 rounded" alt="<%= item.product.name %>" style="max-width: 100px; object-fit: cover;">
+          <div>
+            <h6 class="mb-1"><%= item.product.name %></h6>
+            <p class="mb-0">x<%= item.quantity %> - ₹<%= item.product.price %></p>
           </div>
+        </div>
         <% }); %>
       </div>
     </div>
@@ -39,11 +78,21 @@
 
   <!-- Cancel Order Button -->
   <% if (order.status === 'Pending' || order.status === 'Processed') { %>
-    <div class="d-flex justify-content-end">
-      <form action="/account/order-history/cancel" method="POST" onsubmit="return confirm('Are you sure you want to cancel this order?');">
-        <input type="hidden" name="orderId" value="<%= order._id %>" />
-        <button type="submit" class="btn btn-danger">Cancel Order</button>
-      </form>
-    </div>
+  <div class="text-end">
+    <form action="/account/order-history/cancel" method="POST" onsubmit="return confirm('Are you sure you want to cancel this order?');">
+      <input type="hidden" name="orderId" value="<%= order._id %>" />
+      <button type="submit" class="btn btn-danger">Cancel Order</button>
+    </form>
+  </div>
   <% } %>
 </div>
+
+<style>
+  .card-header h5 {
+    font-size: 1.25rem;
+    margin-bottom: 0;
+  }
+  .breadcrumb-item a:hover {
+    color: #5a31a8;
+  }
+</style>

@@ -172,20 +172,67 @@ exports.updateProduct = asyncHandler(async (req, res) => {
     return res.status(404).json({ message: "Product not found" });
   }
 
+  // Handle image upload if new images are provided
+  const uploadPromises = [];
+  let updatedImages = { ...product.images };
+
+  if (req.files["mainImage"] && req.files["mainImage"].length > 0) {
+    const mainImageFile = req.files["mainImage"][0];
+    uploadPromises.push(
+      new Promise((resolve, reject) => {
+        cloudinary.uploader
+          .upload_stream(
+            { folder: "products", resource_type: "image" },
+            (error, result) => {
+              if (error) return reject(error);
+              resolve(result.secure_url);
+            }
+          )
+          .end(mainImageFile.buffer);
+      })
+    );
+  }
+
+  if (req.files["supportImages"] && req.files["supportImages"].length > 0) {
+    const supportImageFiles = req.files["supportImages"];
+    supportImageFiles.forEach((file) => {
+      uploadPromises.push(
+        new Promise((resolve, reject) => {
+          cloudinary.uploader
+            .upload_stream(
+              { folder: "products", resource_type: "image" },
+              (error, result) => {
+                if (error) return reject(error);
+                resolve(result.secure_url);
+              }
+            )
+            .end(file.buffer);
+        })
+      );
+    });
+  }
+
+  const imageUrls = await Promise.all(uploadPromises);
+
+  if (req.files["mainImage"] && req.files["mainImage"].length > 0) {
+    updatedImages.main = imageUrls.shift(); // Get the first URL for the main image
+  }
+
+  if (req.files["supportImages"] && req.files["supportImages"].length > 0) {
+    updatedImages.supports = imageUrls; // The rest are support images
+  }
+
   // Update product details
   product.name = name;
   product.price = price;
   product.categoryId = categoryId;
-  if (stock) {
-    product.stock = stock;
-    product.isOutOfStock = false;
-  } else {
-    product.isOutOfStock = true;
-    product.stock = 0;
-  }
+  product.stock = stock ? stock : 0;
+  product.isOutOfStock = !stock;
   product.description = description;
+  product.images = updatedImages;
 
   await product.save();
 
   res.redirect("/admin/products/");
 });
+

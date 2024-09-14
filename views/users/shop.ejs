@@ -18,10 +18,10 @@
               <label for="category" class="form-label">Category</label>
               <select class="form-select" id="category" name="category">
                 <option value="">All Categories</option>
-                <option value="headphones">Headphones</option>
-                <option value="earbuds">Earbuds</option>
-                <option value="speakers">Speakers</option>
-                <option value="smartwatches">Smartwatches</option>
+                <option value="Headphones" <% if (category === 'Headphones') { %> selected <% } %>>Headphones</option>
+                <option value="Earbuds" <% if (category === 'Earbuds') { %> selected <% } %>>Earbuds</option>
+                <option value="Speakers" <% if (category === 'Speakers') { %> selected <% } %>>Speakers</option>
+                <option value="Smartwatches" <% if (category === 'Smartwatches') { %> selected <% } %>>Smartwatches</option>
               </select>
             </div>
             <!-- Price Filter -->
@@ -32,19 +32,25 @@
                 <span id="minPriceValue">₹50</span>
                 <span id="maxPriceValue">₹200</span>
               </div>
+              <input type="hidden" id="minPrice" name="minPrice" value="50">
+              <input type="hidden" id="maxPrice" name="maxPrice" value="200">
+            </div>
+            <div id="slider-config"
+              data-min-price="<%= minPrice %>"
+              data-max-price="<%= maxPrice %>">
             </div>
             <!-- Sorting Options -->
             <div class="mb-4">
               <label for="sortOptions" class="form-label">Sort By</label>
               <select class="form-select" id="sortOptions" name="sort">
-                <option value="popularity">Popularity</option>
-                <option value="price-asc">Price: Low to High</option>
-                <option value="price-desc">Price: High to Low</option>
-                <option value="rating">Average Ratings</option>
-                <option value="featured">Featured</option>
-                <option value="new">New Arrivals</option>
-                <option value="a-z">A - Z</option>
-                <option value="z-a">Z - A</option>
+                <option value="popularity" <% if (sortBy === 'popularity') { %> selected <% } %>>Popularity</option>
+                <option value="price-asc" <% if (sortBy === 'price-asc') { %> selected <% } %>>Price: Low to High</option>
+                <option value="price-desc" <% if (sortBy === 'price-desc') { %> selected <% } %>>Price: High to Low</option>
+                <option value="rating" <% if (sortBy === 'rating') { %> selected <% } %>>Average Ratings</option>
+                <option value="featured" <% if (sortBy === 'featured') { %> selected <% } %>>Featured</option>
+                <option value="new" <% if (sortBy === 'new') { %> selected <% } %>>New Arrivals</option>
+                <option value="a-z" <% if (sortBy === 'a-z') { %> selected <% } %>>A - Z</option>
+                <option value="z-a" <% if (sortBy === 'z-a') { %> selected <% } %>>Z - A</option>
               </select>
             </div>
             <!-- Apply Filters Button -->

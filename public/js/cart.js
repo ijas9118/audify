@@ -204,34 +204,42 @@ async function verifyStock() {
   try {
     const products = await getProductIdsFromCart();
 
-    for (const product of products) {
-      const { productId, quantity, name } = product;
-      const response = await fetch(`/shop/stock?productId=${productId}`);
+    if (products === null || products.length === 0) {
+      Toast.fire({
+        icon: "warning",
+        title: "Your cart is empty",
+      });
+      hasStockIssue = true;
+    } else {
+      for (const product of products) {
+        const { productId, quantity, name } = product;
+        const response = await fetch(`/shop/stock?productId=${productId}`);
 
-      if (!response.ok) {
-        throw new Error(`Failed to fetch stock for product ID ${productId}`);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch stock for product ID ${productId}`);
+        }
+
+        const stockData = await response.json();
+        const maxQuantity = stockData.stock;
+
+        if (maxQuantity === 0) {
+          Toast.fire({
+            icon: "warning",
+            title: `${name} is out of stock.`,
+          });
+          hasStockIssue = true;
+        } else if (quantity > maxQuantity) {
+          Toast.fire({
+            icon: "warning",
+            title: `${name} only has ${maxQuantity} available, but you want ${quantity}.`,
+          });
+          hasStockIssue = true;
+        }
       }
 
-      const stockData = await response.json();
-      const maxQuantity = stockData.stock;
-
-      if (maxQuantity === 0) {
-        Toast.fire({
-          icon: "warning",
-          title: `${name} is out of stock.`,
-        });
-        hasStockIssue = true;
-      } else if (quantity > maxQuantity) {
-        Toast.fire({
-          icon: "warning",
-          title: `${name} only has ${maxQuantity} available, but you want ${quantity}.`,
-        });
-        hasStockIssue = true;
+      if (!hasStockIssue) {
+        window.location.href = "/checkout";
       }
-    }
-
-    if (!hasStockIssue) {
-      window.location.href = "/checkout";
     }
   } catch (error) {
     console.error("Error:", error);

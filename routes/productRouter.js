@@ -33,6 +33,10 @@ router.get("/edit/:id", adminAuth, getProductById);
 router.post(
   "/edit/:id",
   adminAuth,
+  upload.fields([
+    { name: "mainImage", maxCount: 1 },
+    { name: "supportImages", maxCount: 2 },
+  ]),
   updateProduct
 );
 

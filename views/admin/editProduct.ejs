@@ -6,6 +6,7 @@
         id="editProductForm"
         action="/admin/products/edit/<%= product._id %>"
         method="POST"
+        enctype="multipart/form-data"
       >
         <!-- Product Details Section -->
         <div class="form-section">
@@ -96,13 +97,15 @@
               alt="Current Main Image"
               class="img-thumbnail me-3"
             />
-            <input
-              type="file"
-              class="form-control"
-              id="editMainImage"
-              name="mainImage"
-              accept="image/*"
-            />
+            <div>
+              <input
+                type="file"
+                class="form-control"
+                id="editMainImage"
+                name="mainImage"
+                accept="image/*"
+              />
+            </div>
           </div>
         </div>
         <!-- Support Images -->
