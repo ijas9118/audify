@@ -379,9 +379,9 @@ exports.getAddressDetails = asyncHandler(async (req, res) => {
     state: address.state,
     landmark: address.landmark || "",
     zip: address.zip,
-  }
+  };
   res.status(200).json(result);
-})
+});
 
 exports.addAddress = asyncHandler(async (req, res) => {
   const userId = req.session.user;
@@ -579,87 +579,98 @@ exports.getCheckoutPage = asyncHandler(async (req, res) => {
   });
 });
 
-exports.orderSuccessPage = asyncHandler(async (req, res) => {
-  console.log(req.body)
-})
+exports.handleOrderSubmission = asyncHandler(async (req, res) => {
+  try {
+    console.log(req.body);
+    const { paymentMethod } = req.body;
+    const cart = await Cart.findOne({ user: req.session.user });
 
-exports.orderSuccessPage2 = asyncHandler(async (req, res) => {
-  console.log(req.body);
-  
-  const { selectedAddressId, paymentMethod } = req.body;
-  const userId = req.session.user;
-  const user = await User.findById(userId);
-  const address = await Address.findById(selectedAddressId);
-  const cart = await Cart.findOne({ user: userId });
+    if (!cart) {
+      return res.status(400).json({ message: "Cart not found" });
+    }
 
-  const insufficientStockItems = [];
-  await Promise.all(
-    cart.items.map(async (item) => {
-      const product = await Product.findById(item.productId);
-      if (item.quantity > product.stock) {
-        insufficientStockItems.push({
-          product: product.name,
-          availableStock: product.stock,
-          requestedQuantity: item.quantity,
+    const orderItems = await Promise.all(
+      cart.items.map(async (item) => {
+        const orderItem = new OrderItem({
+          quantity: item.quantity,
+          product: item.productId,
         });
-      }
-    })
-  );
+        await orderItem.save();
 
-  const orderItems = await Promise.all(
-    cart.items.map(async (item) => {
-      const orderItem = new OrderItem({
-        quantity: item.quantity,
-        product: item.productId,
-      });
-      await orderItem.save();
+        const product = await Product.findById(item.productId);
+        if (!product) {
+          return res.status(404).json({ message: "Product not found" });
+        }
+        
+        const updatedStock = product.stock - item.quantity;
+        const isOutOfStock = updatedStock <= 0;
 
-      const product = await Product.findById(item.productId);
-      const updatedStock = product.stock - item.quantity;
+        await Product.findByIdAndUpdate(
+          item.productId,
+          { $inc: { stock: -item.quantity }, $set: { isOutOfStock } } // Decrement stock by the ordered quantity
+        );
 
-      // Check if product is out of stock
-      const isOutOfStock = updatedStock <= 0;
-      await Product.findByIdAndUpdate(
-        item.productId,
-        { $inc: { stock: -item.quantity }, $set: { isOutOfStock } } // Decrement stock by the ordered quantity
-      );
+        return orderItem;
+      })
+    );
 
-      return orderItem;
-    })
-  );
+    const order = new Order({
+      user: req.session.user,
+      name: req.body.name,
+      mobile: req.body.mobile,
+      alternateMobile: req.body.alternateMobile,
+      location: req.body.location,
+      city: req.body.city,
+      state: req.body.state,
+      landmark: req.body.landmark,
+      zip: req.body.zip,
+      orderItems: orderItems.map((item) => item._id),
+      paymentMethod,
+      shippingCharge: cart.shippingCharge,
+      totalAmount: cart.total,
+      status: "Pending",
+    });
 
-  const order = new Order({
-    user: userId,      
-    name: user.firstName + " " + user.lastName,
-    mobile: user.mobile,
-    alternateMobile: address.alternateMobile,  
-    location: address.location,
-    city: address.city,
-    state: address.state,
-    landmark: address.landmark,
-    zip: address.zip,
-    orderItems: orderItems.map((item) => item._id),
-    paymentMethod,
-    shippingCharge: cart.shippingCharge,
-    totalAmount: cart.total,
-    status: "Pending",
-  });
+    await order.save();
 
-  await order.save();
+    await Cart.findOneAndUpdate({ user: req.session.user }, { $set: { items: [] } });
 
-  await Cart.findOneAndUpdate({ user: userId }, { $set: { items: [] } });
-
-  res.render("layout", {
-    title: "Thank You",
-    header: req.session.user ? "partials/login_header" : "partials/header",
-    viewName: "users/orderSuccess",
-    activePage: "Shop",
-    isAdmin: false,
-    cart,
-    address,
-    paymentMethod,
-  });
+    res.status(200).json({ message: "Order placed successfully", orderId: order._id  });
+  } catch (error) {
+    console.error("Error placing order:", error);
+    res.status(500).json({ message: "Failed to place order" });
+  }
 });
+
+exports.orderSuccessPage = asyncHandler(async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.orderId)
+      .populate({
+        path: 'orderItems',
+        populate: {
+          path: 'product',
+          select: 'name price'
+        }
+      })
+      .exec();
+
+    if (!order) {
+      return res.status(404).send("Order not found");
+    }
+
+    res.render("layout", {
+      title: "Order Success",
+      header: req.session.user ? "partials/login_header" : "partials/header",
+      viewName: "users/orderSuccess",
+      activePage: "Order",
+      isAdmin: false,
+      order,
+    });
+  } catch (error) {
+    console.error("Error fetching order:", error);
+    res.status(500).send("Server Error");
+  }
+})
 
 exports.getOrderHistory = asyncHandler(async (req, res) => {
   const userId = req.session.user;

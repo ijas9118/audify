@@ -110,8 +110,6 @@ function setupFormSubmission() {
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries()); // Convert FormData to a plain object
 
-    console.log("Form Data:", data);
-
     try {
       const response = await fetch("/checkout", {
         method: "POST",
@@ -121,14 +119,18 @@ function setupFormSubmission() {
         body: JSON.stringify(data), // Convert the object to a JSON string
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
+      const result = await response.json(); // Parse the JSON response
 
-      const responseData = await response.json();
-      console.log("Server Response:", responseData);
+      if (response.ok) {
+        // Redirect to another endpoint on success
+        window.location.href = `/checkout/order-success/${result.orderId}`; // Change this URL as needed
+      } else {
+        // Show error message if response is not ok
+        alert(result.message || "An error occurred");
+      }
     } catch (error) {
       console.error("Error:", error);
+      alert("An unexpected error occurred");
     }
   });
 }

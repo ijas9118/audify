@@ -3,11 +3,14 @@ const router = express.Router();
 const userAuth = require("../middleware/userAuth");
 const {
   getCheckoutPage,
+  handleOrderSubmission,
   orderSuccessPage,
 } = require("../controller/userController");
 
 router.get("/", userAuth, getCheckoutPage);
 
-router.post("/", userAuth, orderSuccessPage);
+router.post("/", userAuth, handleOrderSubmission);
+
+router.get('/order-success/:orderId', userAuth, orderSuccessPage)
 
 module.exports = router;
