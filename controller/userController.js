@@ -88,6 +88,35 @@ exports.sendOtp = asyncHandler(async (req, res) => {
   }
 });
 
+exports.resendOtp = asyncHandler(async (req, res) => {
+  const { email } = req.session.tempUser; // Fetch tempUser from session
+  if (!email) {
+    return res.status(400).json({ error: "No user data in session. Please sign up again." });
+  }
+
+  // Generate new OTP and update session
+  const otp = crypto.randomInt(100000, 999999);
+  const otpExpiry = Date.now() + 5 * 60 * 1000;
+
+  req.session.otp = otp;
+  req.session.otpExpiry = otpExpiry;
+
+  const mailOptions = {
+    from: "ahammedijas9118@gmail.com",
+    to: email,
+    subject: "Your OTP for Signup",
+    text: `Your OTP is ${otp}. It will expire in 5 minutes.`,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    res.json({ message: "New OTP sent successfully!" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error sending OTP" });
+  }
+});
+
 exports.verifyAndSignUp = asyncHandler(async (req, res) => {
   const { otp } = req.body;
 

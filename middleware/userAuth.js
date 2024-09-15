@@ -1,7 +1,9 @@
 const asyncHandler = require('express-async-handler');
+const User = require('../models/userModel');
 
 const userAuth = asyncHandler(async (req, res, next) => {
-  if (!req.session.user) {
+  const user = await User.findById(req.session.user);
+  if (!req.session.user || user.status === "Inactive") {
     res.redirect('/login');
   } else {
     next();

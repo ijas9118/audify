@@ -6,6 +6,7 @@ const {
   loginUser,
   logoutUser,
   verifyAndSignUp,
+  resendOtp,
 } = require("../controller/userController");
 
 router.get("/", (req, res) => {
@@ -33,7 +34,7 @@ router.get("/signup", (req, res) => {
 
 router.post("/signup", sendOtp);
 
-router.post("/signup/resend-otp", sendOtp);
+router.get("/signup/resend-otp", resendOtp);
 
 router.post("/verify-otp", verifyAndSignUp);
 
