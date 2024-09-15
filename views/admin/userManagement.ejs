@@ -1,16 +1,19 @@
 <div class="container-fluid mt-3">
   <div class="row">
-    <!-- Main content -->
+    <!-- Breadcrumb Navigation -->
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="/admin">Admin</a></li>
-        <li class="breadcrumb-item active" aria-current="page">
+        <li class="breadcrumb-item">
+          <a href="/admin" class="text-light">Admin</a>
+        </li>
+        <li class="breadcrumb-item active text-info" aria-current="page">
           User Management
         </li>
       </ol>
     </nav>
     <div class="container">
       <div class="row">
+        <h3 class="mb-4 text-light">User Management</h3>
         <div class="table-responsive">
           <table class="table text-light">
             <thead>
@@ -36,10 +39,11 @@
                   <form
                     action="/admin/users/toggle-status/<%= user._id %>"
                     method="POST"
+                    class="w-100"
                   >
                     <button
                       type="submit"
-                      class="btn <%= user.status === 'Active' ? 'btn-danger' : 'btn-success' %>"
+                      class="btn w-100 <%= user.status === 'Active' ? 'btn-outline-light' : 'btn-dark' %>"
                     >
                       <%= user.status === 'Active' ? 'Block' : 'Unblock' %>
                     </button>

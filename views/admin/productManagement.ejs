@@ -1,28 +1,30 @@
 <div class="container-fluid mt-3">
   <div class="row">
     <!-- Main content -->
-    <nav
-      aria-label="breadcrumb"
-      class="d-flex justify-content-between align-items-center"
-    >
-      <ol class="breadcrumb mb-0">
-        <li class="breadcrumb-item"><a href="/admin">Admin</a></li>
-        <li class="breadcrumb-item active" aria-current="page">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="/admin" class="text-light">Admin</a>
+        </li>
+        <li class="breadcrumb-item active text-info" aria-current="page">
           Product Management
         </li>
       </ol>
-      <!-- Add New Category Button -->
-      <button
-        type="button"
-        class="btn btn-primary"
-        data-bs-toggle="modal"
-        data-bs-target="#addProductModel"
-      >
-        Add New Product
-      </button>
     </nav>
-    <div class="container mt-3">
+    <div class="container">
       <div class="row">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h3 class="text-light">Product Management</h3>
+          <!-- Add New Product Button -->
+          <button
+            type="button"
+            class="btn btn-primary"
+            data-bs-toggle="modal"
+            data-bs-target="#addProductModel"
+          >
+            Add New Product
+          </button>
+        </div>
         <div class="table-responsive">
           <table class="table text-light">
             <thead>
@@ -54,10 +56,7 @@
                       style="display: inline"
                       class="w-100"
                     >
-                      <button
-                        type="submit"
-                        class="btn btn-outline-primary w-100"
-                      >
+                      <button type="submit" class="btn btn-outline-light w-100">
                         Edit
                       </button>
                     </form>
@@ -69,7 +68,7 @@
                     >
                       <button
                         type="submit"
-                        class="btn w-100 <%= product.isActive ? 'btn-dark' : 'btn-success' %>"
+                        class="btn w-100 <%= product.isActive ? 'btn-dark' : 'btn-primary' %>"
                       >
                         <%= product.isActive ? "Unlist" : "List" %>
                       </button>
@@ -95,12 +94,12 @@
   aria-hidden="true"
 >
   <div class="modal-dialog modal-xl">
-    <div class="modal-content text-dark">
-      <div class="modal-header">
+    <div class="modal-content bg-dark text-light">
+      <div class="modal-header bg-dark">
         <h5 class="modal-title" id="addProductModelLabel">Add New Product</h5>
         <button
           type="button"
-          class="btn-close"
+          class="btn-close btn-close-white"
           data-bs-dismiss="modal"
           aria-label="Close"
         ></button>
@@ -116,7 +115,7 @@
               <label for="productName" class="form-label">Product Name</label>
               <input
                 type="text"
-                class="form-control"
+                class="form-control custom-search-input"
                 id="productName"
                 name="name"
                 required
@@ -127,7 +126,7 @@
                 >Description</label
               >
               <textarea
-                class="form-control"
+                class="form-control custom-search-input"
                 id="productDescription"
                 name="description"
               ></textarea>
@@ -136,7 +135,7 @@
               <label for="productPrice" class="form-label">Product Price</label>
               <input
                 type="number"
-                class="form-control"
+                class="form-control custom-search-input"
                 id="productPrice"
                 name="price"
                 required
@@ -147,7 +146,7 @@
               <label for="productStock" class="form-label">Stock</label>
               <input
                 type="number"
-                class="form-control"
+                class="form-control custom-search-input"
                 id="productStock"
                 name="stock"
                 min="0"
@@ -177,7 +176,7 @@
               <label for="mainImage" class="form-label">Main Image</label>
               <input
                 type="file"
-                class="form-control image-input"
+                class="form-control custom-search-input image-input"
                 id="mainImageInput"
                 name="mainImage"
                 accept="image/*"
@@ -199,7 +198,7 @@
               <label class="form-label">Support Images 1</label>
               <input
                 type="file"
-                class="form-control image-input"
+                class="form-control custom-search-input image-input"
                 id="supportImageInput1"
                 name="supportImages"
                 accept="image/*"
@@ -219,7 +218,7 @@
               <label class="form-label">Support Images 2</label>
               <input
                 type="file"
-                class="form-control image-input"
+                class="form-control custom-search-input image-input"
                 id="supportImageInput2"
                 name="supportImages"
                 accept="image/*"
@@ -253,3 +252,4 @@
 </div>
 
 <script src="/js/addProduct.js"></script>
+

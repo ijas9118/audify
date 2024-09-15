@@ -69,7 +69,7 @@
         <% products.forEach(product => { %>
         <div class="col-md-4 col-sm-6">
           <div
-            class="card h-100 shadow-sm border-0 <% if (product.isOutOfStock) { %> out-of-stock <% } %>"
+            class="card h-100 shadow-sm border-1 <% if (product.isOutOfStock) { %> out-of-stock <% } %>"
           >
             <div class="position-relative">
               <a href="/shop/<%= product._id %>" class="card-link">

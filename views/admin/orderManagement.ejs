@@ -1,20 +1,19 @@
 <div class="container-fluid mt-3">
   <div class="row">
-    <!-- Main content -->
-    <nav
-      aria-label="breadcrumb"
-      class="d-flex justify-content-between align-items-center"
-    >
-      <ol class="breadcrumb mb-0">
-        <li class="breadcrumb-item"><a href="/admin">Admin</a></li>
-        <li class="breadcrumb-item active" aria-current="page">
+    <!-- Breadcrumb Navigation -->
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="/admin" class="text-light">Admin</a>
+        </li>
+        <li class="breadcrumb-item active text-info" aria-current="page">
           Order Management
         </li>
       </ol>
     </nav>
-    <div class="container mt-3">
+    <div class="container">
       <div class="table-container">
-        <h3 class="mb-4">Order Management</h3>
+        <h3 class="mb-4 text-light">Order Management</h3>
         <div class="table-responsive">
           <table class="table text-dark">
             <thead>
@@ -24,8 +23,8 @@
                 <th scope="col">Total Amount</th>
                 <th scope="col">Payment Method</th>
                 <th scope="col">Status</th>
-                <th scope="col">Date Ordered</th>
-                <th scope="col">Action</th>
+                <th class="text-center" scope="col">Date Ordered</th>
+                <th class="text-center" scope="col">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -49,10 +48,10 @@
                     <option value="Cancelled" <%= order.status === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
                   </select>
                 </td>
-                <td><%= new Date(order.dateOrdered).toLocaleDateString() %></td>
-                <td class="text-center">
+                <td class="text-center"><%= new Date(order.dateOrdered).toLocaleDateString() %></td>
+                <td>
                   <form action="/admin/orders/view/<%= order._id %>" method="GET" style="display: inline">
-                    <button type="submit" class="btn btn-outline-primary">View</button>
+                    <button type="submit" class="btn btn-outline-light w-100">View</button>
                   </form>
                 </td>
               </tr>

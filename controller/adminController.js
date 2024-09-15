@@ -1,6 +1,7 @@
 const Admin = require("../models/adminModel");
 const User = require("../models/userModel");
 const Order = require("../models/order");
+const Offer = require("../models/offer");
 const asyncHandler = require("express-async-handler");
 
 // ============================
@@ -121,7 +122,10 @@ exports.updateOrderStatus = asyncHandler(async (req, res) => {
   const orderId = req.params.id;
   const status = req.body.status;
   try {
-    const updatedOrder = await Order.updateOne({_id: orderId}, { $set: { status } });
+    const updatedOrder = await Order.updateOne(
+      { _id: orderId },
+      { $set: { status } }
+    );
 
     if (!updatedOrder) {
       return res
@@ -139,19 +143,18 @@ exports.updateOrderStatus = asyncHandler(async (req, res) => {
 exports.viewOrder = asyncHandler(async (req, res) => {
   const orderId = req.params.id;
   const order = await Order.findById({ _id: orderId })
-    .populate('address', 'location city state country zip')
-    .populate('user', 'firstName lastName email mobile')
-    .populate({ path: 'orderItems', populate: 'product' });
-  
-    res.render("layout", {
-      title: "Order Management",
-      viewName: "admin/viewOrder",
-      activePage: "orders",
-      isAdmin: true,
-      order,
-    });
-  
-})
+    .populate("address", "location city state country zip")
+    .populate("user", "firstName lastName email mobile")
+    .populate({ path: "orderItems", populate: "product" });
+
+  res.render("layout", {
+    title: "Order Management",
+    viewName: "admin/viewOrder",
+    activePage: "orders",
+    isAdmin: true,
+    order,
+  });
+});
 
 // ============================
 //  Coupon Management Controllers
@@ -173,11 +176,16 @@ exports.getCoupons = asyncHandler(async (req, res) => {
 
 // Render Offer Management Page
 exports.getOffers = asyncHandler(async (req, res) => {
+  const offers = await Offer.find().populate("product").populate("category");
+  console.log(offers);
+  console.log(offers[0].product.name);
+  
   res.render("layout", {
     title: "Offer Management",
     viewName: "admin/offerManagement",
     activePage: "offer",
     isAdmin: true,
+    offers,
   });
 });
 

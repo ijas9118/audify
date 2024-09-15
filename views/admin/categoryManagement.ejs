@@ -1,28 +1,29 @@
 <div class="container-fluid mt-3">
   <div class="row">
     <!-- Main content -->
-    <nav
-      aria-label="breadcrumb"
-      class="d-flex justify-content-between align-items-center"
-    >
-      <ol class="breadcrumb mb-0">
-        <li class="breadcrumb-item"><a href="/admin">Admin</a></li>
-        <li class="breadcrumb-item active" aria-current="page">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="/admin" class="text-light">Admin</a>
+        </li>
+        <li class="breadcrumb-item active text-info" aria-current="page">
           Category Management
         </li>
       </ol>
-      <!-- Add New Category Button -->
-      <button
-        type="button"
-        class="btn btn-primary"
-        data-bs-toggle="modal"
-        data-bs-target="#addCategoryModal"
-      >
-        Add New Category
-      </button>
     </nav>
-    <div class="container mt-3">
+    <div class="container">
       <div class="row">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h3 class="text-light">Category Management</h3>
+          <button
+            type="button"
+            class="btn btn-primary"
+            data-bs-toggle="modal"
+            data-bs-target="#addCategoryModal"
+          >
+            Add New Category
+          </button>
+        </div>
         <div class="table-responsive">
           <table class="table text-light">
             <thead>
@@ -49,24 +50,12 @@
                     >
                       <button
                         type="submit"
-                        class="btn w-100 <%= category.isActive ? 'btn-dark' : 'btn-success' %>"
+                        class="btn w-100 <%= category.isActive ? 'btn-dark' : 'btn-primary' %>"
                       >
                         <%= category.isActive ? "Unlist" : "List" %>
                       </button>
                     </form>
-                    <form
-                      action="/admin/category/edit/<%= category._id %>"
-                      method="GET"
-                      style="display: inline"
-                      class="w-100"
-                    >
-                      <button
-                        type="submit"
-                        class="btn btn-outline-primary w-100"
-                      >
-                        Edit
-                      </button>
-                    </form>
+                    <button class="btn btn-outline-light w-100" data-bs-toggle="modal" data-bs-target="#editCategoryModal<%= category._id %>">Edit</button>
                     <form
                       action="/admin/category/delete/<%= category._id %>"
                       method="POST"
@@ -101,12 +90,12 @@
   aria-hidden="true"
 >
   <div class="modal-dialog">
-    <div class="modal-content text-dark">
-      <div class="modal-header">
+    <div class="modal-content bg-dark text-light">
+      <div class="modal-header bg-dark">
         <h5 class="modal-title" id="addCategoryModalLabel">Add New Category</h5>
         <button
           type="button"
-          class="btn-close"
+          class="btn-close btn-close-white"
           data-bs-dismiss="modal"
           aria-label="Close"
         ></button>
@@ -117,7 +106,7 @@
             <label for="categoryName" class="form-label">Category Name</label>
             <input
               type="text"
-              class="form-control"
+              class="form-control custom-search-input"
               id="categoryName"
               name="name"
               required
@@ -128,7 +117,7 @@
               >Description</label
             >
             <textarea
-              class="form-control"
+              class="form-control custom-search-input"
               id="categoryDescription"
               name="description"
             ></textarea>
@@ -148,3 +137,43 @@
     </div>
   </div>
 </div>
+
+<!-- Edit category Modals (one for each category) -->
+<% categories.forEach((category) => { %>
+  <div class="modal fade" id="editCategoryModal<%= category._id %>" tabindex="-1" aria-labelledby="editCategoryModalLabel<%= category._id %>" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content bg-dark text-light">
+        <div class="modal-header bg-dark text-light">
+          <h5 class="modal-title" id="editcategoryModalLabel<%= category._id %>">Edit Category</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form action="/admin/category/edit/<%= category._id %>" method="POST">
+            <div class="mb-3">
+              <label for="categoryName" class="form-label">Category Name</label>
+              <input
+                type="text"
+                class="form-control custom-search-input"
+                id="categoryName"
+                name="name"
+                value="<%= category.name %>"
+                required
+              />
+            </div>
+            <div class="mb-3">
+              <label for="categoryDescription" class="form-label">Description</label>
+              <textarea
+                class="form-control custom-search-input"
+                id="categoryDescription"
+                name="description"
+                rows="2"
+                required
+              ><%= category.description %></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Update category</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+<% }) %>

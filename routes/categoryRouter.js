@@ -6,7 +6,6 @@ const {
   toggleCategoryStatus,
   deleteCategory,
   addCategory,
-  getCategoryDetail,
   updateCategory
 } = require("../controller/categoryController");
 
@@ -21,9 +20,6 @@ router.post("/toggle-status/:id", adminAuth, toggleCategoryStatus);
 
 // Delete a category
 router.post("/delete/:id", adminAuth, deleteCategory);
-
-// Edit a category
-router.get('/edit/:id', adminAuth, getCategoryDetail);
 
 // Update a category
 router.post('/edit/:id', adminAuth, updateCategory);

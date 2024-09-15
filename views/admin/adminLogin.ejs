@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title><%= title %></title>
@@ -10,62 +10,49 @@
       integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
       crossorigin="anonymous"
     />
-    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/admin.css" />
     <style>
       body {
-        background-color: #f8f9fa;
+        background-color: #24272b;
       }
-      .login-container {
-        max-width: 400px;
-        margin: 5% auto;
-        padding: 2rem;
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      .bg-secondary {
+        background-color: #1e1e1e !important; /* Darker background for the form container */
       }
-      .login-container h2 {
-        margin-bottom: 1rem;
-        text-align: center;
-      }
-      .login-container .form-control {
-        border-radius: 0.25rem;
-      }
-      .login-container .btn-primary {
-        border-radius: 0.25rem;
-        font-size: 1rem;
-      }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="login-container">
-            <h2>Admin Login</h2>
-            <form action="/admin/login" method="POST">
-                <div class="mb-3">
-                    <label for="username" class="form-label">Username</label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      id="username"
-                      name="username"
-                      placeholder="Username"
-                      required
-                    />
-                </div>
-                <div class="mb-3">
-                    <label for="password" class="form-label">Password</label>
-                    <input
-                      type="password"
-                      class="form-control"
-                      id="password"
-                      name="password"
-                      placeholder="Password"
-                      required
-                    />
-                </div>
-                <button type="submit" class="btn btn-primary w-100">Log In</button>
-            </form>
-        </div>
+
+      </style>
+  </head>
+  <body
+    class="text-light d-flex justify-content-center align-items-center vh-100"
+  >
+    <div class="container col-md-3">
+      <div class="login-container bg-secondary rounded p-4 shadow-sm">
+        <h2 class="text-center mb-4">Admin Login</h2>
+        <form action="/admin/login" method="POST">
+          <div class="mb-3">
+            <label for="username" class="form-label">Username</label>
+            <input
+              type="text"
+              class="form-control bg-dark text-light border-0"
+              id="username"
+              name="username"
+              placeholder="Username"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input
+              type="password"
+              class="form-control bg-dark text-light border-0"
+              id="password"
+              name="password"
+              placeholder="Password"
+              required
+            />
+          </div>
+          <button type="submit" class="btn btn-primary w-100 mt-3">Log In</button>
+        </form>
+      </div>
     </div>
 
     <script
@@ -73,5 +60,5 @@
       integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
       crossorigin="anonymous"
     ></script>
-</body>
+  </body>
 </html>
