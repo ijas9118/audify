@@ -17,6 +17,8 @@ const {
   updateOrderStatus,
   viewOrder,
   addOffer,
+  updateOffer,
+  deleteOffer,
 } = require("../controller/adminController");
 const categoryRouter = require("./categoryRouter");
 const productRouter = require('./productRouter')
@@ -72,6 +74,9 @@ router.get('/offer/products', async (req, res) => {
   }
 });
 
+router.post('/offer/update/:id', adminAuth, updateOffer);
+
+router.delete('/offer/delete/:id', adminAuth, deleteOffer);
 // Deal Management Route
 router.get("/deal", adminAuth, getDeals);
 

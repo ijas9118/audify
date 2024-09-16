@@ -47,7 +47,7 @@
               <tbody>
                 <!-- Loop through offers data -->
                 <% offers.forEach((offer, index) => { %>
-                  <tr>
+                  <tr data-offer-id="<%= offer._id %>">
                     <th scope="row"><%= index + 1 %></th>
                     <td><%= offer.type %></td>
                     <td>
@@ -74,7 +74,7 @@
                     </td>
                     <td class="d-flex gap-2">
                       <button class="btn btn-outline-light w-100" data-bs-toggle="modal" data-bs-target="#editOfferModal<%= offer._id %>">Edit</button>
-                      <button class="btn btn-outline-danger w-100">Delete</button>
+                      <button class="btn btn-outline-danger w-100" onclick="deleteOffer('<%= offer._id %>')">Delete</button>
                     </td>
                   </tr>
                 <% }) %>
@@ -226,14 +226,14 @@
 <!-- Edit Offer Modals (one for each offer) -->
 <% offers.forEach((offer) => { %>
   <div class="modal fade" id="editOfferModal<%= offer._id %>" tabindex="-1" aria-labelledby="editOfferModalLabel<%= offer._id %>" aria-hidden="true">
-    <div class="modal-dialog ">
+    <div class="modal-dialog">
       <div class="modal-content bg-dark text-light">
         <div class="modal-header bg-dark text-light">
           <h5 class="modal-title" id="editOfferModalLabel<%= offer._id %>">Edit Offer</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <form>
+          <form class="edit-offer-form" data-offer-id="<%= offer._id %>">
             <div class="mb-3">
               <label for="offerType" class="form-label">Offer Type</label>
               <select class="form-select" id="offerType<%= offer._id %>" value="<%= offer.type %>">
@@ -242,6 +242,27 @@
                 <option value="referral" <%= offer.type === 'referral' ? 'selected' : '' %>>Referral</option>
               </select>
             </div>
+
+            <% if (offer.type === 'category' && offer.category && offer.category.name) { %>
+              <div class="mb-3">
+                <label for="categoryName<%= offer._id %>" class="form-label">Category Name</label>
+                <input type="text" class="form-control custom-search-input" id="categoryName<%= offer._id %>" value="<%= offer.category.name %>" readonly>
+              </div>
+            <% } else if (offer.type === 'product' && offer.product && offer.product.name) { %>
+              <div class="mb-3">
+                <label for="productName<%= offer._id %>" class="form-label">Product Name</label>
+                <input type="text" class="form-control custom-search-input" id="productName<%= offer._id %>" value="<%= offer.product.name %>" readonly>
+              </div>
+            <% } %>
+
+            <div class="mb-3">
+              <label for="discountType<%= offer._id %>" class="form-label">Discount Type</label>
+              <select class="form-select" id="discountType<%= offer._id %>" value="<%= offer.discountType %>">
+                <option value="percentage" <%= offer.discountType === 'percentage' ? 'selected' : '' %>>Percentage</option>
+                <option value="fixed" <%= offer.discountType === 'fixed' ? 'selected' : '' %>>Fixed Amount</option>
+              </select>
+            </div>
+
             <div class="mb-3">
               <label for="discountValue<%= offer._id %>" class="form-label">Discount Value</label>
               <input type="number" class="form-control custom-search-input" id="discountValue<%= offer._id %>" value="<%= offer.discountValue %>">
@@ -269,5 +290,6 @@
     </div>
   </div>
 <% }) %>
+
 
 <script src="/js/offerManagement.js"></script>

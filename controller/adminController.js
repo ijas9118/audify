@@ -2,8 +2,8 @@ const Admin = require("../models/adminModel");
 const User = require("../models/userModel");
 const Order = require("../models/order");
 const Offer = require("../models/offer");
-const Product = require('../models/products');
-const Category = require('../models/categories')
+const Product = require("../models/products");
+const Category = require("../models/categories");
 const asyncHandler = require("express-async-handler");
 
 // ============================
@@ -179,7 +179,6 @@ exports.getCoupons = asyncHandler(async (req, res) => {
 // Render Offer Management Page
 exports.getOffers = asyncHandler(async (req, res) => {
   const offers = await Offer.find().populate("product").populate("category");
- 
   res.render("layout", {
     title: "Offer Management",
     viewName: "admin/offerManagement",
@@ -201,43 +200,125 @@ exports.addOffer = asyncHandler(async (req, res) => {
       minCartValue,
       validFrom,
       validUntil,
-      referralBonus
+      referralBonus,
     } = req.body;
 
     // Validate required fields
     if (!type || !discountType || !discountValue || !validFrom || !validUntil) {
-      return res.status(400).json({ success: false, message: 'Missing required fields' });
+      return res
+        .status(400)
+        .json({ success: false, message: "Missing required fields" });
     }
 
     // Create a new offer document
     const newOffer = new Offer({
       type,
-      product: type === 'product' ? product : undefined,
-      category: type === 'category' ? category : undefined,
+      product: type === "product" ? product : undefined,
+      category: type === "category" ? category : undefined,
       discountType,
       discountValue,
       maxDiscountAmount,
       minCartValue,
       validFrom,
       validUntil,
-      referralBonus: type === 'referral' ? referralBonus : undefined
+      referralBonus: type === "referral" ? referralBonus : undefined,
     });
 
     // Save the offer to the database
     await newOffer.save();
 
-    if (type === 'product' && product) {
-      await Product.findByIdAndUpdate(product, { $set: { offerId: newOffer._id } });
+    if (type === "product" && product) {
+      await Product.findByIdAndUpdate(product, {
+        $set: { offerId: newOffer._id },
+      });
     }
-    if (type === 'category' && category) {
-      await Category.findByIdAndUpdate(category, { $set: { offerId: newOffer._id } });
+    if (type === "category" && category) {
+      await Category.findByIdAndUpdate(category, {
+        $set: { offerId: newOffer._id },
+      });
     }
 
     // Send a success response
-    res.status(201).json({ success: true, message: 'Offer added successfully!' });
+    res
+      .status(201)
+      .json({ success: true, message: "Offer added successfully!" });
   } catch (error) {
-    console.error('Error adding offer:', error);
-    res.status(500).json({ success: false, message: 'An error occurred while adding the offer' });
+    console.error("Error adding offer:", error);
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "An error occurred while adding the offer",
+      });
+  }
+});
+
+exports.updateOffer = async (req, res) => {
+  const { id } = req.params; // The offer ID
+  const {
+    type,
+    discountType,
+    discountValue,
+    maxDiscountAmount,
+    validFrom,
+    validUntil,
+    minCartValue,
+  } = req.body;
+
+  try {
+    // Find the offer by ID
+    const offer = await Offer.findById(id);
+
+    if (!offer) {
+      return res.status(404).json({ message: "Offer not found" });
+    }
+
+    // Update the offer details
+    offer.type = type || offer.type;
+    offer.discountType = discountType || offer.discountType;
+    offer.discountValue = discountValue || offer.discountValue;
+    offer.maxDiscountAmount = maxDiscountAmount || offer.maxDiscountAmount;
+    offer.validFrom = validFrom || offer.validFrom;
+    offer.validUntil = validUntil || offer.validUntil;
+    offer.minCartValue = minCartValue || offer.minCartValue;
+
+    // Save the updated offer
+    await offer.save();
+
+    // Send success response
+    res
+      .status(200)
+      .json({ success: true, message: "Offer updated successfully", offer });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+exports.deleteOffer = asyncHandler(async (req, res) => {
+  const offerId = req.params.id;
+
+  try {
+    const offer = await Offer.findById(offerId);
+
+    if (!offer) {
+      return res.status(404).json({
+        success: false,
+        message: "Offer not found",
+      });
+    }
+
+    await Offer.deleteOne({ _id: offerId });
+    res.status(200).json({
+      success: true,
+      message: "Offer deleted successfully",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "An error occurred while deleting the offer",
+    });
   }
 })
 
