@@ -43,6 +43,11 @@ const productSchema = new mongoose.Schema(
       required: true,
       max: 100,
     },
+    offerId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Offer",
+      default: null,
+    },
     popularity: {
       type: Number,
       default: 0,

@@ -2,6 +2,8 @@ const Admin = require("../models/adminModel");
 const User = require("../models/userModel");
 const Order = require("../models/order");
 const Offer = require("../models/offer");
+const Product = require('../models/products');
+const Category = require('../models/categories')
 const asyncHandler = require("express-async-handler");
 
 // ============================
@@ -177,9 +179,7 @@ exports.getCoupons = asyncHandler(async (req, res) => {
 // Render Offer Management Page
 exports.getOffers = asyncHandler(async (req, res) => {
   const offers = await Offer.find().populate("product").populate("category");
-  console.log(offers);
-  console.log(offers[0].product.name);
-  
+ 
   res.render("layout", {
     title: "Offer Management",
     viewName: "admin/offerManagement",
@@ -188,6 +188,58 @@ exports.getOffers = asyncHandler(async (req, res) => {
     offers,
   });
 });
+
+exports.addOffer = asyncHandler(async (req, res) => {
+  try {
+    const {
+      type,
+      product,
+      category,
+      discountType,
+      discountValue,
+      maxDiscountAmount,
+      minCartValue,
+      validFrom,
+      validUntil,
+      referralBonus
+    } = req.body;
+
+    // Validate required fields
+    if (!type || !discountType || !discountValue || !validFrom || !validUntil) {
+      return res.status(400).json({ success: false, message: 'Missing required fields' });
+    }
+
+    // Create a new offer document
+    const newOffer = new Offer({
+      type,
+      product: type === 'product' ? product : undefined,
+      category: type === 'category' ? category : undefined,
+      discountType,
+      discountValue,
+      maxDiscountAmount,
+      minCartValue,
+      validFrom,
+      validUntil,
+      referralBonus: type === 'referral' ? referralBonus : undefined
+    });
+
+    // Save the offer to the database
+    await newOffer.save();
+
+    if (type === 'product' && product) {
+      await Product.findByIdAndUpdate(product, { $set: { offerId: newOffer._id } });
+    }
+    if (type === 'category' && category) {
+      await Category.findByIdAndUpdate(category, { $set: { offerId: newOffer._id } });
+    }
+
+    // Send a success response
+    res.status(201).json({ success: true, message: 'Offer added successfully!' });
+  } catch (error) {
+    console.error('Error adding offer:', error);
+    res.status(500).json({ success: false, message: 'An error occurred while adding the offer' });
+  }
+})
 
 // ============================
 //  Deals Management Controllers

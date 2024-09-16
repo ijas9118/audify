@@ -74,10 +74,19 @@
             <div class="position-relative">
               <a href="/shop/<%= product._id %>" class="card-link">
                 <!-- Discount Badge -->
-                <span
-                  class="badge bg-danger position-absolute top-0 start-0 m-2"
-                  >-20%</span
-                >
+                <% if (product.productOfferDetails || product.categoryOfferDetails) { %>
+                  <span class="badge bg-danger position-absolute top-0 start-0 m-2">
+                    <% 
+                      // Determine which offer to use (product offer has higher priority)
+                      const offer = product.productOfferDetails || product.categoryOfferDetails;
+                      if (offer.discountType === 'percentage') { %>
+                        -<%= offer.discountValue %>%
+                      <% } else if (offer.discountType === 'fixed') { %>
+                        -₹<%= offer.discountValue.toFixed(2) %>
+                      <% } %>
+                  </span>
+                <% } %>
+
                 <img
                   src="<%= product.images.main %>"
                   class="card-img-top img-fluid"
@@ -91,11 +100,18 @@
               <h5 class="card-title text-truncate"><%= product.name %></h5>
               <!-- Product Price -->
               <div class="d-flex align-items-center">
-                <h6 class="card-price mb-0">₹<%= product.price %></h6>
-                <span class="text-muted ms-2"
-                  ><del>₹<%= (product.price * 1.25).toFixed(0) %></del></span
-                >
+                <% if (product.discountedPrice && product.discountedPrice < product.price) { %>
+                  <!-- Show discounted price and crossed-out original price -->
+                  <h6 class="card-price mb-0">₹<%= product.discountedPrice.toFixed(2) %></h6>
+                  <span class="text-muted ms-2">
+                    <del>₹<%= product.price.toFixed(2) %></del>
+                  </span>
+                <% } else { %>
+                  <!-- Show original price without discount -->
+                  <h6 class="card-price mb-0">₹<%= product.price.toFixed(2) %></h6>
+                <% } %>
               </div>
+
               <!-- Ratings -->
               <div>
                 <span class="text-warning">

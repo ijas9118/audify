@@ -61,7 +61,17 @@
         <!-- Right Side: Product Details -->
         <div class="col-md-3">
           <h1 class="h3 mb-3"><%= product.name %></h1>
-          <h4 class="text-primary mb-3">₹<%= product.price.toFixed(2) %></h4>
+          <!-- Product Price -->
+          <% if (product.discountedPrice < product.price) { %>
+            <h4 class="text-primary mb-3">
+              ₹<%= product.discountedPrice.toFixed(2) %>
+              <span class="text-muted ms-2">
+                <del>₹<%= product.price.toFixed(2) %></del>
+              </span>
+            </h4>
+          <% } else { %>
+            <h4 class="text-primary mb-3">₹<%= product.price.toFixed(2) %></h4>
+          <% } %>
           <p class="mb-4"><%= product.description %></p>
           <!-- Stock Status -->
           <% if (product.isOutOfStock) { %>
@@ -195,8 +205,21 @@
           <h5 class="card-title mb-2 text-truncate" title="<%= product.name %>">
             <%= product.name %>
           </h5>
-          <p class="card-text text-primary mb-3">
-            ₹<%= product.price.toFixed(2) %>
+          <p class="card-text mb-3">
+            <% if (product.discountedPrice < product.price) { %>
+              <!-- Discounted Price and Original Price -->
+              <span class="text-primary">
+                ₹<%= product.discountedPrice.toFixed(2) %>
+              </span>
+              <span class="text-muted ms-2">
+                <del>₹<%= product.price.toFixed(2) %></del>
+              </span>
+            <% } else { %>
+              <!-- Original Price -->
+              <span class="text-primary">
+                ₹<%= product.price.toFixed(2) %>
+              </span>
+            <% } %>
           </p>
           <div class="mb-2">
             <span class="text-warning">

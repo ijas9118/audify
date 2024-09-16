@@ -2,9 +2,11 @@ const User = require("../models/userModel");
 const Product = require("../models/products");
 const Address = require("../models/address");
 const Cart = require("../models/cart");
+const Offer = require("../models/offer")
 const asyncHandler = require("express-async-handler");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
+const { calculateDiscountedPrice } = require("../services/offerService");
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -91,7 +93,9 @@ exports.sendOtp = asyncHandler(async (req, res) => {
 exports.resendOtp = asyncHandler(async (req, res) => {
   const { email } = req.session.tempUser; // Fetch tempUser from session
   if (!email) {
-    return res.status(400).json({ error: "No user data in session. Please sign up again." });
+    return res
+      .status(400)
+      .json({ error: "No user data in session. Please sign up again." });
   }
 
   // Generate new OTP and update session
@@ -216,14 +220,62 @@ exports.getShop = asyncHandler(async (req, res) => {
         isActive: true,
       },
     },
+    {
+      $lookup: {
+        from: "offers",
+        localField: "offerId", // Lookup for product-specific offer
+        foreignField: "_id",
+        as: "productOfferDetails",
+      },
+    },
+    {
+      $unwind: {
+        path: "$productOfferDetails",
+        preserveNullAndEmptyArrays: true, // Include products without a product-specific offer
+      },
+    },
+    {
+      $lookup: {
+        from: "offers",
+        localField: "categoryDetails.offerId", // Lookup for category-specific offer
+        foreignField: "_id",
+        as: "categoryOfferDetails",
+      },
+    },
+    {
+      $unwind: {
+        path: "$categoryOfferDetails",
+        preserveNullAndEmptyArrays: true, // Include categories without a category-wide offer
+      },
+    },
   ]);
+
+  const productsWithDiscounts = products.map((product) => {
+    // Get the offers (if they exist)
+    const productOffer = product.productOfferDetails || null;
+    const categoryOffer = product.categoryOfferDetails || null;
+
+    // Calculate the best discounted price
+    const discountedPrice = calculateDiscountedPrice(
+      product.price,
+      productOffer,
+      categoryOffer
+    );
+
+    // Return the product along with the calculated discounted price
+    return {
+      ...product,
+      discountedPrice, // Add the discounted price
+    };
+  });
+
   res.render("layout", {
     title: "Audify",
     header: req.session.user ? "partials/login_header" : "partials/header",
     viewName: "users/shop",
     activePage: "shop",
     isAdmin: false,
-    products,
+    products: productsWithDiscounts,
     category,
     minPrice,
     maxPrice,
@@ -316,23 +368,65 @@ exports.filterShop = asyncHandler(async (req, res) => {
 });
 
 exports.getProduct = asyncHandler(async (req, res) => {
-  const product = await Product.findById(req.params.id);
-  const categoryId = product.categoryId;
+  const product = await Product.findById(req.params.id).populate('categoryId');
   if (!product) {
     return res.status(404).send("Product not found");
   }
+
+  const categoryOffer = product.categoryId.offerId
+    ? await Offer.findById(product.categoryId.offerId)
+    : null;
+
+  const productOffer = product.offerId
+    ? await Offer.findById(product.offerId)
+    : null;
+
+  const discountedPrice = calculateDiscountedPrice(
+    product.price,
+    productOffer,
+    categoryOffer
+  );
+
   const relatedProducts = await Product.find({
-    categoryId: categoryId,
-    _id: { $ne: product._id },
-  });
+    categoryId: product.categoryId._id,
+    _id: { $ne: product._id }
+  }).populate('categoryId');
+
+
+  // Calculate discounted prices for related products
+  const relatedProductsWithDiscounts = await Promise.all(
+    relatedProducts.map(async (relatedProduct) => {
+      const relatedProductOffer = relatedProduct.offerId
+        ? await Offer.findById(relatedProduct.offerId)
+        : null;
+      const relatedCategoryOffer = relatedProduct.categoryId.offerId
+        ? await Offer.findById(relatedProduct.categoryId.offerId)
+        : null;
+
+      const discountedPrice = calculateDiscountedPrice(
+        relatedProduct.price,
+        relatedProductOffer,
+        relatedCategoryOffer
+      );
+
+      return {
+        ...relatedProduct.toObject(),
+        discountedPrice
+      };
+    })
+  );
+
   res.render("layout", {
     title: "Audify",
     header: req.session.user ? "partials/login_header" : "partials/header",
     viewName: "users/product-detail",
     activePage: "shop",
     isAdmin: false,
-    product,
-    relatedProducts,
+    product: {
+      ...product.toObject(),
+      discountedPrice 
+    },
+    relatedProducts: relatedProductsWithDiscounts,
   });
 });
 

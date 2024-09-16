@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const adminAuth = require("../middleware/adminAuth");
+const Category = require('../models/categories')
+const Product = require('../models/products')
 const {
   loginAdmin,
   logoutAdmin,
@@ -14,6 +16,7 @@ const {
   toggleUserStatus,
   updateOrderStatus,
   viewOrder,
+  addOffer,
 } = require("../controller/adminController");
 const categoryRouter = require("./categoryRouter");
 const productRouter = require('./productRouter')
@@ -51,6 +54,23 @@ router.get("/coupon", adminAuth, getCoupons);
 
 // Offer Management Route
 router.get("/offer", adminAuth, getOffers);
+router.post('/offer', adminAuth, addOffer);
+router.get('/offer/categories', async (req, res) => {
+  try {
+    const categories = await Category.find({});
+    res.json(categories);
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error fetching categories' });
+  }
+});
+router.get('/offer/products', async (req, res) => {
+  try {
+    const products = await Product.find({});
+    res.json(products);
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error fetching products' });
+  }
+});
 
 // Deal Management Route
 router.get("/deal", adminAuth, getDeals);
