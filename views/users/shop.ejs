@@ -131,20 +131,18 @@
             </div>
             <div class="card-footer bg-white border-0">
               <div class="btn-group w-100" role="group">
-                <!-- Add to Cart Button -->
                 <button
                   class="btn btn-dark-purple w-100 <% if (product.isOutOfStock) { %> disabled <% } %>"
                   onclick="addToCart('<%= product._id %>')"
                 >
                   Add to Cart
                 </button>
-                <!-- Wishlist Button -->
-                <a
-                  href="#"
+                <button
                   class="btn btn-outline-dark-purple w-100 <% if (product.isOutOfStock) { %> disabled <% } %>"
+                  onclick="addToWishList('<%= product._id %>')"
                 >
                   <i class="fas fa-heart"></i> Wishlist
-                </a>
+                </button>
               </div>
             </div>
           </div>
@@ -174,3 +172,4 @@
 </style>
 
 <script src="/js/cart.js"></script>
+<script src="/js/wishlist.js"></script>

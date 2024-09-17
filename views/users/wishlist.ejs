@@ -1,0 +1,27 @@
+<div class="container mt-5" style="min-height: 50vh">
+  <h1 class="text-center mb-4">Your Wishlist</h1>
+
+  <% if (wishlist.length > 0) { %>
+      <% wishlist.forEach(product => { %>
+          <div class="row align-items-center justify-content-center mb-4 py-3 border-bottom">
+              <div class="col-md-2 text-center">
+                  <img src="<%= product.image %>" class="img-fluid" alt="<%= product.name %>" style="max-height: 100px;">
+              </div>
+              <div class="col-md-6">
+                  <h5><%= product.name %></h5>
+                  <p class="mb-0"><strong>$<%= product.price.toFixed(2) %></strong></p>
+              </div>
+              <div class="col-md-4 text-end">
+                  <a onclick="addToCartFromWishlist('<%= product._id %>')" class="btn btn-primary">Add to Cart</a>
+                  <a onclick="removeProduct('<%= product._id %>')" class="btn btn-outline-danger">Remove</a>
+              </div>
+          </div>
+      <% }) %>
+  <% } else { %>
+      <div class="alert alert-info text-center" role="alert">
+          Your wishlist is empty.
+      </div>
+  <% } %>
+</div>
+
+<script src="/js/wishlist.js"></script>

@@ -11,6 +11,9 @@ const {
   getProduct,
   getStock,
   getCartItemID,
+  addToWishlist,
+  getWishList,
+  removeWishlist,
 } = require("../controller/userController");
 
 router.get("/", getShop);
@@ -26,6 +29,11 @@ router.post("/cart/updateQuantity", userAuth, updateCart);
 router.get("/cart/:id", userAuth, addToCart);
 
 router.delete("/cart/:id", userAuth, deleteItemFromCart);
+
+// Wishlist 
+router.post('/wishlist/add/:id', userAuth, addToWishlist);
+router.get('/wishlist', userAuth, getWishList);
+router.get('/wishlist/remove/:id', userAuth, removeWishlist);
 
 // Get the stock of a product
 router.get("/stock", userAuth, getStock);
