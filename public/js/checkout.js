@@ -7,6 +7,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Form submission functionality
   setupFormSubmission();
+
+  setupCouponApplication();
 });
 
 // Function to handle address selection
@@ -245,6 +247,53 @@ function setupFormSubmission() {
         icon: "error",
         title: `An unexpected error occurred ${error}`,
       });
+    }
+  });
+}
+
+// Function to handle coupon application
+function setupCouponApplication() {
+  const applyCouponBtn = document.getElementById('applyCouponBtn');
+  const couponCodeInput = document.getElementById('couponCode');
+  const grandTotalElement = document.getElementById('grandTotal');
+  const checkoutForm = document.getElementById('checkoutForm');
+
+  applyCouponBtn.addEventListener('click', async () => {
+    const couponCode = couponCodeInput.value.trim();
+    const totalPrice = parseFloat(checkoutForm.dataset.totalPrice); // Get the total price from the form data attribute
+
+    if (!couponCode) {
+      alert('Please enter a coupon code.');
+      return;
+    }
+
+    try {
+      // Make a POST request to apply the coupon
+      const response = await fetch('/checkout/apply-coupon', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ totalPrice, couponCode }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        const { newTotal } = result;
+        alert(newTotal)
+
+        // Update the grand total on the frontend
+        grandTotalElement.textContent = `₹${newTotal.toFixed(2)}`;
+        checkoutForm.dataset.totalPrice = newTotal.toFixed(2); // Update form's total price
+
+        alert('Coupon applied successfully!');
+      } else {
+        alert(`Error applying coupon: ${result.message}`);
+      }
+    } catch (error) {
+      console.error('Error applying coupon:', error);
+      alert(`An error occurred while applying the coupon. ${error}`);
     }
   });
 }

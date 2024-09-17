@@ -19,6 +19,9 @@ const {
   addOffer,
   updateOffer,
   deleteOffer,
+  addCoupon,
+  updateCoupon,
+  deleteCoupon,
 } = require("../controller/adminController");
 const categoryRouter = require("./categoryRouter");
 const productRouter = require('./productRouter')
@@ -53,6 +56,9 @@ router.use("/category", categoryRouter);
 
 // Coupon Management Route
 router.get("/coupon", adminAuth, getCoupons);
+router.post('/coupon/add', adminAuth, addCoupon);
+router.post('/coupon/update/:id', adminAuth, updateCoupon);
+router.delete('/coupon/delete/:id', adminAuth, deleteCoupon)
 
 // Offer Management Route
 router.get("/offer", adminAuth, getOffers);

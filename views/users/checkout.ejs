@@ -59,9 +59,25 @@
         </div>
         <div class="d-flex justify-content-between mb-4 pb-2 total">
           <span class="fw-bold text-dark">Grand Total</span>
-          <span class="fs-5 fw-bold text-dark"
+          <span class="fs-5 fw-bold text-dark" id="grandTotal"
             >₹<%= cart.total.toFixed(2) %></span
           >
+        </div>
+
+        <!-- Coupon Section -->
+        <div class="mb-4">
+          <div class="input-group">
+            <input
+              type="text"
+              class="form-control"
+              id="couponCode"
+              placeholder="Enter coupon code"
+              aria-label="Coupon code"
+            />
+            <button class="btn btn-dark" type="button" id="applyCouponBtn">
+              Apply
+            </button>
+          </div>
         </div>
       </div>
     </div>

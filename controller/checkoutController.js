@@ -3,8 +3,10 @@ const Cart = require("../models/cart");
 const OrderItem = require("../models/orderItem");
 const Order = require("../models/order");
 const Product = require("../models/products");
+const Coupon = require('../models/coupon')
 const asyncHandler = require("express-async-handler");
 const Razorpay = require("razorpay");
+const { applyCoupon } = require("../services/couponService");
 
 exports.getCheckoutPage = asyncHandler(async (req, res) => {
   const userId = req.session.user;
@@ -20,6 +22,32 @@ exports.getCheckoutPage = asyncHandler(async (req, res) => {
     addresses,
   });
 });
+
+exports.applyCoupon = asyncHandler(async (req,res) => {
+  const { totalPrice, couponCode } = req.body;
+  console.log(req.body)
+  const now = new Date()
+  
+  
+  try {
+    const coupon = await Coupon.findOne({ code: couponCode });
+
+    if (!coupon) {
+      return res.status(400).json({ message: 'Invalid or expired coupon code.' });
+    }
+
+    const finalPrice = await applyCoupon(totalPrice, coupon);
+
+    if (finalPrice === null) {
+      return res.status(400).json({ message: 'Invalid or expired coupon code.' });
+    }
+
+    res.status(200).json({ newTotal: finalPrice });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'An error occurred while applying the coupon.' });
+  }
+})
 
 exports.razorPay = asyncHandler(async (req, res) => {
   try {

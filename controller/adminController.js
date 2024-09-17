@@ -4,6 +4,7 @@ const Order = require("../models/order");
 const Offer = require("../models/offer");
 const Product = require("../models/products");
 const Category = require("../models/categories");
+const Coupon = require('../models/coupon')
 const asyncHandler = require("express-async-handler");
 
 // ============================
@@ -164,13 +165,126 @@ exports.viewOrder = asyncHandler(async (req, res) => {
 
 // Render Coupon Management Page
 exports.getCoupons = asyncHandler(async (req, res) => {
+  const coupons = await Coupon.find();
   res.render("layout", {
     title: "Coupon Management",
     viewName: "admin/couponManagement",
     activePage: "coupon",
     isAdmin: true,
+    coupons
   });
 });
+
+exports.addCoupon = asyncHandler(async (req, res) => {
+  console.log(req.body);
+  try {
+    const {
+      code,
+      discountType,
+      discountValue,
+      maxDiscountValue,
+      minCartValue,
+      validFrom, // Changed from expirationDate
+      validUntil, // New field for expiration date
+      usageLimit,
+      isActive,
+    } = req.body;
+
+    // Validate required fields
+    if (!code || !discountType || !discountValue || !validFrom || !validUntil) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Missing required fields" });
+    }
+
+    // Create a new coupon document
+    const newCoupon = new Coupon({
+      code,
+      discountType,
+      discountValue,
+      maxDiscountValue,
+      minCartValue: minCartValue || 0, // Default to 0 if not provided
+      validFrom, // New field for start date
+      validUntil, // New field for expiration date
+      usageLimit: usageLimit || 1, // Default to 1 if not provided
+      isActive: isActive !== undefined ? isActive : true, // Default to true if not provided
+    });
+
+    // Save the coupon to the database
+    await newCoupon.save();
+
+    // Send a success response
+    res
+      .status(201)
+      .json({ success: true, message: "Coupon added successfully!" });
+  } catch (error) {
+    console.error("Error adding coupon:", error);
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "An error occurred while adding the coupon",
+      });
+  }
+});
+
+exports.updateCoupon = async (req, res) => {
+  const { id } = req.params; 
+  const {
+    code,
+    discountType,
+    discountValue,
+    maxDiscountValue,
+    minCartValue,
+    expirationDate,
+    usageLimit,
+    isActive,
+  } = req.body;
+  console.log(req.body, req.params.id)
+
+  try {
+    const coupon = await Coupon.findById(id);
+
+    if (!coupon) {
+      return res.status(404).json({ message: "Coupon not found" });
+    }
+
+    coupon.code = code || coupon.code;
+    coupon.discountType = discountType || coupon.discountType;
+    coupon.discountValue = discountValue || coupon.discountValue;
+    coupon.maxDiscountValue = maxDiscountValue || coupon.maxDiscountValue;
+    coupon.minCartValue = minCartValue || coupon.minCartValue;
+    coupon.expirationDate = expirationDate || coupon.expirationDate;
+    coupon.usageLimit = usageLimit || coupon.usageLimit;
+    coupon.isActive = isActive !== undefined ? isActive : coupon.isActive;
+
+    await coupon.save();
+
+    res
+      .status(200)
+      .json({ success: true, message: "Coupon updated successfully", coupon });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+exports.deleteCoupon = async (req, res) => {
+  try {
+    const couponId = req.params.id;
+
+    const result = await Coupon.findByIdAndDelete(couponId);
+
+    if (!result) {
+      return res.status(404).json({ message: 'Coupon not found' });
+    }
+
+    res.status(200).json({ message: 'Coupon deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting coupon:', error);
+    res.status(500).json({ message: 'An error occurred while deleting the coupon' });
+  }
+};
 
 // ============================
 //  Offer Management Controllers
