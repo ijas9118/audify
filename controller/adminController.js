@@ -110,7 +110,7 @@ exports.toggleUserStatus = asyncHandler(async (req, res) => {
 
 // Render Order Management Page
 exports.getOrders = asyncHandler(async (req, res) => {
-  const orders = await Order.find();
+  const orders = await Order.find().sort({ dateOrdered: -1 });
 
   res.render("layout", {
     title: "Order Management",
@@ -146,7 +146,6 @@ exports.updateOrderStatus = asyncHandler(async (req, res) => {
 exports.viewOrder = asyncHandler(async (req, res) => {
   const orderId = req.params.id;
   const order = await Order.findById({ _id: orderId })
-    .populate("address", "location city state country zip")
     .populate("user", "firstName lastName email mobile")
     .populate({ path: "orderItems", populate: "product" });
 

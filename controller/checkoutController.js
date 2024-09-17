@@ -3,7 +3,8 @@ const Cart = require("../models/cart");
 const OrderItem = require("../models/orderItem");
 const Order = require("../models/order");
 const Product = require("../models/products");
-const Coupon = require('../models/coupon')
+const Coupon = require("../models/coupon");
+const User = require("../models/userModel");
 const asyncHandler = require("express-async-handler");
 const Razorpay = require("razorpay");
 const { applyCoupon } = require("../services/couponService");
@@ -23,31 +24,36 @@ exports.getCheckoutPage = asyncHandler(async (req, res) => {
   });
 });
 
-exports.applyCoupon = asyncHandler(async (req,res) => {
+exports.applyCoupon = asyncHandler(async (req, res) => {
   const { totalPrice, couponCode } = req.body;
-  console.log(req.body)
-  const now = new Date()
-  
-  
+  console.log(req.body);
+  const now = new Date();
+
   try {
     const coupon = await Coupon.findOne({ code: couponCode });
 
     if (!coupon) {
-      return res.status(400).json({ message: 'Invalid or expired coupon code.' });
+      return res
+        .status(400)
+        .json({ message: "Invalid or expired coupon code." });
     }
 
     const finalPrice = await applyCoupon(totalPrice, coupon);
 
     if (finalPrice === null) {
-      return res.status(400).json({ message: 'Invalid or expired coupon code.' });
+      return res
+        .status(400)
+        .json({ message: "Invalid or expired coupon code." });
     }
 
     res.status(200).json({ newTotal: finalPrice });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'An error occurred while applying the coupon.' });
+    res
+      .status(500)
+      .json({ message: "An error occurred while applying the coupon." });
   }
-})
+});
 
 exports.razorPay = asyncHandler(async (req, res) => {
   try {
@@ -212,7 +218,40 @@ exports.getOrderDetail = asyncHandler(async (req, res) => {
 });
 
 exports.cancelOrder = asyncHandler(async (req, res) => {
-  const orderId = req.body.orderId;
-  await Order.updateOne({ _id: orderId }, { $set: { isCancelled: true } });
-  return res.json({ message: "Order Cancel Requested" });
+  try {
+    const orderId = req.params.id;
+    const order = await Order.findById(orderId);
+
+    if (!order) {
+      return res.status(404).send("Order not found");
+    }
+
+    if (order.status === "Shipped" || order.status === "Delivered") {
+      order.isCancelled = true;
+      await Order.findByIdAndUpdate(orderId, {
+        isCancelled: true,
+      });
+    } else if (order.status === "Pending" || order.status === "Processed") {
+      const user = await User.findById(order.user);
+      if (!user) {
+        throw new Error("User not found");
+      }
+
+      await User.findByIdAndUpdate(order.user, {
+        walletBalance: (user.walletBalance || 0) + order.totalAmount,
+      });
+
+      await Order.findByIdAndUpdate(orderId, { status: "Cancelled" });
+    } else {
+      res
+        .status(400)
+        .json({ message: "Order cannot be cancelled in its current status" });
+    }
+
+    return res.status(200).json({
+      message: "Order cancelled successfully",
+    });
+  } catch (error) {
+    return res.status(400).json({ message: error.message });
+  }
 });

@@ -1,9 +1,9 @@
-<div class="container-fluid mt-3">
+<div class="container-fluid mt-3 text-light">
   <div class="row">
-    <h5 class="card-title">Order Details</h5>
+    <h5 class="card-title text-light">Order Details</h5>
 
     <div class="card-body">
-      <h6 class="card-subtitle mb-4 text-muted">
+      <h6 class="card-subtitle mb-4 text-light">
         Order ID: <span class="badge bg-secondary"><%= order._id %></span>
       </h6>
 
@@ -19,7 +19,7 @@
             <div class="card-header bg-dark text-white">
               <h6 class="mb-0">User Information</h6>
             </div>
-            <div class="card-body">
+            <div class="card-body bg-dark text-light">
               <div class="mb-3">
                 <h6 class="mb-2">User ID</h6>
                 <p class="card-text">
@@ -61,11 +61,11 @@
 
       <h6 class="mb-2">Shipping Address</h6>
       <p class="card-text">
-        Location: <%= order.address.location %>,<br />
-        City: <%= order.address.city %>,<br />
-        State: <%= order.address.state %>,<br />
-        Country: <%= order.address.country %>,<br />
-        Zip: <%= order.address.zip %>
+        Location: <%= order.location %>,<br />
+        City: <%= order.city %>,<br />
+        State: <%= order.state %>,<br />
+        Country: <%= order.country %>,<br />
+        Zip: <%= order.zip %>
       </p>
 
       <h6 class="mb-2">Payment Method</h6>

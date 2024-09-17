@@ -38,7 +38,7 @@ router.post("/:id", userAuth, updateUserAccount);
 
 router.get("/order-history", userAuth, getOrderHistory);
 
-router.post("/order-history/cancel", userAuth, cancelOrder);
+router.get("/order-history/cancel/:id", userAuth, cancelOrder);
 
 router.get("/order-history/:id", userAuth, getOrderDetail);
 
