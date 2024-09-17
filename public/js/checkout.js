@@ -103,6 +103,7 @@ function setupPaymentMethodSelection() {
 // Function to handle form submission
 function setupFormSubmission() {
   const form = document.getElementById("checkoutForm");
+  const totalPrice = form.getAttribute("data-total-price");
 
   let Toast = Swal.mixin({
     toast: true,
@@ -122,34 +123,127 @@ function setupFormSubmission() {
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries()); // Convert FormData to a plain object
 
+    const paymentMethod = data.paymentMethod;
+
     try {
-      const response = await fetch("/checkout", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data), // Convert the object to a JSON string
-      });
+      if (paymentMethod === "RazorPay") {
+        const amount = totalPrice;
+        const currency = "INR";
+        const receiptId = "qwerty1";
 
-      const result = await response.json(); // Parse the JSON response
+        const response = await fetch("/checkout/order", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            amount,
+            currency,
+            receipt: receiptId,
+          }), // Convert the object to a JSON string
+        });
+        const order = await response.json();
 
-      if (response.ok) {
-        await Toast.fire({
-          icon: "success",
-          title: "Order placed!",
+        var options = {
+          key: "rzp_test_QYQyRI9jHWn6Or", // Enter the Key ID generated from the Dashboard
+          amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+          currency,
+          name: "Audify", //your business name
+          description: "Test Transaction",
+          image: "https://example.com/your_logo",
+          order_id: order.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+          handler: async function (response) {
+            const razorpayPaymentId = response.razorpay_payment_id;
+            const razorpayOrderId = response.razorpay_order_id;
+            const razorpaySignature = response.razorpay_signature;
+
+            try {
+              const finalCheckoutResponse = await fetch("/checkout", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+              });
+  
+              const checkoutResult = await finalCheckoutResponse.json();
+  
+              if (finalCheckoutResponse.ok) {
+                // Show success toast
+                await Toast.fire({
+                  icon: "success",
+                  title: "Order placed successful!",
+                });
+                // Redirect to order success page
+                window.location.href = `/checkout/order-success/${checkoutResult.orderId}`;
+              } else {
+                Toast.fire({
+                  icon: "error",
+                  title: checkoutResult.message || "An error occurred while finalizing the order",
+                });
+              }
+            } catch (error) {
+              console.error("Error during final checkout:", error);
+              Toast.fire({
+                icon: "error",
+                title: "An unexpected error occurred while finalizing the order",
+              });
+            }
+          },
+          prefill: {
+            //We recommend using the prefill parameter to auto-fill customer's contact information, especially their phone number
+            name: data.name, //your customer's name
+            contact: data.mobile, //Provide the customer's phone number for better conversion rates
+          },
+          notes: {
+            address: "Razorpay Corporate Office",
+          },
+          theme: {
+            color: "#3399cc",
+          },
+        };
+        var rzp1 = new window.Razorpay(options);
+        rzp1.on("payment.failed", function (response) {
+          alert(response.error.code);
+          alert(response.error.description);
+          alert(response.error.source);
+          alert(response.error.step);
+          alert(response.error.reason);
+          alert(response.error.metadata.order_id);
+          alert(response.error.metadata.payment_id);
         });
-        window.location.href = `/checkout/order-success/${result.orderId}`; // Change this URL as needed
-      } else {
-        Toast.fire({
-          icon: "error",
-          title: result.message || "An error occurred",
+
+        rzp1.open();
+      } else if (paymentMethod === "Cash On Delivery") {
+        // If Cash on Delivery is selected, call standard checkout API
+        let response = await fetch("/checkout", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
         });
+        const result = await response.json(); // Parse the JS`ON response
+  
+        if (response.ok) {
+          await Toast.fire({
+            icon: "success",
+            title: "Order placed successfully!",
+          });
+          window.location.href = `/checkout/order-success/${result.orderId}`; // Change this URL as needed
+        } else {
+          Toast.fire({
+            icon: "error",
+            title: result.message || "An error occurred while placing the order",
+          });
+        }
       }
+
     } catch (error) {
       console.error("Error:", error);
       Toast.fire({
         icon: "error",
-        title: "An unexpected error occurred",
+        title: `An unexpected error occurred ${error}`,
       });
     }
   });

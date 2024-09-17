@@ -4,6 +4,7 @@ const OrderItem = require("../models/orderItem");
 const Order = require("../models/order");
 const Product = require("../models/products");
 const asyncHandler = require("express-async-handler");
+const Razorpay = require("razorpay");
 
 exports.getCheckoutPage = asyncHandler(async (req, res) => {
   const userId = req.session.user;
@@ -18,6 +19,27 @@ exports.getCheckoutPage = asyncHandler(async (req, res) => {
     cart,
     addresses,
   });
+});
+
+exports.razorPay = asyncHandler(async (req, res) => {
+  try {
+    const razorpay = new Razorpay({
+      key_id: process.env.RAZORPAY_KEY_ID,
+      key_secret: process.env.RAZORPAY_SECRET,
+    });
+
+    const options = req.body;
+    const order = await razorpay.orders.create(options);
+
+    if (!order) {
+      return res.status(500).send("Error");
+    }
+
+    res.status(200).json(order);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error");
+  }
 });
 
 exports.handleOrderSubmission = asyncHandler(async (req, res) => {
@@ -51,7 +73,10 @@ exports.handleOrderSubmission = asyncHandler(async (req, res) => {
 
         await Product.findByIdAndUpdate(
           item.productId,
-          { $inc: { stock: -item.quantity, popularity: 1 }, $set: { isOutOfStock } } // Decrement stock by the ordered quantity
+          {
+            $inc: { stock: -item.quantity, popularity: 1 },
+            $set: { isOutOfStock },
+          } // Decrement stock by the ordered quantity
         );
 
         return orderItem;
@@ -78,9 +103,11 @@ exports.handleOrderSubmission = asyncHandler(async (req, res) => {
     await order.save();
 
     cart.items = [];
-    cart.calculateTotals(); 
+    cart.calculateTotals();
 
-    await Cart.findByIdAndUpdate(cart._id, { $set: { items: cart.items, total: cart.total } });
+    await Cart.findByIdAndUpdate(cart._id, {
+      $set: { items: cart.items, total: cart.total },
+    });
 
     res
       .status(200)
@@ -139,12 +166,11 @@ exports.getOrderHistory = asyncHandler(async (req, res) => {
 });
 
 exports.getOrderDetail = asyncHandler(async (req, res) => {
-  const order = await Order.findById(req.params.id)
-  .populate({
-    path: 'orderItems',
+  const order = await Order.findById(req.params.id).populate({
+    path: "orderItems",
     populate: {
-      path: 'product'
-    }
+      path: "product",
+    },
   });
 
   res.render("layout", {

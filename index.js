@@ -2,6 +2,7 @@ const express = require("express");
 const path = require("node:path");
 const connectDB = require("./config/db");
 const session = require("express-session");
+const cors = require('cors')
 require("dotenv").config();
 const { notFound, errorHandler } = require("./middleware/errorHandler");
 const userRouter = require("./routes/userRoute");
@@ -19,6 +20,8 @@ app.set("views", path.join(__dirname, "views"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
+app.use(cors());
+
 
 // Prevent caching by setting headers
 app.use((req, res, next) => {

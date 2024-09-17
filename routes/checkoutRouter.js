@@ -5,11 +5,14 @@ const {
   getCheckoutPage,
   handleOrderSubmission,
   orderSuccessPage,
+  razorPay,
 } = require("../controller/checkoutController");
 
 router.get("/", userAuth, getCheckoutPage);
 
 router.post("/", userAuth, handleOrderSubmission);
+
+router.post('/order', razorPay);
 
 router.get("/order-success/:orderId", userAuth, orderSuccessPage);
 
