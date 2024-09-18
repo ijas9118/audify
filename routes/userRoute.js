@@ -1,13 +1,39 @@
 const express = require("express");
 const router = express.Router();
 const userAuth = require("../middleware/userAuth");
+const passport = require("passport");
+require('../services/passport.js')
+
 const {
   sendOtp,
   loginUser,
   logoutUser,
   verifyAndSignUp,
   resendOtp,
+  successGoogleLogin,
+  failureGoogleLogin,
 } = require("../controller/userController");
+
+router.use(passport.initialize()); 
+router.use(passport.session());
+
+// Google OAuth routes
+router.get('/auth/google' , passport.authenticate('google', { scope: 
+	[ 'email', 'profile' ] 
+})); 
+
+// Auth Callback 
+router.get( '/auth/google/callback', 
+	passport.authenticate( 'google', { 
+		successRedirect: '/success', 
+		failureRedirect: '/failure'
+}));
+
+// Success 
+router.get('/success' , successGoogleLogin); 
+
+// failure 
+router.get('/failure' , failureGoogleLogin);
 
 router.get("/", (req, res) => {
   res.render("layout", {

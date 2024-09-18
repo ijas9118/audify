@@ -52,6 +52,36 @@ const addToCart = async (userId, productId, quantity) => {
   return cart;
 };
 
+exports.successGoogleLogin = async (req , res) => { 
+	if(!req.user) 
+		res.redirect('/failure'); 
+  try {
+    let user = await User.findOne({ email: req.user.email });
+
+    if (!user) {
+      user = new User({
+        firstName: req.user.name.givenName,
+        lastName: req.user.name.familyName,
+        email: req.user.email,
+        password: "123456",
+        status: "Active",
+      });
+      await user.save();
+    }
+
+    req.session.user = user;
+
+    res.redirect("/");
+  } catch (error) {
+    console.error("Error during Google login: ", error);
+    res.redirect("/login");
+  }
+}
+
+exports.failureGoogleLogin = (req , res) => { 
+	res.send("Error"); 
+}
+
 exports.sendOtp = asyncHandler(async (req, res) => {
   const { firstName, lastName, email, password } = req.body;
   const findUser = await User.findOne({ email });
