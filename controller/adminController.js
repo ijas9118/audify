@@ -4,8 +4,9 @@ const Order = require("../models/order");
 const Offer = require("../models/offer");
 const Product = require("../models/products");
 const Category = require("../models/categories");
-const Coupon = require('../models/coupon')
+const Coupon = require("../models/coupon");
 const asyncHandler = require("express-async-handler");
+const moment = require("moment");
 
 // ============================
 //  Admin Authentication Controllers
@@ -170,7 +171,7 @@ exports.getCoupons = asyncHandler(async (req, res) => {
     viewName: "admin/couponManagement",
     activePage: "coupon",
     isAdmin: true,
-    coupons
+    coupons,
   });
 });
 
@@ -218,17 +219,15 @@ exports.addCoupon = asyncHandler(async (req, res) => {
       .json({ success: true, message: "Coupon added successfully!" });
   } catch (error) {
     console.error("Error adding coupon:", error);
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "An error occurred while adding the coupon",
-      });
+    res.status(500).json({
+      success: false,
+      message: "An error occurred while adding the coupon",
+    });
   }
 });
 
 exports.updateCoupon = async (req, res) => {
-  const { id } = req.params; 
+  const { id } = req.params;
   const {
     code,
     discountType,
@@ -239,7 +238,7 @@ exports.updateCoupon = async (req, res) => {
     usageLimit,
     isActive,
   } = req.body;
-  console.log(req.body, req.params.id)
+  console.log(req.body, req.params.id);
 
   try {
     const coupon = await Coupon.findById(id);
@@ -275,13 +274,15 @@ exports.deleteCoupon = async (req, res) => {
     const result = await Coupon.findByIdAndDelete(couponId);
 
     if (!result) {
-      return res.status(404).json({ message: 'Coupon not found' });
+      return res.status(404).json({ message: "Coupon not found" });
     }
 
-    res.status(200).json({ message: 'Coupon deleted successfully' });
+    res.status(200).json({ message: "Coupon deleted successfully" });
   } catch (error) {
-    console.error('Error deleting coupon:', error);
-    res.status(500).json({ message: 'An error occurred while deleting the coupon' });
+    console.error("Error deleting coupon:", error);
+    res
+      .status(500)
+      .json({ message: "An error occurred while deleting the coupon" });
   }
 };
 
@@ -357,12 +358,10 @@ exports.addOffer = asyncHandler(async (req, res) => {
       .json({ success: true, message: "Offer added successfully!" });
   } catch (error) {
     console.error("Error adding offer:", error);
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "An error occurred while adding the offer",
-      });
+    res.status(500).json({
+      success: false,
+      message: "An error occurred while adding the offer",
+    });
   }
 });
 
@@ -433,7 +432,7 @@ exports.deleteOffer = asyncHandler(async (req, res) => {
       message: "An error occurred while deleting the offer",
     });
   }
-})
+});
 
 // ============================
 //  Deals Management Controllers
@@ -447,4 +446,139 @@ exports.getDeals = asyncHandler(async (req, res) => {
     activePage: "deal",
     isAdmin: true,
   });
+});
+
+// ============================
+//  Sales Report Controllers
+// ============================
+
+const getDateRange = (filterType) => {
+  const today = moment().startOf("day");
+
+  switch (filterType) {
+    case "Daily":
+      return {
+        start: today.clone(), // Clone to avoid mutation
+        end: today.clone().endOf("day"),
+      };
+    case "Weekly":
+      return {
+        start: today.clone().startOf("week"),
+        end: today.clone().endOf("week"),
+      };
+    case "Monthly":
+      return {
+        start: today.clone().startOf("month"),
+        end: today.clone().endOf("month"),
+      };
+    case "Yearly":
+      return {
+        start: today.clone().startOf("year"),
+        end: today.clone().endOf("year"),
+      };
+    default:
+      return { start: null, end: null };
+  }
+};
+
+exports.getSalesReport = asyncHandler(async (req, res) => {
+  const { filter, startDate, endDate } = req.body;
+  let start, end;
+
+  if (filter === "Custom Date Range" && startDate && endDate) {
+    start = moment(startDate).startOf("day");
+    end = moment(endDate).endOf("day");
+  } else {
+    const dateRange = getDateRange(filter);
+    start = dateRange.start;
+    end = dateRange.end;
+  }
+  try {
+    // Fetch orders within the date range
+    const orders = await Order.find({
+      dateOrdered: { $gte: start.toDate(), $lte: end.toDate() },
+    })
+    .populate({
+      path: 'orderItems',
+      populate: {
+        path: 'product',
+        select: 'price', // Select only the fields you need
+      },
+    });
+
+    // Process sales data
+    const salesData = orders.reduce((acc, order) => {
+      const dateKey = moment(order.dateOrdered).format("YYYY-MM-DD");
+      if (!acc[dateKey]) {
+        acc[dateKey] = {
+          totalSalesRevenue: 0,
+          discountApplied: 0,
+          netSales: 0,
+          numberOfOrders: 0,
+          totalItemsSold: 0,
+        };
+      }
+
+      const originalPriceTotal = order.orderItems.reduce((sum, item) => {
+        if (item.product && item.product.price) {
+          return sum + item.product.price * item.quantity;
+        } else {
+          console.error('Item product or price is undefined:', item);
+          return sum; // Return the sum as is if there's an issue
+        }
+      }, 0);
+
+      const discountApplied = order.totalAmount - originalPriceTotal;
+
+      acc[dateKey].totalSalesRevenue += order.totalAmount;
+      // Assuming discountApplied is derived from a different source
+      acc[dateKey].discountApplied += discountApplied; // Adjust if needed
+      acc[dateKey].netSales += originalPriceTotal; // Adjust if needed
+      acc[dateKey].numberOfOrders += 1;
+      acc[dateKey].totalItemsSold += order.orderItems.length;
+
+      return acc;
+    }, {});
+
+    // Transform sales data into an array
+    const responseData = Object.keys(salesData).map((date) => ({
+      date,
+      ...salesData[date],
+    }));
+
+    // Summary
+    const totalSalesCount = orders.length;
+    const overallOrderAmount = orders.reduce(
+      (sum, order) => sum + order.totalAmount,
+      0
+    );
+    const overallDiscount = orders.reduce(
+      (sum, order) => {
+        // Calculate discount for each order
+        const originalPriceTotal = order.orderItems.reduce((sum, item) => {
+          if (item.product && item.product.price) {
+            return sum + item.product.price * item.quantity;
+          } else {
+            console.error('Item product or price is undefined:', item);
+            return sum;
+          }
+        }, 0);
+        return sum + (order.totalAmount - originalPriceTotal);
+      },
+      0
+    );
+
+    res.json({
+      success: true,
+      data: responseData,
+      summary: {
+        totalSalesCount,
+        overallOrderAmount,
+        overallDiscount,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
 });

@@ -22,12 +22,16 @@ const {
   addCoupon,
   updateCoupon,
   deleteCoupon,
+  getSalesReport,
+  generatePDF,
 } = require("../controller/adminController");
 const categoryRouter = require("./categoryRouter");
 const productRouter = require('./productRouter')
 
 // Admin Home Route
 router.get("/", adminAuth, getAdminHome);
+
+router.post("/sales-report", adminAuth, getSalesReport);
 
 // Admin Authentication Routes
 // Admin Login Route
