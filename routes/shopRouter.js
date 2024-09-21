@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const Product = require('../models/products')
 const userAuth = require("../middleware/userAuth");
 const {
   getShop,
@@ -19,6 +20,32 @@ const {
 router.get("/", getShop);
 
 router.post("/", filterShop);
+
+router.get('/search-products', async (req, res) => {
+  const query = req.query.query || '';
+
+  try {
+    let products;
+    if (query === '') {
+      // If query is empty, return all products
+      products = await Product.find({});
+    } else {
+      // Otherwise, perform a case-insensitive search using regex
+      const regex = new RegExp('^' + query, 'i'); // ^ ensures it starts with the input
+      products = await Product.find({ name: { $regex: regex } });
+    }
+
+    // Log the products for debugging
+    console.log(products);
+
+    // Send the matching products back as JSON
+    res.json(products);
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    res.status(500).json({ error: 'Server Error' });
+  }
+});
+
 
 router.get("/cart", userAuth, getCart);
 

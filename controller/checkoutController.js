@@ -25,35 +25,98 @@ exports.getCheckoutPage = asyncHandler(async (req, res) => {
 });
 
 exports.applyCoupon = asyncHandler(async (req, res) => {
-  const { totalPrice, couponCode } = req.body;
-  console.log(req.body);
-  const now = new Date();
+  const { couponCode, cartId } = req.body;
 
   try {
-    const coupon = await Coupon.findOne({ code: couponCode });
+    const cart = await Cart.findById(cartId);
+    if (!cart) {
+      return res.status(404).json({ success: false, message: "Cart not found" });
+    }
 
+    const coupon = await Coupon.findOne({ code: couponCode, isActive: true });
     if (!coupon) {
-      return res
-        .status(400)
-        .json({ message: "Invalid or expired coupon code." });
+      return res.status(400).json({ success: false, message: "Invalid or expired coupon code" });
     }
 
-    const finalPrice = await applyCoupon(totalPrice, coupon);
-
-    if (finalPrice === null) {
-      return res
-        .status(400)
-        .json({ message: "Invalid or expired coupon code." });
+    const currentDate = new Date();
+    if (currentDate < coupon.validFrom || currentDate > coupon.validUntil) {
+      return res.status(400).json({ success: false, message: `Coupon ${couponCode} is not valid at this time.` });
     }
 
-    res.status(200).json({ newTotal: finalPrice });
+    let discount = 0;
+    if (coupon.discountType === "percentage") {
+      discount = (coupon.discountValue / 100) * cart.total;
+      if (coupon.maxDiscountValue && discount > coupon.maxDiscountValue) {
+        discount = coupon.maxDiscountValue;
+      }
+    } else if (coupon.discountType === "fixed") {
+      discount = coupon.discountValue;
+    }
+
+    if (cart.appliedCoupon) {
+      return res.status(400).json({ success: false, message: "A coupon has already been applied to this cart." });
+    }
+
+    let finalTotal = cart.total - discount;
+
+    await Cart.updateOne(
+      { _id: cartId }, 
+      {
+        $set: {
+          appliedCoupon: coupon.code,
+          discountApplied: discount,  
+          finalTotal, 
+        }
+      }
+    );
+    
+    res.json({
+      success: true,
+      message: `Coupon ${couponCode} applied successfully.`,
+      finalTotal,
+      appliedCoupon: cart.appliedCoupon,
+    });
   } catch (error) {
-    console.error(error);
-    res
-      .status(500)
-      .json({ message: "An error occurred while applying the coupon." });
+    console.error("Error applying coupon:", error);
+    res.status(500).json({ success: false, message: "An error occurred while applying the coupon" });
   }
 });
+
+exports.removeCoupon = asyncHandler(async (req, res) => {
+  const cartId = req.params.cartId;
+  try {
+    const cart = await Cart.findById(cartId);
+    if (!cart) {
+      return res.status(404).json({ success: false, message: "Cart not found" });
+    }
+
+    if (!cart.appliedCoupon) {
+      return res.status(400).json({ success: false, message: "No coupon applied to this cart." });
+    }
+
+    cart.appliedCoupon = null; 
+    cart.discountApplied = 0; 
+
+    cart.calculateTotals(); 
+
+    await Cart.updateOne({ _id: cartId }, {
+      $set: {
+        appliedCoupon: cart.appliedCoupon,
+        discountApplied: cart.discountApplied,
+        finalTotal: cart.finalTotal,
+      }
+    });
+
+    res.json({
+      success: true,
+      message: "Coupon removed successfully",
+      finalTotal: cart.finalTotal 
+    });
+  } catch (error) {
+    console.error("Error removing coupon:", error);
+    res.status(500).json({ success: false, message: "An error occurred while removing the coupon" });
+  }
+}) 
 
 exports.razorPay = asyncHandler(async (req, res) => {
   try {

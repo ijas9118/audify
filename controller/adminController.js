@@ -234,14 +234,15 @@ exports.updateCoupon = async (req, res) => {
     discountValue,
     maxDiscountValue,
     minCartValue,
-    expirationDate,
+    validFrom,
+    validUntil,
     usageLimit,
     isActive,
   } = req.body;
-  console.log(req.body, req.params.id);
 
   try {
     const coupon = await Coupon.findById(id);
+    console.log(req.body)
 
     if (!coupon) {
       return res.status(404).json({ message: "Coupon not found" });
@@ -250,12 +251,13 @@ exports.updateCoupon = async (req, res) => {
     coupon.code = code || coupon.code;
     coupon.discountType = discountType || coupon.discountType;
     coupon.discountValue = discountValue || coupon.discountValue;
-    coupon.maxDiscountValue = maxDiscountValue || coupon.maxDiscountValue;
-    coupon.minCartValue = minCartValue || coupon.minCartValue;
-    coupon.expirationDate = expirationDate || coupon.expirationDate;
+    coupon.maxDiscountValue = maxDiscountValue;
+    coupon.minCartValue = minCartValue;
+    coupon.validFrom = validFrom || coupon.validFrom;
+    coupon.validUntil = validUntil || coupon.validUntil;
     coupon.usageLimit = usageLimit || coupon.usageLimit;
     coupon.isActive = isActive !== undefined ? isActive : coupon.isActive;
-
+    console.log(coupon)
     await coupon.save();
 
     res

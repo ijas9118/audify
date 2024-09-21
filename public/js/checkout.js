@@ -139,7 +139,7 @@ function setupFormSubmission() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            amount,
+            amount: amount * 100,
             currency,
             receipt: receiptId,
           }), // Convert the object to a JSON string
@@ -148,7 +148,7 @@ function setupFormSubmission() {
 
         var options = {
           key: "rzp_test_QYQyRI9jHWn6Or", // Enter the Key ID generated from the Dashboard
-          amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+          amount,
           currency,
           name: "Audify", //your business name
           description: "Test Transaction",
@@ -167,9 +167,9 @@ function setupFormSubmission() {
                 },
                 body: JSON.stringify(data),
               });
-  
+
               const checkoutResult = await finalCheckoutResponse.json();
-  
+
               if (finalCheckoutResponse.ok) {
                 // Show success toast
                 await Toast.fire({
@@ -181,14 +181,17 @@ function setupFormSubmission() {
               } else {
                 Toast.fire({
                   icon: "error",
-                  title: checkoutResult.message || "An error occurred while finalizing the order",
+                  title:
+                    checkoutResult.message ||
+                    "An error occurred while finalizing the order",
                 });
               }
             } catch (error) {
               console.error("Error during final checkout:", error);
               Toast.fire({
                 icon: "error",
-                title: "An unexpected error occurred while finalizing the order",
+                title:
+                  "An unexpected error occurred while finalizing the order",
               });
             }
           },
@@ -226,7 +229,7 @@ function setupFormSubmission() {
           body: JSON.stringify(data),
         });
         const result = await response.json(); // Parse the JS`ON response
-  
+
         if (response.ok) {
           await Toast.fire({
             icon: "success",
@@ -236,11 +239,11 @@ function setupFormSubmission() {
         } else {
           Toast.fire({
             icon: "error",
-            title: result.message || "An error occurred while placing the order",
+            title:
+              result.message || "An error occurred while placing the order",
           });
         }
       }
-
     } catch (error) {
       console.error("Error:", error);
       Toast.fire({
@@ -251,49 +254,114 @@ function setupFormSubmission() {
   });
 }
 
-// Function to handle coupon application
-function setupCouponApplication() {
-  const applyCouponBtn = document.getElementById('applyCouponBtn');
-  const couponCodeInput = document.getElementById('couponCode');
-  const grandTotalElement = document.getElementById('grandTotal');
-  const checkoutForm = document.getElementById('checkoutForm');
+const couponBtn = document.getElementById("applyCouponBtn");
+const couponCodeInput = document.getElementById("couponCode");
+const cartId = couponCode.getAttribute("data-cartId");
+const applyCouponDiv = document.getElementById("applyCouponDiv");
+const appliedCouponDiv = document.getElementById("appliedCouponDiv");
+const appliedCouponCodeSpan = document.getElementById("appliedCouponCode");
+const removeCouponBtn = document.getElementById("removeCouponBtn");
+const grandTotal = document.getElementById('grandTotal');
 
-  applyCouponBtn.addEventListener('click', async () => {
-    const couponCode = couponCodeInput.value.trim();
-    const totalPrice = parseFloat(checkoutForm.dataset.totalPrice); // Get the total price from the form data attribute
-
-    if (!couponCode) {
-      alert('Please enter a coupon code.');
-      return;
-    }
-
-    try {
-      // Make a POST request to apply the coupon
-      const response = await fetch('/checkout/apply-coupon', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ totalPrice, couponCode }),
-      });
-
-      const result = await response.json();
-
-      if (response.ok) {
-        const { newTotal } = result;
-        alert(newTotal)
-
-        // Update the grand total on the frontend
-        grandTotalElement.textContent = `₹${newTotal.toFixed(2)}`;
-        checkoutForm.dataset.totalPrice = newTotal.toFixed(2); // Update form's total price
-
-        alert('Coupon applied successfully!');
-      } else {
-        alert(`Error applying coupon: ${result.message}`);
-      }
-    } catch (error) {
-      console.error('Error applying coupon:', error);
-      alert(`An error occurred while applying the coupon. ${error}`);
-    }
+couponBtn.addEventListener("click", () => {
+  let Toast = Swal.mixin({
+    toast: true,
+    position: "top",
+    showConfirmButton: false,
+    timer: 2500,
+    timerProgressBar: true,
+    didOpen: (toast) => {
+      toast.onmouseenter = Swal.stopTimer;
+      toast.onmouseleave = Swal.resumeTimer;
+    },
   });
-}
+  const couponCode = couponCodeInput.value.trim();
+  if (couponCode) {
+    const data = {
+      couponCode,
+      cartId,
+    };
+    fetch("/checkout/apply-coupons", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    })
+      .then((response) => response.json())
+      .then((result) => {
+        if (result.success) {
+          Toast.fire({
+            icon: "success",
+            title: result.message,
+          });
+          appliedCouponCodeSpan.querySelector("strong").textContent =
+            couponCode;
+          applyCouponDiv.classList.add("d-none");
+          appliedCouponDiv.classList.remove("d-none");
+          grandTotal.textContent = `₹${result.finalTotal.toFixed(2)}`;
+        } else {
+          Toast.fire({
+            icon: "error",
+            title: result.message,
+          });
+          console.error("Failed to apply coupon:", couponCode, result.message);
+        }
+      })
+      .catch((error) => {
+        Toast.fire({
+          icon: "error",
+          title: `Error: ${error}`,
+        });
+        console.error("Error:", error);
+      });
+  } else {
+    Toast.fire({
+      icon: "warning",
+      title: "Please enter a coupon code.",
+    });
+    console.log("Please enter a coupon code.");
+  }
+});
+
+removeCouponBtn.addEventListener("click", async () => {
+  applyCouponDiv.classList.remove("d-none");
+  appliedCouponDiv.classList.add("d-none");
+  couponCodeInput.value = "";
+
+  let Toast = Swal.mixin({
+    toast: true,
+    position: "top",
+    showConfirmButton: false,
+    timer: 2500,
+    timerProgressBar: true,
+    didOpen: (toast) => {
+      toast.onmouseenter = Swal.stopTimer;
+      toast.onmouseleave = Swal.resumeTimer;
+    },
+  });
+
+  fetch(`/checkout/remove-coupon/${cartId}`)
+    .then((response) => response.json())
+    .then((result) => {
+      if (result.success) {
+        Toast.fire({
+          icon: "success",
+          title: result.message,
+        });
+        grandTotal.textContent = `₹${result.finalTotal.toFixed(2)}`; 
+      } else {
+        Toast.fire({
+          icon: "error",
+          title: result.message,
+        });
+      }
+    })
+    .catch((error) => {
+      Toast.fire({
+        icon: "error",
+        title: `Error: ${error}`,
+      });
+      console.error("Error:", error);
+    });
+});

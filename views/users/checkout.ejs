@@ -60,25 +60,36 @@
         <div class="d-flex justify-content-between mb-4 pb-2 total">
           <span class="fw-bold text-dark">Grand Total</span>
           <span class="fs-5 fw-bold text-dark" id="grandTotal"
-            >₹<%= cart.total.toFixed(2) %></span
+            >₹<%= cart.finalTotal.toFixed(2) %></span
           >
         </div>
 
         <!-- Coupon Section -->
-        <div class="mb-4">
-          <div class="input-group">
+        <div class="mb-4" id="couponSection">
+          <!-- Coupon Input Group -->
+          <div class="<%= cart.appliedCoupon ? 'd-none' : '' %> input-group" id="applyCouponDiv">
             <input
               type="text"
               class="form-control"
               id="couponCode"
               placeholder="Enter coupon code"
               aria-label="Coupon code"
+              data-cartId="<%= cart.id %>"
             />
-            <button class="btn btn-dark" type="button" id="applyCouponBtn">
-              Apply
-            </button>
+            <button class="btn btn-dark" type="button" id="applyCouponBtn">Apply</button>
+          </div>
+
+          <!-- Applied Coupon Section (Hidden by default) -->
+          <div class="<%= cart.appliedCoupon ? '' : 'd-none' %>" id="appliedCouponDiv">
+            <div class="alert alert-success d-flex justify-content-between align-items-center">
+              <span id="appliedCouponCode">Coupon: <strong><%= cart.appliedCoupon %></strong></span>
+              <button class="btn btn-link text-danger" id="removeCouponBtn">
+                <i class="fas fa-times"></i> Remove
+              </button>
+            </div>
           </div>
         </div>
+
       </div>
     </div>
   </div>

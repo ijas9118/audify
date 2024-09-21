@@ -52,7 +52,7 @@ async function addCoupon() {
     code: couponCode,
     discountType,
     discountValue: parseFloat(discountValue),
-    maxDiscountValue: maxDiscountValue ? parseFloat(maxDiscountValue) : undefined,
+    maxDiscountValue: maxDiscountValue ? parseFloat(maxDiscountValue) : 0,
     minCartValue: minCartValue ? parseFloat(minCartValue) : 0,
     validFrom, // New field for start date
     validUntil, // Updated field for expiration date
@@ -114,7 +114,8 @@ async function updateCoupon(couponId) {
   const maxDiscountValue =
     document.getElementById(`maxDiscountValue${couponId}`).value || null;
   const minCartValue = document.getElementById(`minCartValue${couponId}`).value || null;
-  const expirationDate = document.getElementById(`expirationDate${couponId}`).value;
+  const validFrom = document.getElementById(`validFrom${couponId}`).value;
+  const validUntil = document.getElementById(`validUntil${couponId}`).value;
   const usageLimit = document.getElementById(`usageLimit${couponId}`).value || null;
   const isActive = document.getElementById(`isActive${couponId}`).checked; // Corrected to boolean
 
@@ -122,7 +123,8 @@ async function updateCoupon(couponId) {
     !couponCode ||
     !discountType ||
     !discountValue ||
-    !expirationDate
+    !validFrom ||
+    !validUntil
   ) {
     await Toast.fire({
       icon: "warning",
@@ -137,7 +139,8 @@ async function updateCoupon(couponId) {
     discountValue: parseFloat(discountValue),
     maxDiscountValue: maxDiscountValue ? parseFloat(maxDiscountValue) : undefined,
     minCartValue: minCartValue ? parseFloat(minCartValue) : 0,
-    expirationDate,
+    validFrom,
+    validUntil,
     usageLimit: parseInt(usageLimit, 10),
     isActive,
   };
@@ -154,23 +157,26 @@ async function updateCoupon(couponId) {
     const result = await response.json();
 
     if (response.ok) {
-      document.getElementById(`couponCodeDisplay${couponId}`).textContent = couponCode;
+      const updatedCoupon = result.coupon;
+      document.getElementById(`couponCodeDisplay${couponId}`).textContent = updatedCoupon.code;
+
       document.getElementById(`discountTypeDisplay${couponId}`).textContent =
-        discountType === 'percentage' ? `${couponData.discountValue}%` : `₹${couponData.discountValue}`;
+      updatedCoupon.discountType === 'percentage' ? `${updatedCoupon.discountValue}%` : `₹${updatedCoupon.discountValue}`;
+
       document.getElementById(`maxDiscountValueDisplay${couponId}`).textContent =
-        couponData.maxDiscountValue ? `₹${couponData.maxDiscountValue}` : '-';
+        updatedCoupon.maxDiscountValue ? `₹${updatedCoupon.maxDiscountValue}` : '-';
       document.getElementById(`minCartValueDisplay${couponId}`).textContent =
-        couponData.minCartValue ? `₹${couponData.minCartValue}` : '-';
+        updatedCoupon.minCartValue ? `₹${updatedCoupon.minCartValue}` : '-';
       document.getElementById(`usageLimitDisplay${couponId}`).textContent =
-        couponData.usageLimit || 'Unlimited';
-      document.getElementById(`validFromDisplay${couponId}`).textContent = new Date(couponData.expirationDate).toLocaleDateString();
-      document.getElementById(`validUntilDisplay${couponId}`).textContent = new Date(couponData.expirationDate).toLocaleDateString();
+        updatedCoupon.usageLimit || 'Unlimited';
+      document.getElementById(`validFromDisplay${couponId}`).textContent = new Date(updatedCoupon.validFrom).toLocaleDateString();
+      document.getElementById(`validUntilDisplay${couponId}`).textContent = new Date(updatedCoupon.validUntil).toLocaleDateString();
       document.getElementById(`isActiveDisplay${couponId}`).innerHTML =
-        `<span class="badge w-100 py-2 ${couponData.isActive ? 'bg-success' : 'bg-danger'}">${couponData.isActive ? 'Active' : 'Inactive'}</span>`;
+        `<span class="badge w-100  ${updatedCoupon.isActive ? 'bg-success' : 'bg-danger'}">${updatedCoupon.isActive ? 'Active' : 'Inactive'}</span>`;
 
       Toast.fire({
         icon: "success",
-        title: "Coupon updated successfully!",
+        title: result.message,
       });
       const modal = bootstrap.Modal.getInstance(
         document.getElementById(`editCouponModal${couponId}`)
