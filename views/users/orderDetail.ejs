@@ -36,10 +36,16 @@
         </div>
         <div class="col-md-6">
           <p class="mb-2">
-            <strong>Total Amount:</strong> ₹<%= order.totalAmount %>
+            <strong>Total Amount:</strong> ₹<%= order.totalAmount%>
           </p>
           <p class="mb-2">
             <strong>Shipping Charge:</strong> ₹<%= order.shippingCharge %>
+          </p>
+          <p class="mb-2 text-success">
+            <strong>Discount Applied:</strong> ₹<%= order.discountApplied%>
+          </p>
+          <p>
+            <strong>Final Total:</strong> ₹<%= order.finalTotal%>
           </p>
         </div>
       </div>

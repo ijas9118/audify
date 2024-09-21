@@ -30,17 +30,26 @@ exports.applyCoupon = asyncHandler(async (req, res) => {
   try {
     const cart = await Cart.findById(cartId);
     if (!cart) {
-      return res.status(404).json({ success: false, message: "Cart not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Cart not found" });
     }
 
     const coupon = await Coupon.findOne({ code: couponCode, isActive: true });
     if (!coupon) {
-      return res.status(400).json({ success: false, message: "Invalid or expired coupon code" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid or expired coupon code" });
     }
 
     const currentDate = new Date();
     if (currentDate < coupon.validFrom || currentDate > coupon.validUntil) {
-      return res.status(400).json({ success: false, message: `Coupon ${couponCode} is not valid at this time.` });
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message: `Coupon ${couponCode} is not valid at this time.`,
+        });
     }
 
     let discount = 0;
@@ -54,22 +63,27 @@ exports.applyCoupon = asyncHandler(async (req, res) => {
     }
 
     if (cart.appliedCoupon) {
-      return res.status(400).json({ success: false, message: "A coupon has already been applied to this cart." });
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message: "A coupon has already been applied to this cart.",
+        });
     }
 
     let finalTotal = cart.total - discount;
 
     await Cart.updateOne(
-      { _id: cartId }, 
+      { _id: cartId },
       {
         $set: {
           appliedCoupon: coupon.code,
-          discountApplied: discount,  
-          finalTotal, 
-        }
+          discountApplied: discount,
+          finalTotal,
+        },
       }
     );
-    
+
     res.json({
       success: true,
       message: `Coupon ${couponCode} applied successfully.`,
@@ -78,7 +92,12 @@ exports.applyCoupon = asyncHandler(async (req, res) => {
     });
   } catch (error) {
     console.error("Error applying coupon:", error);
-    res.status(500).json({ success: false, message: "An error occurred while applying the coupon" });
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "An error occurred while applying the coupon",
+      });
   }
 });
 
@@ -87,36 +106,48 @@ exports.removeCoupon = asyncHandler(async (req, res) => {
   try {
     const cart = await Cart.findById(cartId);
     if (!cart) {
-      return res.status(404).json({ success: false, message: "Cart not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Cart not found" });
     }
 
     if (!cart.appliedCoupon) {
-      return res.status(400).json({ success: false, message: "No coupon applied to this cart." });
+      return res
+        .status(400)
+        .json({ success: false, message: "No coupon applied to this cart." });
     }
 
-    cart.appliedCoupon = null; 
-    cart.discountApplied = 0; 
+    cart.appliedCoupon = null;
+    cart.discountApplied = 0;
 
-    cart.calculateTotals(); 
+    cart.calculateTotals();
 
-    await Cart.updateOne({ _id: cartId }, {
-      $set: {
-        appliedCoupon: cart.appliedCoupon,
-        discountApplied: cart.discountApplied,
-        finalTotal: cart.finalTotal,
+    await Cart.updateOne(
+      { _id: cartId },
+      {
+        $set: {
+          appliedCoupon: cart.appliedCoupon,
+          discountApplied: cart.discountApplied,
+          finalTotal: cart.finalTotal,
+        },
       }
-    });
+    );
 
     res.json({
       success: true,
       message: "Coupon removed successfully",
-      finalTotal: cart.finalTotal 
+      finalTotal: cart.finalTotal,
     });
   } catch (error) {
     console.error("Error removing coupon:", error);
-    res.status(500).json({ success: false, message: "An error occurred while removing the coupon" });
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "An error occurred while removing the coupon",
+      });
   }
-}) 
+});
 
 exports.razorPay = asyncHandler(async (req, res) => {
   try {
@@ -194,16 +225,24 @@ exports.handleOrderSubmission = asyncHandler(async (req, res) => {
       paymentMethod,
       shippingCharge: cart.shippingCharge,
       totalAmount: cart.total,
+      discountApplied: cart.discountApplied,
+      finalTotal: cart.finalTotal,
       status: "Pending",
     });
 
     await order.save();
 
     cart.items = [];
-    cart.calculateTotals();
+    const finalTotal = cart.calculateTotals();
 
     await Cart.findByIdAndUpdate(cart._id, {
-      $set: { items: cart.items, total: cart.total },
+      $set: {
+        items: cart.items,
+        total: cart.total,
+        finalTotal,
+        discountApplied: 0,
+        appliedCoupon: null,
+      },
     });
 
     res

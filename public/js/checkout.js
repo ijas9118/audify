@@ -106,7 +106,7 @@ function setupPaymentMethodSelection() {
 function setupFormSubmission() {
   const form = document.getElementById("checkoutForm");
   const totalPrice = form.getAttribute("data-total-price");
-
+  
   let Toast = Swal.mixin({
     toast: true,
     position: "top", // Adjust position as needed
@@ -118,17 +118,18 @@ function setupFormSubmission() {
       toast.onmouseleave = Swal.resumeTimer;
     },
   });
-
+  
   form.addEventListener("submit", async (event) => {
     event.preventDefault(); // Prevent the default form submission
-
+    
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries()); // Convert FormData to a plain object
-
+    
     const paymentMethod = data.paymentMethod;
-
+    
     try {
       if (paymentMethod === "RazorPay") {
+        console.log(totalPrice)
         const amount = totalPrice;
         const currency = "INR";
         const receiptId = "qwerty1";
@@ -152,7 +153,6 @@ function setupFormSubmission() {
           currency,
           name: "Audify", //your business name
           description: "Test Transaction",
-          image: "https://example.com/your_logo",
           order_id: order.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
           handler: async function (response) {
             const razorpayPaymentId = response.razorpay_payment_id;

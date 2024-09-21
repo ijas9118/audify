@@ -81,7 +81,7 @@
 
           <!-- Applied Coupon Section (Hidden by default) -->
           <div class="<%= cart.appliedCoupon ? '' : 'd-none' %>" id="appliedCouponDiv">
-            <div class="alert alert-success d-flex justify-content-between align-items-center">
+            <div class="alert alert-primary d-flex justify-content-between align-items-center">
               <span id="appliedCouponCode">Coupon: <strong><%= cart.appliedCoupon %></strong></span>
               <button class="btn btn-link text-danger" id="removeCouponBtn">
                 <i class="fas fa-times"></i> Remove
@@ -94,7 +94,7 @@
     </div>
   </div>
 
-  <form id="checkoutForm" data-total-price="<%= cart.total %>">
+  <form id="checkoutForm" data-total-price="<%= cart.finalTotal%>">
     <!-- Address Selection -->
     <div class="mb-4">
       <h4 class="mb-3">Select Address</h4>

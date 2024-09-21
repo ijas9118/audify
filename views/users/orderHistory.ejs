@@ -39,7 +39,7 @@
                   <%= order.status %>
                 </span>
               </td>
-              <td class="align-middle">₹<%= order.totalAmount %></td>
+              <td class="align-middle">₹<%= order.finalTotal %></td>
               <td class="align-middle">
                 <div class="d-flex align-items-center">
                   <% order.orderItems.slice(0, 3).forEach(item => { %>
