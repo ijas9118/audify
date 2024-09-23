@@ -17,6 +17,7 @@ const {
   deleteAddress,
   updateUserAccount,
   walletTransactions,
+  updatePassword,
 } = require("../controller/userController");
 
 router.get("/", userAuth, getUserAccount);
@@ -35,9 +36,11 @@ router.post("/addresses/edit/:id", userAuth, updateAddress);
 
 router.delete("/addresses/delete/:id", userAuth, deleteAddress);
 
+router.post("/update-password", userAuth, updatePassword);
+
 router.post("/:id", userAuth, updateUserAccount);
 
-router.get('/wallet/transactions', userAuth, walletTransactions)
+router.get("/wallet/transactions", userAuth, walletTransactions);
 
 router.get("/order-history", userAuth, getOrderHistory);
 

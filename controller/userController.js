@@ -6,6 +6,7 @@ const Offer = require("../models/offer")
 const asyncHandler = require("express-async-handler");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
+const bcrypt = require("bcrypt");
 const { calculateDiscountedPrice } = require("../services/offerService");
 
 const transporter = nodemailer.createTransport({
@@ -521,6 +522,33 @@ exports.updateUserAccount = asyncHandler(async (req, res) => {
     .status(200)
     .json({ success: true, message: "Account updated successfully" });
 });
+
+exports.updatePassword = asyncHandler(async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+  const userId = req.session.user;
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ error: 'Incorrect current password' });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    await User.findByIdAndUpdate(userId, { password: hashedPassword });
+
+    res.status(200).json({ message: 'Password updated successfully' });
+  } catch (error) {
+    console.error('Error updating password:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+})
 
 exports.getAddresses = asyncHandler(async (req, res) => {
   const userId = req.session.user;
