@@ -16,6 +16,7 @@ const {
   updateAddress,
   deleteAddress,
   updateUserAccount,
+  walletTransactions,
 } = require("../controller/userController");
 
 router.get("/", userAuth, getUserAccount);
@@ -35,6 +36,8 @@ router.post("/addresses/edit/:id", userAuth, updateAddress);
 router.delete("/addresses/delete/:id", userAuth, deleteAddress);
 
 router.post("/:id", userAuth, updateUserAccount);
+
+router.get('/wallet/transactions', userAuth, walletTransactions)
 
 router.get("/order-history", userAuth, getOrderHistory);
 

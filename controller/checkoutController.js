@@ -52,7 +52,7 @@ exports.applyCoupon = asyncHandler(async (req, res) => {
 
     let discount = 0;
     if (coupon.discountType === "percentage") {
-      discount = (coupon.discountValue / 100) * cart.total;
+      discount = parseFloat(((coupon.discountValue / 100) * cart.total).toFixed(2));
       if (coupon.maxDiscountValue && discount > coupon.maxDiscountValue) {
         discount = coupon.maxDiscountValue;
       }
@@ -184,7 +184,6 @@ exports.confirmPayment = asyncHandler(async (req, res) => {
   order.status = "Processed";
 
   await order.save();
-  console.log(order)
   res.status(200).json({
     success: true,
     message: "Payment confirmed, order updated successfully",
@@ -218,14 +217,20 @@ exports.walletPayment = asyncHandler(async (req, res) => {
     }
 
     // Deduct the order amount from the wallet
-    user.walletBalance -= order.finalTotal;
+    const updatedWalletBalance = parseFloat((user.walletBalance - order.finalTotal).toFixed(2));
 
     // Update the order status and payment method
     order.paymentMethod = "Wallet";
     order.status = "Processed";
 
     // Save the updated user and order
-    await user.save();
+    await User.updateOne(
+      { _id: userId },
+      { 
+        $set: { walletBalance: updatedWalletBalance },
+        $push: { walletTransactions: { transactionType: "Debit", amount: order.finalTotal, description: `Payment for Order ID: ${orderId}`, date: new Date() }}
+      }
+    );
     await order.save();
 
     res.status(200).json({
@@ -236,7 +241,7 @@ exports.walletPayment = asyncHandler(async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error processing wallet payment",
+      message: `Error processing wallet payment ${error.message}`,
       error: error.message,
     });
   }

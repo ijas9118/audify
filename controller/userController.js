@@ -643,6 +643,25 @@ exports.deleteAddress = asyncHandler(async (req, res) => {
   res.status(200).send("Address deleted successfully");
 });
 
+exports.walletTransactions = asyncHandler(async (req, res) => {
+  const userId = req.session.user;
+
+  const user = await User.findById(userId);
+
+  if (!user) {
+    return res.status(404).json({ success: false, message: "User not found" });
+  }
+
+  res.render("layout", {
+    title: "My Audify Account",
+    header: req.session.user ? "partials/login_header" : "partials/header",
+    viewName: "users/walletTransaction",
+    activePage: "Home",
+    isAdmin: false,
+    user,
+  });
+})
+
 exports.getCart = asyncHandler(async (req, res) => {
   const userId = req.session.user;
   const cart = await Cart.findOne({ user: userId });

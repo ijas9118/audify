@@ -83,13 +83,25 @@
   </div>
 
   <!-- Cancel Order Button -->
-  <% if (order.status === 'Pending' || order.status === 'Processed') { %>
+  <% if (order.status === 'Processed') { %>
   <div class="text-end">
     <input type="hidden" name="orderId" value="<%= order._id %>" />
     <button onclick="cancelOrder('<%= order._id %>')" class="btn btn-danger">Cancel Order</button>
   </div>
+  <% } else if (order.status === 'Pending') { %>
+    <div class="text-end">
+      <input type="hidden" name="orderId" value="<%= order._id %>" />
+      <button class="btn btn-success" onclick="redirectToPayment('<%= order._id %>')">Proceed to Payment</button>
+    </div>
   <% } %>
 </div>
+
+<script>
+  function redirectToPayment(orderId) {
+  const paymentUrl = `/checkout/payment/${orderId}`;
+  window.location.href = paymentUrl;
+}
+</script>
 
 <style>
   .card-header h5 {
