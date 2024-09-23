@@ -45,6 +45,26 @@ var userSchema = new mongoose.Schema(
     walletBalance: {
       type: Number,
     },
+    walletTransactions: [
+      {
+        transactionType: {
+          type: String,
+          enum: ["Credit", "Debit"], // Credit for adding to wallet, Debit for using wallet money
+          required: true,
+        },
+        amount: {
+          type: Number,
+          required: true,
+        },
+        description: {
+          type: String,
+        },
+        date: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
     addresses: [
       {
         type: mongoose.Schema.Types.ObjectId,

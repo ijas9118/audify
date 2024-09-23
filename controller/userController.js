@@ -25,7 +25,7 @@ const addToCart = async (userId, productId, quantity) => {
 
   let cart = await Cart.findOne({ user: userId });
   if (!cart) {
-    cart = new Cart({ user: userId, items: [], shippingCharge: 50, total: 0 });
+    cart = new Cart({ user: userId, items: [], total: 0 });
   }
 
   const itemIndex = cart.items.findIndex((item) =>

@@ -44,12 +44,10 @@ exports.applyCoupon = asyncHandler(async (req, res) => {
 
     const currentDate = new Date();
     if (currentDate < coupon.validFrom || currentDate > coupon.validUntil) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: `Coupon ${couponCode} is not valid at this time.`,
-        });
+      return res.status(400).json({
+        success: false,
+        message: `Coupon ${couponCode} is not valid at this time.`,
+      });
     }
 
     let discount = 0;
@@ -63,12 +61,10 @@ exports.applyCoupon = asyncHandler(async (req, res) => {
     }
 
     if (cart.appliedCoupon) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "A coupon has already been applied to this cart.",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "A coupon has already been applied to this cart.",
+      });
     }
 
     let finalTotal = cart.total - discount;
@@ -92,12 +88,10 @@ exports.applyCoupon = asyncHandler(async (req, res) => {
     });
   } catch (error) {
     console.error("Error applying coupon:", error);
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "An error occurred while applying the coupon",
-      });
+    res.status(500).json({
+      success: false,
+      message: "An error occurred while applying the coupon",
+    });
   }
 });
 
@@ -140,17 +134,16 @@ exports.removeCoupon = asyncHandler(async (req, res) => {
     });
   } catch (error) {
     console.error("Error removing coupon:", error);
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "An error occurred while removing the coupon",
-      });
+    res.status(500).json({
+      success: false,
+      message: "An error occurred while removing the coupon",
+    });
   }
 });
 
 exports.razorPay = asyncHandler(async (req, res) => {
   try {
+    const orderData = await Order.findById(req.params.id)
     const razorpay = new Razorpay({
       key_id: process.env.RAZORPAY_KEY_ID,
       key_secret: process.env.RAZORPAY_SECRET,
@@ -163,17 +156,108 @@ exports.razorPay = asyncHandler(async (req, res) => {
       return res.status(500).send("Error");
     }
 
-    res.status(200).json(order);
+    res.status(200).json({order, orderData});
   } catch (err) {
     console.error(err);
     res.status(500).send("Error");
   }
 });
 
-exports.handleOrderSubmission = asyncHandler(async (req, res) => {
+exports.confirmPayment = asyncHandler(async (req, res) => {
+  const orderId = req.body.orderId;
+  const paymentMethod = req.body.paymentMethod;
+  const order = await Order.findById(orderId)
+  if (!order) {
+    return res.status(404).json({success: false, message: "Order not found!"});
+  }
+
+  if (paymentMethod === 'COD') {
+    if (order.finalTotal > 1000) {
+      return res.status(400).json({
+        success: false,
+        message: "Cash on Delivery is not available for orders above ₹1000."
+      });
+    }
+  }
+
+  order.paymentMethod = paymentMethod;
+  order.status = "Processed";
+
+  await order.save();
+  console.log(order)
+  res.status(200).json({
+    success: true,
+    message: "Payment confirmed, order updated successfully",
+    order,
+  });
+})
+
+exports.walletPayment = asyncHandler(async (req, res) => {
+  const orderId = req.body.orderId;
+  const userId = req.session.user;
+
   try {
-    const { paymentMethod } = req.body;
-    const cart = await Cart.findOne({ user: req.session.user });
+    // Find the user and their wallet balance
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found!" });
+    }
+
+    // Find the order
+    const order = await Order.findById(orderId);
+    if (!order) {
+      return res.status(404).json({ success: false, message: "Order not found!" });
+    }
+
+    // Check if the wallet balance is sufficient
+    if (user.walletBalance < order.finalTotal) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Insufficient wallet balance. Please use a different payment method."
+      });
+    }
+
+    // Deduct the order amount from the wallet
+    user.walletBalance -= order.finalTotal;
+
+    // Update the order status and payment method
+    order.paymentMethod = "Wallet";
+    order.status = "Processed";
+
+    // Save the updated user and order
+    await user.save();
+    await order.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Payment confirmed using wallet, order updated successfully",
+      order,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error processing wallet payment",
+      error: error.message,
+    });
+  }
+});
+
+
+exports.placeOrder = asyncHandler(async (req, res) => {
+  const userId = req.session.user;
+  const {
+    name,
+    mobile,
+    alternateMobile,
+    location,
+    city,
+    state,
+    landmark,
+    zip,
+  } = req.body;
+
+  try {
+    const cart = await Cart.findOne({ user: userId });
 
     if (!cart) {
       return res.status(400).json({ message: "Cart not found" });
@@ -212,47 +296,70 @@ exports.handleOrderSubmission = asyncHandler(async (req, res) => {
     );
 
     const order = new Order({
-      user: req.session.user,
-      name: req.body.name,
-      mobile: req.body.mobile,
-      alternateMobile: req.body.alternateMobile,
-      location: req.body.location,
-      city: req.body.city,
-      state: req.body.state,
-      landmark: req.body.landmark,
-      zip: req.body.zip,
+      user: userId,
+      name,
+      mobile,
+      alternateMobile,
+      location,
+      city,
+      state,
+      landmark,
+      zip,
       orderItems: orderItems.map((item) => item._id),
-      paymentMethod,
       shippingCharge: cart.shippingCharge,
-      totalAmount: cart.total,
+      totalAmount: cart.total, 
       discountApplied: cart.discountApplied,
-      finalTotal: cart.finalTotal,
-      status: "Pending",
+      finalTotal: cart.finalTotal, 
+      appliedCoupon: cart.appliedCoupon || null,
+      paymentMethod: null, 
     });
 
-    await order.save();
+    const placedOrder = await order.save();
 
-    cart.items = [];
-    const finalTotal = cart.calculateTotals();
+    await Cart.deleteOne({ user: userId });
 
-    await Cart.findByIdAndUpdate(cart._id, {
-      $set: {
-        items: cart.items,
-        total: cart.total,
-        finalTotal,
-        discountApplied: 0,
-        appliedCoupon: null,
-      },
+    res.status(201).json({
+      success: true,
+      message: "Order placed successfully",
+      orderId: placedOrder._id,
     });
-
-    res
-      .status(200)
-      .json({ message: "Order placed successfully", orderId: order._id });
   } catch (error) {
-    console.error("Error placing order:", error);
-    res.status(500).json({ message: "Failed to place order" });
+    res
+      .status(500)
+      .json({ success: false, message: "Error placing the order", error: error.message });
   }
 });
+
+exports.paymentSelection = asyncHandler(async (req, res) => {
+  const { orderId } = req.params;
+
+  try {
+    const order = await Order.findById(orderId).populate({
+      path: "orderItems",
+      populate: {
+        path: "product",
+      },
+    });
+    
+    const user = await User.findById(req.session.user).select('walletBalance');
+
+    if (!order) {
+      return res.status(404).send("Order not found");
+    }
+
+    res.render("layout", {
+      title: "Checkout",
+      header: req.session.user ? "partials/login_header" : "partials/header",
+      viewName: "users/payment",
+      activePage: "Shop",
+      isAdmin: false,
+      order,
+      walletBalance: user.walletBalance
+    });
+  } catch (error) {
+    res.status(500).send("Error fetching order");
+  }
+})
 
 exports.orderSuccessPage = asyncHandler(async (req, res) => {
   try {
@@ -340,7 +447,15 @@ exports.cancelOrder = asyncHandler(async (req, res) => {
       }
 
       await User.findByIdAndUpdate(order.user, {
-        walletBalance: (user.walletBalance || 0) + order.totalAmount,
+        $inc: { walletBalance: order.finalTotal }, // Add the order amount to the wallet balance
+        $push: {
+          walletTransactions: {
+            transactionType: "Credit",
+            amount: order.finalTotal,
+            description: `Refund for cancelled order #${order._id}`,
+            date: new Date(),
+          },
+        },
       });
 
       await Order.findByIdAndUpdate(orderId, { status: "Cancelled" });

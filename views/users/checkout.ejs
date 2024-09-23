@@ -243,89 +243,10 @@
 
     <input type="hidden" name="selectedAddressId" id="selectedAddressId" />
 
-    <div class="container my-5">
-      <h4 class="mb-4">Payment Method</h4>
-      <div class="row">
-        <div class="col-12">
-          <!-- Payment Method 2 -->
-          <div class="mb-4">
-            <div class="form-check">
-              <input
-                class="form-check-input"
-                type="radio"
-                name="paymentMethod"
-                id="razorpay"
-                value="RazorPay"
-              />
-              <label
-                class="form-check-label d-flex align-items-center"
-                for="razorpay"
-              >
-                <i
-                  class="fas fa-mobile-alt fa-2x ms-3 me-3"
-                  style="color: #7a479b"
-                ></i>
-                Online Payment (RazorPay)
-              </label>
-            </div>
-          </div>
 
-          <!-- Payment Method 3 -->
-          <div class="mb-4">
-            <div class="form-check">
-              <input
-                class="form-check-input"
-                type="radio"
-                name="paymentMethod"
-                id="wallet"
-                value="Wallet"
-              />
-              <label
-                class="form-check-label d-flex align-items-center"
-                for="wallet"
-              >
-                <i
-                  class="fas fa-wallet fa-2x ms-3 me-3"
-                  style="color: #7a479b"
-                ></i>
-                Wallet
-              </label>
-            </div>
-          </div>
-
-          <!-- Payment Method 4 -->
-          <div class="mb-3">
-            <div class="form-check">
-              <input
-                class="form-check-input"
-                type="radio"
-                name="paymentMethod"
-                id="cashOnDelivery"
-                value="Cash On Delivery"
-              />
-              <label
-                class="form-check-label d-flex align-items-center"
-                for="cashOnDelivery"
-              >
-                <i
-                  class="fa-solid fa-money-bill-1 fa-2x ms-3 me-3"
-                  style="color: #7a479b"
-                ></i>
-                Cash On Delivery
-              </label>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Hidden Input for Payment Method -->
-    <input type="hidden" name="paymentMethod" id="paymentMethod" />
-
-    <!-- Place Order Button -->
     <div class="d-flex justify-content-start col-4">
       <button id="placeOrder" class="btn btn-dark btn-lg w-100" type="submit">
-        Place Order
+        Proceed to Payment
       </button>
     </div>
   </form>
