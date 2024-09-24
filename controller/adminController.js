@@ -176,7 +176,6 @@ exports.getCoupons = asyncHandler(async (req, res) => {
 });
 
 exports.addCoupon = asyncHandler(async (req, res) => {
-  console.log(req.body);
   try {
     const {
       code,
@@ -287,6 +286,27 @@ exports.deleteCoupon = async (req, res) => {
       .json({ message: "An error occurred while deleting the coupon" });
   }
 };
+
+exports.toggleCouponStatus = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const coupon = await Coupon.findById(id);
+    
+    if (!coupon) {
+      return res.status(404).json({ success: false, message: "Coupon not found" });
+    }
+
+    coupon.isActive = !coupon.isActive;
+
+    await coupon.save();
+
+    res.json({ success: true, message: "Coupon status updated", coupon });
+  } catch (error) {
+    console.error("Error updating coupon status:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+})
 
 // ============================
 //  Offer Management Controllers
@@ -435,6 +455,31 @@ exports.deleteOffer = asyncHandler(async (req, res) => {
     });
   }
 });
+
+exports.toggleOfferStatus = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Fetch the offer by id
+    const offer = await Offer.findById(id);
+
+    if (!offer) {
+      return res.status(404).json({ success: false, message: "Offer not found" });
+    }
+
+    // Toggle the status field between 'active' and 'expired'
+    offer.status = offer.status === 'active' ? 'expired' : 'active';
+
+    // Save the updated offer
+    await offer.save();
+
+    res.json({ success: true, offer });
+  } catch (error) {
+    console.error("Error updating offer:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
 
 // ============================
 //  Deals Management Controllers

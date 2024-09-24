@@ -68,7 +68,11 @@
                     <td><%= new Date(offer.validFrom).toLocaleDateString() %></td>
                     <td><%= new Date(offer.validUntil).toLocaleDateString() %></td>
                     <td>
-                      <span class="badge w-100 py-2 <%= offer.status === 'active' ? 'bg-success' : 'bg-danger' %>">
+                      <span 
+                        id="statusDisplay<%= offer._id %>" 
+                        class="badge w-100 py-2 <%= offer.status === 'active' ? 'bg-success' : 'bg-danger' %>" 
+                        style="cursor: pointer;" 
+                        onclick="toggleOfferStatus('<%= offer._id %>')">
                         <%= offer.status %>
                       </span>
                     </td>

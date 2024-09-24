@@ -40,3 +40,7 @@ async function cancelOrder(orderid) {
     });
   }
 }
+function downloadInvoice(orderId) {
+  const invoiceUrl = `/account/order/${orderId}/invoice`;
+  window.location.href = invoiceUrl;
+}

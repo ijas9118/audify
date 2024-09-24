@@ -7,7 +7,6 @@ const Coupon = require("../models/coupon");
 const User = require("../models/userModel");
 const asyncHandler = require("express-async-handler");
 const Razorpay = require("razorpay");
-const { applyCoupon } = require("../services/couponService");
 
 exports.getCheckoutPage = asyncHandler(async (req, res) => {
   const userId = req.session.user;

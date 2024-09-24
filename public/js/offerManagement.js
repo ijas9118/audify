@@ -125,16 +125,16 @@ function addOffer() {
     body: JSON.stringify(offerData),
   })
     .then((response) => response.json())
-    .then((data) => {
+    .then(async (data) => {
       if (data.success) {
+        await Toast.fire({
+          icon: "success",
+          title: `${data.message}`,
+        });
         const modal = bootstrap.Modal.getInstance(
           document.getElementById("addOfferModal")
         );
         modal.hide();
-        Toast.fire({
-          icon: "success",
-          title: `${data.message}`,
-        });
       } else {
         Toast.fire({
           icon: "error",
@@ -144,7 +144,6 @@ function addOffer() {
     })
     .catch((error) => {
       console.error("Error:", error);
-      alert("An error occurred while adding the offer.");
       Toast.fire({
         icon: "error",
         title: "An error occurred while adding the offer.",
@@ -273,4 +272,31 @@ function deleteOffer(offerId) {
       title: "An error occurred while deleting the offer.",
     });
   });
+}
+
+async function toggleOfferStatus(offerId) {
+  try {
+    const response = await fetch(`/admin/offer/toggle/${offerId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      }
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      // Update the UI with the new status
+      const badge = document.getElementById(`statusDisplay${offerId}`);
+      const newStatus = result.offer.status; // Get the updated value from the response
+
+      badge.classList.remove(newStatus === 'active' ? 'bg-danger' : 'bg-success');
+      badge.classList.add(newStatus === 'active' ? 'bg-success' : 'bg-danger');
+      badge.textContent = newStatus;
+    } else {
+      console.error("Error updating status:", result.message);
+    }
+  } catch (error) {
+    console.error("Error toggling offer status:", error);
+  }
 }

@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const adminAuth = require("../middleware/adminAuth");
-const Category = require('../models/categories')
-const Product = require('../models/products')
+const Category = require("../models/categories");
+const Product = require("../models/products");
 const {
   loginAdmin,
   logoutAdmin,
@@ -25,9 +25,11 @@ const {
   getSalesReport,
   getSalesData,
   getBestSellers,
+  toggleCouponStatus,
+  toggleOfferStatus,
 } = require("../controller/adminController");
 const categoryRouter = require("./categoryRouter");
-const productRouter = require('./productRouter')
+const productRouter = require("./productRouter");
 
 // Admin Home Route
 router.get("/", adminAuth, getAdminHome);
@@ -36,7 +38,7 @@ router.post("/sales-report", adminAuth, getSalesReport);
 
 router.get("/sales-data", adminAuth, getSalesData);
 
-router.get('/best-sellers', getBestSellers);
+router.get("/best-sellers", getBestSellers);
 
 // Admin Authentication Routes
 // Admin Login Route
@@ -56,42 +58,54 @@ router.use("/products", productRouter);
 // Order Management Route
 router.get("/orders", adminAuth, getOrders);
 
-router.post('/orders/update-status/:id', adminAuth, updateOrderStatus);
+router.post("/orders/update-status/:id", adminAuth, updateOrderStatus);
 
-router.get('/orders/view/:id', adminAuth, viewOrder)
+router.get("/orders/view/:id", adminAuth, viewOrder);
 
 // Category Management Route
 router.use("/category", categoryRouter);
 
 // Coupon Management Route
 router.get("/coupon", adminAuth, getCoupons);
-router.post('/coupon/add', adminAuth, addCoupon);
-router.post('/coupon/update/:id', adminAuth, updateCoupon);
-router.delete('/coupon/delete/:id', adminAuth, deleteCoupon)
+
+router.post("/coupon/add", adminAuth, addCoupon);
+
+router.post("/coupon/update/:id", adminAuth, updateCoupon);
+
+router.delete("/coupon/delete/:id", adminAuth, deleteCoupon);
+
+router.put("/coupon/toggle-status/:id", adminAuth, toggleCouponStatus);
 
 // Offer Management Route
 router.get("/offer", adminAuth, getOffers);
-router.post('/offer', adminAuth, addOffer);
-router.get('/offer/categories', async (req, res) => {
+router.post("/offer", adminAuth, addOffer);
+router.get("/offer/categories", async (req, res) => {
   try {
     const categories = await Category.find({});
     res.json(categories);
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Error fetching categories' });
+    res
+      .status(500)
+      .json({ success: false, message: "Error fetching categories" });
   }
 });
-router.get('/offer/products', async (req, res) => {
+router.get("/offer/products", async (req, res) => {
   try {
     const products = await Product.find({});
     res.json(products);
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Error fetching products' });
+    res
+      .status(500)
+      .json({ success: false, message: "Error fetching products" });
   }
 });
 
-router.post('/offer/update/:id', adminAuth, updateOffer);
+router.post("/offer/update/:id", adminAuth, updateOffer);
 
-router.delete('/offer/delete/:id', adminAuth, deleteOffer);
+router.delete("/offer/delete/:id", adminAuth, deleteOffer);
+
+router.put("/offer/toggle/:id", adminAuth, toggleOfferStatus);
+
 // Deal Management Route
 router.get("/deal", adminAuth, getDeals);
 

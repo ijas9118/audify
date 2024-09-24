@@ -60,6 +60,11 @@
         <strong>Mobile:</strong> <%= order.mobile %> <% if(order.alternateMobile){ %> (Alternate: <%= order.alternateMobile %>) <% } %>
       </p>
     </div>
+    <!-- Add this button in your Order Details Card -->
+    <div class="text-end p-2">
+      <button onclick="downloadInvoice('<%= order._id %>')" class="btn btn-dark">Download Invoice</button>
+    </div>
+
   </div>
 
   <!-- Ordered Items Card -->

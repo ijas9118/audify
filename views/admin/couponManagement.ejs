@@ -69,7 +69,11 @@
                       <%= new Date(coupon.validUntil).toLocaleDateString() %>
                     </td>
                     <td >
-                      <span id="isActiveDisplay<%= coupon._id %>" class="badge w-100 py-2 <%= coupon.isActive ? 'bg-success' : 'bg-danger' %>">
+                      <span 
+                        id="isActiveDisplay<%= coupon._id %>" 
+                        class="badge w-100 py-2 <%= coupon.isActive ? 'bg-success' : 'bg-danger' %>" 
+                        style="cursor: pointer;" 
+                        onclick="toggleCouponStatus('<%= coupon._id %>')">
                         <%= coupon.isActive ? 'Active' : 'Inactive' %>
                       </span>
                     </td>

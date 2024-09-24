@@ -256,3 +256,31 @@ async function deleteCoupon(couponId) {
     });
   }
 }
+
+async function toggleCouponStatus(couponId) {
+  try {
+    const response = await fetch(`/admin/coupon/toggle-status/${couponId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      }
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      // Update the UI with the new status
+      const badge = document.getElementById(`isActiveDisplay${couponId}`);
+      const newStatus = result.coupon.isActive; // Get the updated value from the response
+
+      badge.classList.remove(newStatus ? 'bg-danger' : 'bg-success');
+      badge.classList.add(newStatus ? 'bg-success' : 'bg-danger');
+      badge.textContent = newStatus ? 'Active' : 'Inactive';
+    } else {
+      console.error("Error updating status:", result.message);
+    }
+  } catch (error) {
+    console.error("Error toggling coupon status:", error);
+  }
+}
+

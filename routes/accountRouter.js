@@ -18,6 +18,7 @@ const {
   updateUserAccount,
   walletTransactions,
   updatePassword,
+  downloadInvoice,
 } = require("../controller/userController");
 
 router.get("/", userAuth, getUserAccount);
@@ -47,5 +48,7 @@ router.get("/order-history", userAuth, getOrderHistory);
 router.get("/order-history/cancel/:id", userAuth, cancelOrder);
 
 router.get("/order-history/:id", userAuth, getOrderDetail);
+
+router.get("/order/:id/invoice", downloadInvoice);
 
 module.exports = router;
