@@ -487,20 +487,22 @@ exports.getSalesReport = asyncHandler(async (req, res) => {
   const { filter, startDate, endDate } = req.body;
   let start, end;
 
+  // Determine date range
   if (filter === "Custom Date Range" && startDate && endDate) {
     start = moment(startDate).startOf("day");
     end = moment(endDate).endOf("day");
   } else {
-    const dateRange = getDateRange(filter);
+    const dateRange = getDateRange(filter); // Ensure this function is defined
     start = dateRange.start;
     end = dateRange.end;
   }
+
   try {
-    // Fetch orders within the date range
+    // Fetch orders within the date range, excluding cancelled ones
     const orders = await Order.find({
       dateOrdered: { $gte: start.toDate(), $lte: end.toDate() },
-    })
-    .populate({
+      isCancelled: false, // Exclude cancelled orders
+    }).populate({
       path: 'orderItems',
       populate: {
         path: 'product',
@@ -521,21 +523,13 @@ exports.getSalesReport = asyncHandler(async (req, res) => {
         };
       }
 
-      const originalPriceTotal = order.orderItems.reduce((sum, item) => {
-        if (item.product && item.product.price) {
-          return sum + item.product.price * item.quantity;
-        } else {
-          console.error('Item product or price is undefined:', item);
-          return sum; // Return the sum as is if there's an issue
-        }
-      }, 0);
+      // Use the discount applied field directly from the order
+      const discountApplied = order.discountApplied; // Already provided in the order model
 
-      const discountApplied = order.totalAmount - originalPriceTotal;
-
+      // Calculate total sales revenue including shipping charge
       acc[dateKey].totalSalesRevenue += order.totalAmount;
-      // Assuming discountApplied is derived from a different source
-      acc[dateKey].discountApplied += discountApplied; // Adjust if needed
-      acc[dateKey].netSales += originalPriceTotal; // Adjust if needed
+      acc[dateKey].discountApplied += discountApplied;
+      acc[dateKey].netSales += order.finalTotal; // Use finalTotal for net sales
       acc[dateKey].numberOfOrders += 1;
       acc[dateKey].totalItemsSold += order.orderItems.length;
 
@@ -548,25 +542,16 @@ exports.getSalesReport = asyncHandler(async (req, res) => {
       ...salesData[date],
     }));
 
-    // Summary
-    const totalSalesCount = orders.length;
+    // Summary calculations
+    const totalSalesCount = orders.length; // Count of non-cancelled orders
     const overallOrderAmount = orders.reduce(
       (sum, order) => sum + order.totalAmount,
       0
     );
+
+    // Total discount applied considering only successful orders
     const overallDiscount = orders.reduce(
-      (sum, order) => {
-        // Calculate discount for each order
-        const originalPriceTotal = order.orderItems.reduce((sum, item) => {
-          if (item.product && item.product.price) {
-            return sum + item.product.price * item.quantity;
-          } else {
-            console.error('Item product or price is undefined:', item);
-            return sum;
-          }
-        }, 0);
-        return sum + (order.totalAmount - originalPriceTotal);
-      },
+      (sum, order) => sum + order.discountApplied,
       0
     );
 

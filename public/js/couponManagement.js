@@ -1,17 +1,5 @@
-document.querySelector("#addCouponform").addEventListener("submit", function (event) {
+document.querySelector("#addCouponform").addEventListener("submit", async function (event) {
   event.preventDefault();
-  addCoupon();
-});
-
-document.querySelectorAll(".edit-coupon-form").forEach(form => {
-  form.addEventListener("submit", function (event) {
-    event.preventDefault();
-    const couponId = this.getAttribute("data-coupon-id");
-    updateCoupon(couponId);
-  });
-});
-
-async function addCoupon() {
   let Toast = Swal.mixin({
     toast: true,
     position: "top",
@@ -72,10 +60,13 @@ async function addCoupon() {
     const result = await response.json();
 
     if (response.ok) {
-      Toast.fire({
+      await Toast.fire({
         icon: "success",
         title: "Coupon added successfully!",
       });
+      document.getElementById("addCouponform").reset();
+
+      // Hide the modal
       const addCouponModal = new bootstrap.Modal(
         document.getElementById("addCouponModal")
       );
@@ -93,7 +84,16 @@ async function addCoupon() {
       title: "An error occurred while adding the coupon.",
     });
   }
-}
+});
+
+document.querySelectorAll(".edit-coupon-form").forEach(form => {
+  form.addEventListener("submit", function (event) {
+    event.preventDefault();
+    const couponId = this.getAttribute("data-coupon-id");
+    updateCoupon(couponId);
+  });
+});
+
 
 async function updateCoupon(couponId) {
   let Toast = Swal.mixin({
