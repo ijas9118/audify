@@ -524,18 +524,13 @@ exports.updateUserAccount = asyncHandler(async (req, res) => {
 });
 
 exports.updatePassword = asyncHandler(async (req, res) => {
-  const { currentPassword, newPassword } = req.body;
+  const { newPassword } = req.body;
   const userId = req.session.user;
 
   try {
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
-    }
-
-    const isMatch = await bcrypt.compare(currentPassword, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ error: 'Incorrect current password' });
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -549,6 +544,39 @@ exports.updatePassword = asyncHandler(async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 })
+
+exports.resetPassword  = asyncHandler(async (req, res) => {
+  const { newPassword, confirmPassword } = req.body;
+  const email = req.session.email; // Assuming user ID is stored in session
+
+  // Check if user is authenticated
+  if (!email) {
+    return res.status(401).json({ error: 'Unauthorized access' });
+  }
+
+  // Check if passwords match
+  if (newPassword !== confirmPassword) {
+    return res.status(400).json({ error: 'Passwords do not match' });
+  }
+
+  try {
+    const user = await User.find({email});
+    const userId = user[0]._id;
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    await User.findByIdAndUpdate(userId, { password: hashedPassword });
+
+    res.status(200).json({ message: 'Password updated successfully' });
+  } catch (error) {
+    console.error('Error updating password:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 exports.getAddresses = asyncHandler(async (req, res) => {
   const userId = req.session.user;

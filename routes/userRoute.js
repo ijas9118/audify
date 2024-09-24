@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const userAuth = require("../middleware/userAuth");
 const passport = require("passport");
+const User = require('../models/userModel.js')
 require('../services/passport.js')
 
 const {
@@ -12,6 +13,7 @@ const {
   resendOtp,
   successGoogleLogin,
   failureGoogleLogin,
+  resetPassword,
 } = require("../controller/userController");
 
 router.use(passport.initialize()); 
@@ -78,6 +80,39 @@ router.get("/login", (req, res) => {
 });
 
 router.post("/login", loginUser);
+
+router.get('/login/forgot-password', (req, res) => {
+  res.render("layout", {
+    title: "Login",
+    header: "partials/header",
+    viewName: "users/forgotPassword",
+    activePage: "home",
+    isAdmin: false,
+  });
+});
+
+router.post('/login/reset-password', resetPassword)
+
+router.post('/forgot-password', async (req, res) => {
+  const { email } = req.body;
+  req.session.email = email;
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).send('Email not found');
+    }
+    
+    res.render("layout", {
+      title: "Login",
+      header: "partials/header",
+      viewName: "users/resetPassword",
+      activePage: "home",
+      isAdmin: false,
+    });
+  } catch (err) {
+    res.status(500).send('Server error');
+  }
+});
 
 router.post("/logout", userAuth, logoutUser);
 

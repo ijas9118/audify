@@ -23,7 +23,8 @@ const {
   updateCoupon,
   deleteCoupon,
   getSalesReport,
-  generatePDF,
+  getSalesData,
+  getBestSellers,
 } = require("../controller/adminController");
 const categoryRouter = require("./categoryRouter");
 const productRouter = require('./productRouter')
@@ -32,6 +33,10 @@ const productRouter = require('./productRouter')
 router.get("/", adminAuth, getAdminHome);
 
 router.post("/sales-report", adminAuth, getSalesReport);
+
+router.get("/sales-data", adminAuth, getSalesData);
+
+router.get('/best-sellers', getBestSellers);
 
 // Admin Authentication Routes
 // Admin Login Route

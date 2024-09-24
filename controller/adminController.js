@@ -584,3 +584,203 @@ exports.getSalesReport = asyncHandler(async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 });
+
+exports.getSalesData = async (req, res) => {
+  try {
+    const filter = req.query.filter || "Monthly";
+    let match = {};
+    let groupId = null;
+
+    const today = new Date();
+
+    switch (filter) {
+      case "Daily":
+        // Last 7 days
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(today.getDate() - 6);
+
+        match = {
+          dateOrdered: {
+            $gte: sevenDaysAgo,
+            $lte: today,
+          },
+        };
+
+        groupId = {
+          $dateToString: { format: "%Y-%m-%d", date: "$dateOrdered" },
+        };
+        break;
+
+      case "Weekly":
+        // Last 4 weeks
+        const fourWeeksAgo = new Date();
+        fourWeeksAgo.setDate(today.getDate() - 28);
+
+        match = {
+          dateOrdered: {
+            $gte: fourWeeksAgo,
+            $lte: today,
+          },
+        };
+
+        groupId = {
+          week: { $isoWeek: "$dateOrdered" },
+          year: { $isoWeekYear: "$dateOrdered" },
+        };
+        break;
+
+      case "Monthly":
+        // Last 12 months
+        const twelveMonthsAgo = new Date();
+        twelveMonthsAgo.setMonth(today.getMonth() - 11);
+
+        match = {
+          dateOrdered: {
+            $gte: twelveMonthsAgo,
+            $lte: today,
+          },
+        };
+
+        groupId = {
+          $dateToString: { format: "%Y-%m", date: "$dateOrdered" },
+        };
+        break;
+
+      case "Yearly":
+        // Last 5 years
+        const fiveYearsAgo = new Date();
+        fiveYearsAgo.setFullYear(today.getFullYear() - 4);
+
+        match = {
+          dateOrdered: {
+            $gte: fiveYearsAgo,
+            $lte: today,
+          },
+        };
+
+        groupId = {
+          $dateToString: { format: "%Y", date: "$dateOrdered" },
+        };
+        break;
+
+      case "Custom Date Range":
+        const startDate = new Date(req.query.startDate);
+        const endDate = new Date(req.query.endDate);
+
+        if (isNaN(startDate) || isNaN(endDate)) {
+          return res.status(400).json({ message: "Invalid date range" });
+        }
+
+        match = {
+          dateOrdered: {
+            $gte: startDate,
+            $lte: endDate,
+          },
+        };
+
+        groupId = {
+          $dateToString: { format: "%Y-%m-%d", date: "$dateOrdered" },
+        };
+        break;
+
+      default:
+        // Default to Monthly
+        const defaultMonthsAgo = new Date();
+        defaultMonthsAgo.setMonth(today.getMonth() - 11);
+
+        match = {
+          dateOrdered: {
+            $gte: defaultMonthsAgo,
+            $lte: today,
+          },
+        };
+
+        groupId = {
+          $dateToString: { format: "%Y-%m", date: "$dateOrdered" },
+        };
+        break;
+    }
+
+    // Aggregation pipeline
+    const salesData = await Order.aggregate([
+      { $match: match },
+      {
+        $group: {
+          _id: groupId,
+          totalSales: { $sum: "$totalAmount" },
+          count: { $sum: 1 },
+        },
+      },
+      { $sort: { _id: 1 } },
+    ]);
+
+    // Prepare data for the chart
+    let labels = [];
+    let values = [];
+
+    if (filter === "Weekly") {
+      // Handle weekly data
+      labels = salesData.map(
+        (data) => `Week ${data._id.week} (${data._id.year})`
+      );
+    } else {
+      labels = salesData.map((data) => data._id);
+    }
+
+    values = salesData.map((data) => data.totalSales);
+
+    res.json({ labels, values });
+  } catch (error) {
+    console.error("Error fetching sales data:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+exports.getBestSellers = async (req, res) => {
+  try {
+    // Fetch top 10 best-selling products
+    const topProducts = await Product.find({ isActive: true })
+      .sort({ popularity: -1 })
+      .limit(10)
+      .select('name images.main popularity');
+
+    // Fetch top 3 best-selling categories
+    const topCategories = await Category.aggregate([
+      {
+        $lookup: {
+          from: "products",
+          localField: "_id",
+          foreignField: "categoryId",
+          as: "products",
+        },
+      },
+      {
+        $project: {
+          name: 1,
+          popularity: { $sum: "$products.popularity" },
+        },
+      },
+      {
+        $sort: { popularity: -1 },
+      },
+      {
+        $limit: 3,
+      },
+    ]);
+
+    res.status(200).json({
+      topProducts: topProducts.map(product => ({
+        name: product.name,
+        image: product.images.main,
+        popularity: product.popularity,
+      })),
+      topCategories: topCategories.map(category => ({
+        name: category.name,
+        popularity: category.popularity || 0,
+      })),
+    });
+  } catch (error) {
+    console.error('Error fetching best sellers:', error);
+    res.status(500).json({ error: 'Failed to fetch best sellers' });
+  }
+};
