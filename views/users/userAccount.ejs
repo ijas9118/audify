@@ -209,6 +209,11 @@
                 <i class="fas fa-eye"></i>
               </button>
             </div>
+            <% if (user.isGoogleUser) { %>
+              <small id="dummyPasswordText" class="form-text text-muted">
+                Your current password is: <strong>123456</strong>
+              </small>
+            <% } %>
           </div>
           <!-- New Password -->
           <div class="mb-3">

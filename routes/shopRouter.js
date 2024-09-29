@@ -27,18 +27,13 @@ router.get('/search-products', async (req, res) => {
   try {
     let products;
     if (query === '') {
-      // If query is empty, return all products
-      products = await Product.find({});
+      products = await Product.find();
+
     } else {
-      // Otherwise, perform a case-insensitive search using regex
-      const regex = new RegExp('^' + query, 'i'); // ^ ensures it starts with the input
+      const regex = new RegExp('^' + query, 'i');
       products = await Product.find({ name: { $regex: regex } });
     }
 
-    // Log the products for debugging
-    console.log(products);
-
-    // Send the matching products back as JSON
     res.json(products);
   } catch (error) {
     console.error('Error fetching products:', error);

@@ -69,6 +69,7 @@ exports.successGoogleLogin = async (req , res) => {
         email: req.user.email,
         password: "123456",
         status: "Active",
+        isGoogleUser: true,
       });
       await user.save();
     }

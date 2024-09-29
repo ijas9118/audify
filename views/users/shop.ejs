@@ -67,7 +67,7 @@
       <div class="col-4">
         <div class="input-group mb-3">
           <input type="search" name="search" class="form-control" placeholder="Search for products..." aria-label="Recipient's username" aria-describedby="button-addon2" oninput="searchProduct(this.value)">
-          <button class="btn btn-outline-dark" type="button" id="button-addon2" onclick="searchProduct()">Search</button>
+          <button class="btn btn-outline-dark" type="button" id="button-addon2" onclick="searchProduct(document.getElementById('search-input').value)">Search</button>
         </div>
       </div>
     
@@ -136,7 +136,7 @@
                 </span>
               </div>
             </div>
-            <div class="card-footer bg-white border-0">
+            <div class="card-footer bg-white border-0">  
               <div class="btn-group w-100" role="group">
                 <button
                   class="btn btn-dark-purple w-100 <% if (product.isOutOfStock) { %> disabled <% } %>"
