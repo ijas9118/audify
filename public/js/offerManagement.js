@@ -135,6 +135,7 @@ function addOffer() {
           document.getElementById("addOfferModal")
         );
         modal.hide();
+        window.location.reload();
       } else {
         Toast.fire({
           icon: "error",
@@ -200,6 +201,7 @@ function updateOffer(offerId) {
           document.getElementById(`editOfferModal${offerId}`)
         );
         modal.hide();
+        window.location.reload();
       } else {
         Toast.fire({
           icon: "error",

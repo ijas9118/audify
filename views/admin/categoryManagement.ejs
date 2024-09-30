@@ -34,7 +34,7 @@
                 <th scope="col">Action</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody id="categoryList">
               <% categories.forEach((category, index) => { %>
               <tr>
                 <th scope="row"><%= index + 1 %></th>
@@ -56,24 +56,17 @@
                       </button>
                     </form>
                     <button class="btn btn-outline-light w-100" data-bs-toggle="modal" data-bs-target="#editCategoryModal<%= category._id %>">Edit</button>
-                    <form
-                      action="/admin/category/delete/<%= category._id %>"
-                      method="POST"
-                      style="display: inline"
-                      class="w-100"
+                    <button
+                      class="btn btn-outline-danger w-100"
+                      onclick="handleCategoryDelete('<%= category._id %>')"
                     >
-                      <button
-                        type="submit"
-                        class="btn btn-outline-danger w-100"
-                      >
-                        Delete
-                      </button>
-                    </form>
+                      Delete
+                    </button>
                   </div>
                 </td>
               </tr>
               <% }); %>
-            </tbody>
+            </tbody>            
           </table>
         </div>
       </div>
@@ -100,7 +93,7 @@
           aria-label="Close"
         ></button>
       </div>
-      <form action="/admin/category" method="POST">
+      <form id="addCategoryForm">
         <div class="modal-body">
           <div class="mb-3">
             <label for="categoryName" class="form-label">Category Name</label>
@@ -148,32 +141,34 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <form action="/admin/category/edit/<%= category._id %>" method="POST">
-            <div class="mb-3">
-              <label for="categoryName" class="form-label">Category Name</label>
-              <input
-                type="text"
-                class="form-control custom-search-input"
-                id="categoryName"
-                name="name"
-                value="<%= category.name %>"
-                required
-              />
-            </div>
-            <div class="mb-3">
-              <label for="categoryDescription" class="form-label">Description</label>
-              <textarea
-                class="form-control custom-search-input"
-                id="categoryDescription"
-                name="description"
-                rows="2"
-                required
-              ><%= category.description %></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary">Update category</button>
-          </form>
+          <div class="mb-3">
+            <label for="categoryName<%= category._id %>" class="form-label">Category Name</label>
+            <input
+              type="text"
+              class="form-control custom-search-input"
+              id="categoryName<%= category._id %>"
+              name="name"
+              value="<%= category.name %>"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label for="categoryDescription<%= category._id %>" class="form-label">Description</label>
+            <textarea
+              class="form-control custom-search-input"
+              id="categoryDescription<%= category._id %>"
+              name="description"
+              rows="2"
+              required
+            ><%= category.description %></textarea>
+          </div>
+          <button type="button" class="btn btn-primary" onclick="handleCategoryUpdate('<%= category._id %>')">Update category</button>
         </div>
       </div>
     </div>
   </div>
 <% }) %>
+>
+
+
+<script src="/js/categoryManagement.js"></script>

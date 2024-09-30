@@ -4,7 +4,7 @@ document.querySelector("#addCouponform").addEventListener("submit", async functi
     toast: true,
     position: "top",
     showConfirmButton: false,
-    timer: 3000,
+    timer: 2500,
     timerProgressBar: true,
     didOpen: (toast) => {
       toast.onmouseenter = Swal.stopTimer;
@@ -71,6 +71,7 @@ document.querySelector("#addCouponform").addEventListener("submit", async functi
         document.getElementById("addCouponModal")
       );
       addCouponModal.hide();
+      window.location.reload();
     } else {
       Toast.fire({
         icon: "error",

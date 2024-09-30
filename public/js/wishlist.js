@@ -3,7 +3,7 @@ async function addToWishList(productId) {
     toast: true,
     position: "top",
     showConfirmButton: false,
-    timer: 3000,
+    timer: 2500,
     timerProgressBar: true,
     didOpen: (toast) => {
       toast.onmouseenter = Swal.stopTimer;
@@ -45,7 +45,7 @@ async function addToCartFromWishlist(productId) {
     toast: true,
     position: "top",
     showConfirmButton: false,
-    timer: 3000,
+    timer: 2500,
     timerProgressBar: true,
     didOpen: (toast) => {
       toast.onmouseenter = Swal.stopTimer;
@@ -62,13 +62,12 @@ async function addToCartFromWishlist(productId) {
     const data = await response.json();
 
     if (response.ok) {
-      Toast.fire({
+      await Toast.fire({
         icon: "success",
         title: 'Product added to cart!',
       });
-      window.location.reload();
+      removeProduct(productId);
     } else {
-      alert(data.message || 'Failed to add product to cart');
       Toast.fire({
         icon: "error",
         title: data.message || 'Failed to add product to cart',
@@ -88,7 +87,7 @@ async function removeProduct(productId) {
     toast: true,
     position: "top",
     showConfirmButton: false,
-    timer: 3000,
+    timer: 2500,
     timerProgressBar: true,
     didOpen: (toast) => {
       toast.onmouseenter = Swal.stopTimer;
@@ -105,13 +104,8 @@ async function removeProduct(productId) {
     const data = await response.json();
 
     if (response.ok) {
-      await Toast.fire({
-        icon: "success",
-        title: data.message,
-      });
       window.location.reload();
     } else {
-      alert(data.message || 'Failed to remove product');
       Toast.fire({
         icon: "error",
         title: data.message,

@@ -1,5 +1,5 @@
 const Category = require("../models/categories");
-const Product = require('../models/products')
+const Product = require("../models/products");
 const asyncHandler = require("express-async-handler");
 
 // Render Category Management Page
@@ -24,20 +24,21 @@ exports.addCategory = asyncHandler(async (req, res) => {
   const { name, description } = req.body;
 
   if (!name) {
-    res.status(400);
-    throw new Error("Category name is required");
+    return res.status(400).json({ message: "Category name is required" });
   }
 
   const existingCategory = await Category.findOne({ name });
+
   if (existingCategory) {
-    res.status(400);
-    throw new Error("Category already exists");
+    return res.status(400).json({ message: "Category already exists" });
   }
 
   const newCategory = new Category({ name, description });
   await newCategory.save();
 
-  res.redirect("/admin/category");
+  res
+    .status(201)
+    .json({ message: "Category added successfully", category: newCategory });
 });
 
 // Unlist Category
@@ -62,25 +63,32 @@ exports.toggleCategoryStatus = asyncHandler(async (req, res) => {
 exports.deleteCategory = asyncHandler(async (req, res) => {
   const categoryId = req.params.id;
 
-  // Find and delete the category by ID
+  // Find the category by ID
   const category = await Category.findById(categoryId);
 
   if (!category) {
-    res.status(404);
-    throw new Error("Category not found");
+    return res.status(404).json({
+      success: false,
+      message: "Category not found",
+    });
   }
 
+  // Count products associated with this category
   const products = await Product.countDocuments({ categoryId: categoryId });
-  console.log(products);
-  
 
   if (products > 0) {
-    res.status(400);
-    throw new Error(`Cannot delete category. There are ${products} product(s) associated with this category.`);
-  } else {
-    await Category.findByIdAndDelete(categoryId);
-    res.redirect("/admin/category");
+    return res.status(400).json({
+      success: false,
+      message: `Cannot delete category. There are ${products} product(s) associated with this category.`,
+    });
   }
+
+  // Delete the category
+  await Category.findByIdAndDelete(categoryId);
+  res.status(200).json({
+    success: true,
+    message: "Category deleted successfully",
+  });
 });
 
 // Get edit category page
@@ -118,5 +126,9 @@ exports.updateCategory = asyncHandler(async (req, res) => {
   category.description = description;
 
   await category.save();
-  res.redirect("/admin/category");
+
+  res.status(200).json({
+    message: "Category updated successfully",
+    category: { name: category.name, description: category.description },
+  });
 });

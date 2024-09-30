@@ -196,6 +196,15 @@ exports.addCoupon = asyncHandler(async (req, res) => {
         .json({ success: false, message: "Missing required fields" });
     }
 
+    const existingCoupon = await Coupon.findOne({ code });
+
+    if (existingCoupon) {
+      return res.status(400).json({
+        success: false,
+        message: "A coupon with this code already exists",
+      });
+    }
+
     // Create a new coupon document
     const newCoupon = new Coupon({
       code,
@@ -241,7 +250,6 @@ exports.updateCoupon = async (req, res) => {
 
   try {
     const coupon = await Coupon.findById(id);
-    console.log(req.body)
 
     if (!coupon) {
       return res.status(404).json({ message: "Coupon not found" });
@@ -256,7 +264,6 @@ exports.updateCoupon = async (req, res) => {
     coupon.validUntil = validUntil || coupon.validUntil;
     coupon.usageLimit = usageLimit || coupon.usageLimit;
     coupon.isActive = isActive !== undefined ? isActive : coupon.isActive;
-    console.log(coupon)
     await coupon.save();
 
     res
